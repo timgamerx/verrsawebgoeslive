@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd @latest && npm run build",
+  "outputDirectory": "@latest/dist",
+  "installCommand": "cd @latest && npm install",
+  "framework": "vite",
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+}

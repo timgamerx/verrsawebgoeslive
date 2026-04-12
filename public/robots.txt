@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Block internal APIs from crawling
+Disallow: /api/
+
+Sitemap: https://www.verrsa.org/sitemap.xml
