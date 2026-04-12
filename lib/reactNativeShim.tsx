@@ -83,17 +83,17 @@ type ModalProps = {
   [key: string]: any;
 };
 
-function rnStyleToCSS(style: any): React.CSSProperties {
+function rnStyleToCSS(style: any): any {
   if (!style) return {};
   if (Array.isArray(style)) {
-    return style.reduce((acc: React.CSSProperties, s: any) => ({ ...acc, ...rnStyleToCSS(s) }), {});
+    return style.reduce((acc: any, s: any) => ({ ...acc, ...rnStyleToCSS(s) }), {});
   }
-  return style as React.CSSProperties;
+  return style;
 }
 
 export const View: React.FC<ViewProps> = ({ style, horizontal, children, ...rest }) => {
   const css = rnStyleToCSS(style);
-  if (horizontal) css.overflowX = css.overflowX || "auto";
+  if (horizontal) (css as any).overflowX = (css as any).overflowX || "auto";
   return <div style={{ display: "flex", flexDirection: horizontal ? "row" : "column", ...css }} {...rest}>{children}</div>;
 };
 
@@ -140,9 +140,9 @@ export const Image: React.FC<ImageProps> = ({ style, source, resizeMode, ...rest
 export const ScrollView: React.FC<ScrollViewProps> = ({ style, horizontal, contentContainerStyle, showsHorizontalScrollIndicator, showsVerticalScrollIndicator, children, refreshControl, ...rest }) => {
   const css = rnStyleToCSS(style);
   const innerCss = rnStyleToCSS(contentContainerStyle);
-  if (horizontal) css.overflowX = "auto";
-  else css.overflowY = "auto";
-  if (!showsHorizontalScrollIndicator) css.scrollbarWidth = "none" as any;
+  if (horizontal) (css as any).overflowX = "auto";
+  else (css as any).overflowY = "auto";
+  if (!showsHorizontalScrollIndicator) (css as any).scrollbarWidth = "none";
   return (
     <div style={{ display: "flex", flexDirection: horizontal ? "row" : "column", ...css }} {...rest}>
       <div style={{ display: "flex", flexDirection: horizontal ? "row" : "column", ...innerCss }}>{children}</div>
