@@ -7,6 +7,7 @@ import { MdAnalytics } from 'react-icons/md';
 import { FiMessageCircle, FiBookmark } from 'react-icons/fi';
 import MetaTags from '../components/MetaTags';
 import { getPodcasts, toggleLike as apiToggleLike, getUserLikeStatusBatch, toggleBookmark as apiToggleBookmark, getUserBookmarkStatusBatch, trackShare } from '../components/api';
+import { supabase } from '../components/supabase';
 import { useRouter } from 'next/router';
 
 const DUMMY_PODCASTS = [
@@ -117,6 +118,8 @@ const Podcasts = () => {
   const [likedPodcasts, setLikedPodcasts] = useState(new Set());
   const [bookmarkedPodcasts, setBookmarkedPodcasts] = useState(new Set());
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [userAvatar, setUserAvatar] = useState('/avatar.jpg');
   const categoryRefs = useRef({});
 
   const router = useRouter();
@@ -126,8 +129,42 @@ const Podcasts = () => {
     router.push('/create-podcast');
   };
 
+  const navigateToMenu = () => {
+    if (typeof window !== 'undefined') {
+      if ((window as any).__openVerrsaMobileMenu) {
+        (window as any).__openVerrsaMobileMenu();
+        return;
+      }
+      window.location.assign('/menu');
+      return;
+    }
+    router.push('/menu');
+  };
+
   useEffect(() => {
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    const fetchUserAvatar = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', session.user.id)
+        .single();
+      if (data?.avatar_url) setUserAvatar(data.avatar_url);
+    };
+
+    fetchUserAvatar();
   }, []);
 
   const fetchData = async () => {
@@ -238,21 +275,51 @@ const Podcasts = () => {
               objectFit: 'contain',
             }}
           />
-          <button
-            type="button"
-            aria-label="Notifications"
-            style={{
-              border: 'none',
-              background: 'transparent',
-              padding: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-            }}
-          >
-            <IoNotificationsOutline size={22} color="#111" />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <button
+              type="button"
+              aria-label="Notifications"
+              style={{
+                border: 'none',
+                background: 'transparent',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+            >
+              <IoNotificationsOutline size={22} color="#111" />
+            </button>
+            {isMobile && (
+              <button
+                type="button"
+                aria-label="Open menu"
+                onClick={navigateToMenu}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <img
+                  src={userAvatar}
+                  alt="Menu"
+                  onError={(e) => { e.currentTarget.src = '/avatar.jpg'; }}
+                  style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                  }}
+                />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

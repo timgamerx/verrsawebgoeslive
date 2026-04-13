@@ -23,6 +23,7 @@ import CommentModal from '../components/CommentModal';
 import SharePostModal from '../components/SharePostModal.web';
 import MetaTags from '../components/MetaTags';
 import { getAllPosts, toggleLike as apiToggleLike, getUserLikeStatusBatch, toggleBookmark as apiToggleBookmark, getUserBookmarkStatusBatch, trackShare } from '../components/api';
+import { supabase } from '../components/supabase';
 
 
 // Dummy posts data
@@ -133,7 +134,31 @@ function Home() {
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [userAvatar, setUserAvatar] = useState('/avatar.jpg');
   const router = useRouter();
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    const fetchUserAvatar = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', session.user.id)
+        .single();
+      if (data?.avatar_url) setUserAvatar(data.avatar_url);
+    };
+
+    fetchUserAvatar();
+  }, []);
 
   const navigateToWriteArticle = () => {
     router.push('/write-article');
@@ -149,6 +174,18 @@ function Home() {
 
   const navigateToCreateVerse = () => {
     router.push('/create-verse');
+  };
+
+  const navigateToMenu = () => {
+    if (typeof window !== 'undefined') {
+      if ((window as any).__openVerrsaMobileMenu) {
+        (window as any).__openVerrsaMobileMenu();
+        return;
+      }
+      window.location.assign('/menu');
+      return;
+    }
+    router.push('/menu');
   };
 
   const navigateToUserProfile = (userId) => {
@@ -431,9 +468,16 @@ function Home() {
       <div style={styles.stickyHeader}>
         <div style={styles.headerRow}>
           <img src="/verrsa-logo.png" alt="Verrsa" style={styles.headerLogo} />
-          <button type="button" style={styles.headerIconButton} aria-label="Notifications">
-            <IoMdNotificationsOutline size={22} color="#111" />
-          </button>
+          <div style={styles.headerActions}>
+            <button type="button" style={styles.headerIconButton} aria-label="Notifications">
+              <IoMdNotificationsOutline size={22} color="#111" />
+            </button>
+            {isMobile && (
+              <button type="button" style={styles.headerAvatarButton} aria-label="Open menu" onClick={navigateToMenu}>
+                <img src={userAvatar} alt="Menu" style={styles.avatarSmall} onError={(e) => { e.currentTarget.src = '/avatar.jpg'; }} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -616,6 +660,26 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
+  },
+  headerActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  },
+  headerAvatarButton: {
+    border: "none",
+    background: "transparent",
+    padding: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+  },
+  avatarSmall: {
+    width: "30px",
+    height: "30px",
+    borderRadius: "50%",
+    objectFit: "cover",
   },
   scrollContent: {
     paddingLeft: "20px",

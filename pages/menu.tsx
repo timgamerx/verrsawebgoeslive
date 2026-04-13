@@ -35,6 +35,22 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [followSystemTheme, setFollowSystemTheme] = useState(false);
+  const [animateIn, setAnimateIn] = useState(embedded);
+
+  useEffect(() => {
+    if (embedded) {
+      setAnimateIn(true);
+      return;
+    }
+    if (!isOpen) return;
+
+    setAnimateIn(false);
+    const rafId = window.requestAnimationFrame(() => {
+      setAnimateIn(true);
+    });
+
+    return () => window.cancelAnimationFrame(rafId);
+  }, [isOpen, embedded]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -150,7 +166,16 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
   return (
     <>
       {/* Overlay */}
-      {!embedded && <div style={styles.overlay} onClick={safeOnClose} />}
+      {!embedded && (
+        <div
+          style={{
+            ...styles.overlay,
+            opacity: animateIn ? 1 : 0,
+            transition: "opacity 220ms ease",
+          }}
+          onClick={safeOnClose}
+        />
+      )}
 
       {/* Drawer */}
       <div
@@ -166,6 +191,13 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
                 boxShadow: "none",
                 borderLeft: `1px solid ${theme.border}`,
                 zIndex: 1,
+              }
+            : {}),
+          ...(!embedded
+            ? {
+                transform: animateIn ? "translateX(0)" : "translateX(28px)",
+                opacity: animateIn ? 1 : 0,
+                transition: "transform 240ms ease, opacity 220ms ease",
               }
             : {}),
           backgroundColor: theme.background,
