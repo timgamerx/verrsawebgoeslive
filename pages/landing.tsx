@@ -463,7 +463,7 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#dcf6ff",
-    padding: "20px 80px",
+    padding: "20px 40px",
     borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
     position: "sticky",
     top: 0,
