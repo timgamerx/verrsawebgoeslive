@@ -451,7 +451,7 @@ function Reels() {
             {/* Separator */}
             <div style={styles.separator} />
           </div>
-        )))
+        ))
         ) : (
           <div style={styles.loadingContainer}>
         <p style={styles.loadingText}>No videos found</p>
