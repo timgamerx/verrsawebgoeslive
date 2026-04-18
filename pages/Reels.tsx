@@ -329,7 +329,13 @@ function Reels() {
         ...styles.fullscreenContent,
         paddingTop: "0",
       }}>
-        {videos.map((video, index) => (
+        {loading ? (
+          <div style={styles.loadingContainer}>
+            <div style={styles.spinner}></div>
+            <p style={styles.loadingText}>Loading videos...</p>
+          </div>
+        ) : videos.length > 0 ? (
+          videos.map((video, index) => (
           <div 
             key={video.id} 
             style={{
@@ -454,7 +460,7 @@ function Reels() {
         ))
         ) : (
           <div style={styles.loadingContainer}>
-        <p style={styles.loadingText}>No videos found</p>
+            <p style={styles.loadingText}>No videos found</p>
           </div>
         )}
       </div>
