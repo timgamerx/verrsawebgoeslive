@@ -445,7 +445,12 @@ export default function Profile() {
   const renderContent = () => {
     if (activeTab === "Posts") {
       if (loadingPosts) {
-        return <div style={styles.emptyState}><p>Loading posts...</p></div>;
+        return (
+          <div style={styles.emptyState}>
+            <div style={styles.spinner}></div>
+            <p style={styles.loadingText}>Loading posts...</p>
+          </div>
+        );
       }
       if (userPosts.length === 0) {
         return (
@@ -510,7 +515,14 @@ export default function Profile() {
   };
 
   return (
-    <div style={styles.container}>
+    <>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+      <div style={styles.container}>
       {/* Fixed Header */}
       <div style={styles.fixedHeader}>
         <button style={styles.backButton} onClick={() => router.back()}>
@@ -606,6 +618,7 @@ export default function Profile() {
         </div>
       )}
     </div>
+    </>
   );
 }
 
@@ -980,6 +993,20 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     padding: "48px 0",
+  },
+  spinner: {
+    width: "40px",
+    height: "40px",
+    border: "4px solid #f3f3f3",
+    borderTop: "4px solid #00BFFF",
+    borderRadius: "50%",
+    animation: "spin 1s linear infinite",
+    marginBottom: "16px",
+  },
+  loadingText: {
+    fontSize: "16px",
+    color: "#888",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   emptyText: {
     fontSize: "16px",

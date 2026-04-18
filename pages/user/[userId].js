@@ -723,6 +723,12 @@ export default function UserProfile({ initialMeta, initialProfile }) {
 
   return (
     <>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       <Head>
         <title>{initialMeta?.title || 'Creator - Verrsa'}</title>
         <meta name="description" content={initialMeta?.description || 'View this creator profile on Verrsa.'} />
@@ -1360,10 +1366,11 @@ const styles = {
   spinner: {
     width: "40px",
     height: "40px",
-    border: "3px solid #f0f0f0",
-    borderTop: "3px solid #00BFFF",
+    border: "4px solid #f3f3f3",
+    borderTop: "4px solid #00BFFF",
     borderRadius: "50%",
-    animation: "spin 0.8s linear infinite",
+    animation: "spin 1s linear infinite",
+    marginBottom: "16px",
   },
   retryBtn: {
     marginTop: "16px",

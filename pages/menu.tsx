@@ -601,6 +601,7 @@ const styles = {
     textAlign: "left",
     transition: "opacity 0.2s",
     fontFamily: "'Instrument Sans', sans-serif",
+    outline: "none",
   },
   menuText: {
     fontSize: "16px",

@@ -1081,16 +1081,25 @@ export default function Bookmarks() {
       <div
         style={{...(styles.container || {}), ...(styles.centerContent || {}), backgroundColor: theme.background}}
       >
-        <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}><div style={{width: 24, height: 24, borderRadius: "50%", border: "3px solid #00bfff", borderTopColor: "transparent", animation: "spin 1s linear infinite"}} /></div>
-        <span style={{...(styles.loadingText || {}), color: theme.secondaryText}}> 
-          Loading bookmarks...
-        </span>
+        <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "60px 20px"}}>
+          <div style={{width: "40px", height: "40px", border: "4px solid #f3f3f3", borderTop: "4px solid #00BFFF", borderRadius: "50%", animation: "spin 1s linear infinite", marginBottom: "16px"}} />
+          <span style={{fontSize: "16px", color: "#888", fontFamily: "'Instrument Sans', sans-serif"}}> 
+            Loading bookmarks...
+          </span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div
+    <>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+      <div
       style={{...(styles.outerContainer || {}), flexDirection: isDesktop ? "row" : "column",
           backgroundColor: theme.background,}}
     >
@@ -1208,6 +1217,7 @@ export default function Bookmarks() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

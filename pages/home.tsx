@@ -459,6 +459,12 @@ function Home() {
 
   return (
     <>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       <MetaTags
         title="Verrsa - Write, Post, Live, Earn"
         description="Join Verrsa to discover amazing content from creators. Read articles, watch videos, listen to podcasts, and share your own verses with the world."
@@ -524,6 +530,7 @@ function Home() {
         {/* Posts */}
         {loading ? (
           <div style={styles.loadingContainer}>
+            <div style={styles.spinner}></div>
             <p style={styles.loadingText}>Loading posts...</p>
           </div>
         ) : posts.length > 0 ? (
@@ -963,9 +970,19 @@ const styles: Record<string, React.CSSProperties> = {
   },
   loadingContainer: {
     display: "flex",
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     padding: "60px 20px",
+  },
+  spinner: {
+    width: "40px",
+    height: "40px",
+    border: "4px solid #f3f3f3",
+    borderTop: "4px solid #00BFFF",
+    borderRadius: "50%",
+    animation: "spin 1s linear infinite",
+    marginBottom: "16px",
   },
   loadingText: {
     fontSize: "16px",

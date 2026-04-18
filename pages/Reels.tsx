@@ -291,6 +291,12 @@ function Reels() {
 
   return (
     <>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       <MetaTags
         title={currentVideo?.title || "Reels - Verrsa"}
         description={currentVideo?.description || "Watch short videos and reels from creators on Verrsa. Discover entertaining and educational video content."}
@@ -445,7 +451,12 @@ function Reels() {
             {/* Separator */}
             <div style={styles.separator} />
           </div>
-        ))}
+        )))
+        ) : (
+          <div style={styles.loadingContainer}>
+        <p style={styles.loadingText}>No videos found</p>
+          </div>
+        )}
       </div>
 
       {/* Floating Action Button 
@@ -840,6 +851,28 @@ const styles = {
     color: "#fff",
     fontWeight: "300",
     lineHeight: "1",
+  },
+  loadingContainer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "60px 20px",
+    backgroundColor: "#000",
+  },
+  spinner: {
+    width: "40px",
+    height: "40px",
+    border: "4px solid #333",
+    borderTop: "4px solid #00BFFF",
+    borderRadius: "50%",
+    animation: "spin 1s linear infinite",
+    marginBottom: "16px",
+  },
+  loadingText: {
+    fontSize: "16px",
+    color: "#888",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
 };
 

@@ -33,7 +33,7 @@ const POLICY_SECTIONS = [
     items: [
       {
         label: "Reading Engagement",
-        text: "Each user who reads for at least 50% of estimated reading time counts once. Articles must be at least 700 words to qualify.",
+        text: "Each user who reads for at least 50% of estimated reading time counts once. Articles must be at least 500 words to qualify.",
       },
       {
         label: "Listen Engagement",
@@ -45,7 +45,7 @@ const POLICY_SECTIONS = [
       },
       {
         label: "Eligible audience",
-        text: "Only verified or premium users count toward earnings, and each qualifying user is counted once per engagement session.",
+        text: "All users count toward earnings for Basic and Premium creators. Each qualifying user is counted once per engagement session, regardless of verification status.",
       },
     ],
   },
@@ -54,7 +54,7 @@ const POLICY_SECTIONS = [
     items: [
       {
         label: "Articles",
-        text: "Articles need a minimum of 700 words to be eligible for earnings.",
+        text: "Articles need a minimum of 500 words to be eligible for earnings.",
       },
       {
         label: "Videos & Podcasts",
@@ -67,7 +67,7 @@ const POLICY_SECTIONS = [
     items: [
       {
         label: "Frequency",
-        text: "Payouts are issued monthly after each month’s revenue cycle.",
+      text: "Payouts are issued biweekly.",
       },
       {
         label: "Processing",
@@ -78,8 +78,6 @@ const POLICY_SECTIONS = [
         text: "Earnings accumulate until you reach the $10 minimum withdrawal threshold.",
       },
     ],
-    footer:
-      "As Verrsa scales and revenue stabilizes, payout frequency may expand to bi-weekly or weekly.",
   },
   {
     title: "5. Platform fee",
@@ -214,11 +212,7 @@ export default function Monetization() {
                 </div>
               ))} 
 
-              {section.footer ? (
-                <span style={{...(styles.sectionFooter || {}), color: theme.secondaryText}}> 
-                  {section.footer}
-                </span>
-              ) : null}
+
             </div>
           ))}
         </div>  
@@ -360,11 +354,6 @@ const styles: Record<string, React.CSSProperties> = {
   bulletLabel: {
     fontWeight: "600",
   },
-  sectionFooter: {
-    fontSize: fontSize.md2,
-    lineHeight: 24,
-    marginTop: spacing.xs,
-  },
   bottomButtons: {
     paddingTop: spacing.md,
     paddingBottom: spacing.lg,
@@ -404,7 +393,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: fontSize.lg,
     alignSelf: "center",
     fontWeight: "600",
-    fontFamily: "InstrumentSans-Bold",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   desktopDrawer: {
     flex: 0.2,

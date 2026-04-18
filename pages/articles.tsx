@@ -345,6 +345,12 @@ function Articles() {
 
   return (
     <>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       <MetaTags
         title="Articles - Verrsa"
         description="Discover insightful articles from creators on Verrsa. Read about technology, health, business, lifestyle, education, and more."
@@ -407,8 +413,19 @@ function Articles() {
           ))}
         </div>
 
-        {/* Articles */}
-        {articles.map((article) => renderArticle(article))}
+        {/*Articles */}
+        {loading ? (
+          <div style={styles.loadingContainer}>
+            <div style={styles.spinner}></div>
+            <p style={styles.loadingText}>Loading articles...</p>
+          </div>
+        ) : articles.length > 0 ? (
+          articles.map((article) => renderArticle(article))
+        ) : (
+          <div style={styles.emptyContainer}>
+            <p style={styles.emptyText}>No articles found</p>
+          </div>
+        )}
       </div>
 
       {/* FAB Button */}
@@ -708,6 +725,38 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
     zIndex: 999,
+  },
+  loadingContainer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "60px 20px",
+  },
+  spinner: {
+    width: "40px",
+    height: "40px",
+    border: "4px solid #f3f3f3",
+    borderTop: "4px solid #00BFFF",
+    borderRadius: "50%",
+    animation: "spin 1s linear infinite",
+    marginBottom: "16px",
+  },
+  loadingText: {
+    fontSize: "16px",
+    color: "#888",
+    fontFamily: "'Instrument Sans', sans-serif",
+  },
+  emptyContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "60px 20px",
+  },
+  emptyText: {
+    fontSize: "16px",
+    color: "#888",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
 };
 

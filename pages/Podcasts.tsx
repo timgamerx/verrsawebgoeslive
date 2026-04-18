@@ -239,6 +239,12 @@ const Podcasts = () => {
 
   return (
     <>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       <MetaTags
         title="Podcasts - Verrsa"
         description="Listen to engaging podcasts from creators on Verrsa. Discover stories, insights, and conversations about business, lifestyle, technology, and more."
@@ -415,7 +421,13 @@ const Podcasts = () => {
         </div>
 
         {/* Podcasts List */}
-        {filteredPodcasts.map((podcast, index) => (
+        {loading ? (
+          <div style={styles.loadingContainer}>
+            <div style={styles.spinner}></div>
+            <p style={styles.loadingText}>Loading podcasts...</p>
+          </div>
+        ) : filteredPodcasts.length > 0 ? (
+          filteredPodcasts.map((podcast, index) => (
           <div key={podcast.id}>
             <div style={{ marginBottom: '32px' }}>
               {/* Post Header */}
@@ -703,35 +715,14 @@ const Podcasts = () => {
               }} />
             )}
           </div>
-        ))}
-
-        {/* Empty State */}
-        {filteredPodcasts.length === 0 && (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '64px 20px',
-          }}>
-            <IoMic size={48} color="#ccc" />
-            <p style={{
-              fontSize: '18px',
-              fontWeight: '500',
-              color: '#666',
-              marginTop: '16px',
-            }}>
-              {searchTerm ? `No podcasts found for "${searchTerm}"` : 'No podcasts available'}
-            </p>
-            <p style={{
-              fontSize: '15px',
-              color: '#999',
-              marginTop: '8px',
-            }}>
-              {searchTerm ? 'Try a different search term' : 'Check back later for new content'}
-            </p>
+        ))
+        ) : (
+          <div style={styles.loadingContainer}>
+            <p style={styles.loadingText}>No podcasts found</p>
           </div>
         )}
+
+        {/* Empty State - Removed duplicate as we handle it in ternary above */}
       </div>
 
       {/* FAB Button */}
@@ -768,6 +759,27 @@ const styles = {
     fontSize: "32px",
     color: "#fff",
     fontWeight: "300",
+    fontFamily: "'Instrument Sans', sans-serif",
+  },
+  loadingContainer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "60px 20px",
+  },
+  spinner: {
+    width: "40px",
+    height: "40px",
+    border: "4px solid #f3f3f3",
+    borderTop: "4px solid #00BFFF",
+    borderRadius: "50%",
+    animation: "spin 1s linear infinite",
+    marginBottom: "16px",
+  },
+  loadingText: {
+    fontSize: "16px",
+    color: "#888",
     fontFamily: "'Instrument Sans', sans-serif",
   },
 };
