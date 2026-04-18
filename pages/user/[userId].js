@@ -6,7 +6,6 @@ import {
   IoThumbsUpOutline,
   IoThumbsUp,
   IoBookmarkOutline,
-  IoCheckmarkCircle,
   IoMailOutline,
   IoChevronBack,
   IoVolumeMuteOutline,
@@ -33,6 +32,7 @@ import {
 } from "react-icons/fi";
 import { HiDotsHorizontal } from "react-icons/hi";
 import MetaTags from '../../components/MetaTags';
+import VerificationBadge from '../../components/VerificationBadge';
 import { supabase } from '../../components/supabase';
 import { getActiveModerationExclusions } from '../../lib/moderationExclusions';
 
@@ -422,7 +422,7 @@ export default function UserProfile({ initialMeta, initialProfile }) {
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={styles.postUserName}>{userName}</span>
               {(item.profiles?.is_verified || profile?.is_verified) && (
-                <IoCheckmarkCircle size={15} color="#00BFFF" />
+                <VerificationBadge size={15} />
               )}
             </div>
             <span style={styles.postTime}>{formatTime(item.created_at)}</span>
@@ -829,7 +829,7 @@ export default function UserProfile({ initialMeta, initialProfile }) {
           <div style={styles.profileInfo}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <h2 style={styles.name}>{profile?.full_name || "Creator"}</h2>
-              {profile?.is_verified && <IoCheckmarkCircle size={20} color="#00BFFF" />}
+              {profile?.is_verified && <VerificationBadge size={20} />}
             </div>
             <p style={styles.usernameText}>@{profile?.username || "username"}</p>
             <p style={styles.follow}>

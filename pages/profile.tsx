@@ -7,7 +7,6 @@ import {
   IoThumbsUp,
   IoBookmarkOutline,
   IoShareSocialOutline,
-  IoCheckmarkCircle,
   IoWalletOutline,
   IoMailOutline,
   IoChevronBack,
@@ -36,6 +35,7 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 import { supabase } from "../components/supabase";
+import VerificationBadge from "../components/VerificationBadge";
 import { getActiveModerationExclusions } from "../lib/moderationExclusions";
 
 // VideoPost component
@@ -325,7 +325,7 @@ export default function Profile() {
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={styles.postUserName}>{userName}</span>
               {(item.profiles?.is_verified || profile?.is_verified) && (
-                <IoCheckmarkCircle size={16} color="#00BFFF" />
+                <VerificationBadge size={16} />
               )}
             </div>
             <span style={styles.postTime}>{postTime}</span>
@@ -542,7 +542,7 @@ export default function Profile() {
           <div style={styles.profileInfo}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <h2 style={styles.name}>{profile?.full_name || "Your Name"}</h2>
-              {profile?.is_verified && <IoCheckmarkCircle size={20} color="#00BFFF" />}
+              {profile?.is_verified && <VerificationBadge size={20} />}
             </div>
             <p style={styles.username}>@{profile?.username || "username"}</p>
             <p style={styles.follow}>

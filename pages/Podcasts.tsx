@@ -6,6 +6,7 @@ import { HiDotsHorizontal } from 'react-icons/hi';
 import { MdAnalytics } from 'react-icons/md';
 import { FiMessageCircle, FiBookmark } from 'react-icons/fi';
 import MetaTags from '../components/MetaTags';
+import VerificationBadge from '../components/VerificationBadge';
 import { getPodcasts, toggleLike as apiToggleLike, getUserLikeStatusBatch, toggleBookmark as apiToggleBookmark, getUserBookmarkStatusBatch, trackShare } from '../components/api';
 import { supabase } from '../components/supabase';
 import { useRouter } from 'next/router';
@@ -445,9 +446,7 @@ const Podcasts = () => {
                       {podcast.profiles?.full_name || podcast.username || 'Unknown'}
                     </span>
                     {(podcast.profiles?.is_verified || podcast.is_verified) && (
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#00BFFF">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
-                      </svg>
+                      <VerificationBadge size={14} />
                     )}
                     {podcast.is_boosted && (
                       <span style={{

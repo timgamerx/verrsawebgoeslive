@@ -13,11 +13,12 @@ import {
   IoEllipsisHorizontal,
   IoArrowBack,
 } from "react-icons/io5";
-import { MdAnalytics, MdVerified } from "react-icons/md";
+import { MdAnalytics } from "react-icons/md";
 import { useRouter } from 'next/router';
 import CommentModal from '../components/CommentModal';
 import SharePostModal from '../components/SharePostModal.web';
 import MetaTags from '../components/MetaTags';
+import VerificationBadge from '../components/VerificationBadge';
 import { getVideos, getVideoById, toggleLike as apiToggleLike, getUserLikeStatusBatch, trackShare } from '../components/api';
 
 // Dummy video data
@@ -342,7 +343,7 @@ function Reels() {
                   <div style={styles.usernameRow}>
                     <span style={styles.username}>{video.profiles?.full_name || video.user?.full_name || 'Unknown'}</span>
                     {(video.profiles?.is_verified || video.user?.is_verified) && (
-                      <MdVerified size={16} color="#00BFFF" />
+                      <VerificationBadge size={16} />
                     )}
                   </div>
                   <span style={styles.time}>{getTimeAgo(video.created_at)}</span>

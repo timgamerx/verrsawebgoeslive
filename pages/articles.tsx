@@ -16,6 +16,7 @@ import { HiDotsHorizontal } from "react-icons/hi";
 import CommentModal from '../components/CommentModal';
 import SharePostModal from '../components/SharePostModal.web';
 import MetaTags from '../components/MetaTags';
+import VerificationBadge from '../components/VerificationBadge';
 import { getArticles, toggleLike as apiToggleLike, getUserLikeStatusBatch, toggleBookmark as apiToggleBookmark, getUserBookmarkStatusBatch, trackShare } from '../components/api';
 import { supabase } from '../components/supabase';
 import { useRouter } from 'next/router';
@@ -242,7 +243,7 @@ function Articles() {
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={styles.username}>{userName}</span>
               {item.profiles?.is_verified && (
-                <span style={{ color: "#00BFFF", fontSize: "14px" }}>✓</span>
+                <VerificationBadge size={14} />
               )}
               {item.is_boosted && (
                 <span style={styles.promotedBadge}>Promoted</span>

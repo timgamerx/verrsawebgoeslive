@@ -18,9 +18,9 @@ import {
   IoChevronBack,
   IoPhonePortraitOutline,
   IoMoonOutline,
-  IoCheckmarkCircle,
 } from "react-icons/io5";
 import { supabase } from "../components/supabase";
+import VerificationBadge from "../components/VerificationBadge";
 
 export default function Menu({ isOpen = false, onClose, embedded = false }) {
   const router = useRouter();
@@ -220,7 +220,7 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
                   {userName}
                 </h2>
                 {isVerified && (
-                  <IoCheckmarkCircle size={16} color="#00BFFF" />
+                  <VerificationBadge size={16} />
                 )}
               </div>
               <p style={styles.profileSubText}>My Account</p>
@@ -435,7 +435,7 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
                         {account.full_name || account.email.split("@")[0]}
                       </span>
                       {account.is_verified && (
-                        <IoCheckmarkCircle size={14} color="#00BFFF" />
+                        <VerificationBadge size={14} />
                       )}
                     </div>
                     <p style={styles.accountEmail}>{account.email}</p>

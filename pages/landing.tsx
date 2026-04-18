@@ -462,11 +462,12 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.98)",
-    padding: "20px 32px",
+    backgroundColor: "#dcf6ff",
+    padding: "20px 80px",
     borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
     position: "sticky",
     top: 0,
+    marginBottom: 0,
     zIndex: 100,
   },
   logo: {
@@ -475,7 +476,7 @@ const styles: Record<string, React.CSSProperties> = {
     objectFit: "contain",
   },
   signInButton: {
-    backgroundColor: "#0EA5E9",
+     backgroundColor: "#00bfff",
     padding: "12px 24px",
     borderRadius: "8px",
     border: "none",
@@ -486,26 +487,26 @@ const styles: Record<string, React.CSSProperties> = {
   signInButtonText: {
     color: "#fff",
     fontSize: "15px",
-    fontWeight: "400",
+    fontWeight: "500",
     fontFamily: "'Instrument Sans', sans-serif",
   },
   heroSection: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    background: "linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 50%, #E0F2FE 100%)",
+    backgroundColor: "#dcf6ff",
     padding: "80px 20px",
   },
   badge: {
     backgroundColor: "#F0F9FF",
     border: "1px solid #BAE6FD",
     borderRadius: "9999px",
-    padding: "8px 16px",
+    padding: "8px 20px",
     marginBottom: "32px",
     boxShadow: "0 2px 8px rgba(14, 165, 233, 0.1)",
   },
   badgeText: {
-    fontSize: "13px",
+    fontSize: "15px",
     fontWeight: "400",
     color: "#0369A1",
     textAlign: "center",
@@ -529,7 +530,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   heroTitle: {
     fontSize: "64px",
-    fontWeight: "400",
+    fontWeight: "600",
     color: "#0F172A",
     maxWidth: "900px",
     textAlign: "center",
@@ -557,7 +558,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: "16px",
     padding: "20px 32px",
     borderRadius: "12px",
-    background: "linear-gradient(90deg, #0EA5E9 0%, #0284C7 100%)",
+    backgroundColor: "#00bfff",
     border: "none",
     cursor: "pointer",
     boxShadow: "0 8px 24px rgba(14, 165, 233, 0.3)",
@@ -566,7 +567,7 @@ const styles: Record<string, React.CSSProperties> = {
   primaryCtaText: {
     color: "#fff",
     fontSize: "18px",
-    fontWeight: "400",
+    fontWeight: "500",
     letterSpacing: "0.2px",
     fontFamily: "'Instrument Sans', sans-serif",
   },
@@ -589,7 +590,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   statNumber: {
     fontSize: "48px",
-    fontWeight: "500",
+    fontWeight: "600",
     color: "#0EA5E9",
     letterSpacing: "-1px",
     marginBottom: "4px",
@@ -632,7 +633,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   sectionTitle: {
     fontSize: "36px",
-    fontWeight: "400",
+    fontWeight: "600",
     color: "#0F172A",
     marginBottom: "20px",
     letterSpacing: "-1px",
@@ -689,7 +690,7 @@ const styles: Record<string, React.CSSProperties> = {
     margin: 0,
   },
   audienceBold: {
-    fontWeight: "500",
+    fontWeight: "600",
     color: "#0F172A",
   },
   stepsList: {
@@ -724,7 +725,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   stepTitle: {
     fontSize: "18px",
-    fontWeight: "400",
+    fontWeight: "600",
     color: "#0F172A",
     marginBottom: "8px",
     letterSpacing: "-0.3px",
@@ -759,7 +760,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   comparisonPlatformName: {
     fontSize: "15px",
-    fontWeight: "400",
+    fontWeight: "600",
     color: "#1E293B",
     marginBottom: "8px",
     display: "block",
@@ -788,7 +789,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   comparisonVerrsaLabel: {
     fontSize: "14px",
-    fontWeight: "500",
+    fontWeight: "600",
     color: "#0369A1",
     letterSpacing: "0.1px",
   },
@@ -827,7 +828,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   featureTitle: {
     fontSize: "20px",
-    fontWeight: "400",
+    fontWeight: "600",
     color: "#0F172A",
     marginBottom: "12px",
     letterSpacing: "-0.5px",
@@ -863,7 +864,7 @@ const styles: Record<string, React.CSSProperties> = {
   faqQuestionText: {
     flex: 1,
     fontSize: "18px",
-    fontWeight: "400",
+    fontWeight: "600",
     color: "#0F172A",
     lineHeight: "26px",
     margin: 0,

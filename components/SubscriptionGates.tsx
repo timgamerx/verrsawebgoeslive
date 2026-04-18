@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React from "react";
+import SharedVerificationBadge from "./VerificationBadge";
 
 interface FeatureGateProps {
   feature: string;
@@ -32,11 +33,7 @@ interface VerificationBadgeProps {
 }
 
 export const VerificationBadge: React.FC<VerificationBadgeProps> = ({ size = 16, style }) => {
-  return (
-    <span style={{ color: "#00BFFF", fontSize: size, lineHeight: 1, ...style }}>
-      ✔
-    </span>
-  );
+  return <SharedVerificationBadge size={size} style={style} />;
 };
 
 interface PlanIndicatorProps {

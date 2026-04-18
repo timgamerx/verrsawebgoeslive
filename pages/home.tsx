@@ -22,6 +22,7 @@ import { useRouter } from 'next/router';
 import CommentModal from '../components/CommentModal';
 import SharePostModal from '../components/SharePostModal.web';
 import MetaTags from '../components/MetaTags';
+import VerificationBadge from '../components/VerificationBadge';
 import { getAllPosts, toggleLike as apiToggleLike, getUserLikeStatusBatch, toggleBookmark as apiToggleBookmark, getUserBookmarkStatusBatch, trackShare } from '../components/api';
 import { supabase } from '../components/supabase';
 
@@ -302,7 +303,7 @@ function Home() {
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={styles.username}>{userName}</span>
               {item.profiles?.is_verified && (
-                <span style={{ color: "#00BFFF", fontSize: "14px" }}>✓</span>
+                <VerificationBadge size={14} />
               )}
             </div>
             <span style={styles.time}>{postTime}</span>

@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import React, { useState, useEffect } from "react";
 import { spacing, radius, fontSize } from '../lib/theme';
 import { IoArrowBack, IoFlagOutline, IoThumbsUpOutline, IoChatbubbleOutline, IoPlayCircle, IoPauseCircle } from 'react-icons/io5';
-import { MdVerified } from 'react-icons/md';
 import { incrementViewCount, updatePodcastListenTime } from '../components/api';
 import { trackPodcastListen } from '../lib/engagementTracking';
 import {
@@ -12,6 +11,7 @@ import {
 } from '../lib/adImpressionTracking';
 import ReportContentModal from '../components/ReportContentModal';
 import MetaTags from '../components/MetaTags';
+import VerificationBadge from '../components/VerificationBadge';
 import { fetchCurrentUserProfile, UserProfile } from '../lib/profileUtils';
 import { useTheme } from '../context/ThemeProvider';
 import { supabase } from '../components/supabase';
@@ -565,7 +565,7 @@ export default function PodcastPost() {
                     "Unknown User"}
                 </span>
                 {currentPodcast.profiles?.is_verified && (
-                  <MdVerified size={16} color="#00BFFF" style={{ marginLeft: spacing.xs }} />
+                  <VerificationBadge size={16} style={{ marginLeft: spacing.xs }} />
                 )}
               </div>
               <span
