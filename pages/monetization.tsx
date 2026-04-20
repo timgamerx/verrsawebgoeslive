@@ -6,7 +6,8 @@ import { useRouter } from 'next/router';
 import { spacing, radius, fontSize } from '../lib/theme';
 import { supabase } from '../components/supabase';
 import { useTheme } from '../context/ThemeProvider';
-import { TbChevronLeft, TbDots } from 'react-icons/tb'
+import { TbChevronLeft, TbCreditCard } from 'react-icons/tb'
+import Menu from './menu';
 
 const POLICY_SECTIONS = [
   {
@@ -117,8 +118,19 @@ export default function Monetization() {
           style={{...(styles.header || {}), backgroundColor: theme.background,
               borderBottomColor: theme.border,}}
         >
-          <button onClick={() => router.back()}>
-            <TbChevronLeft />
+          <button 
+            onClick={() => router.back()}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <TbChevronLeft size={26} color={theme.icon || "#111"} />
           </button>
           <div style={styles.headerText}>
             <span
@@ -130,26 +142,26 @@ export default function Monetization() {
         </div>
 
         {/* Scrollable Content */}
-        <div style={{overflowY: "auto", flex: 1}}>
-          <span style={{...(styles.title || {}), color: theme.text}}>
+        <div style={{overflowY: "auto", flex: 1, paddingBottom: spacing.lg}}>
+          <p style={{...(styles.title || {}), color: theme.text}}>
             Get paid on Verrsa
-          </span>
-          <span style={{...(styles.subTitle || {}), color: theme.secondaryText}}>
+          </p>
+          <p style={{...(styles.subTitle || {}), color: theme.secondaryText}}>
             You must get verified first with Verrsa Basic or Premium to continue monetization
-          </span>
+          </p>
 
-            <span style={{...(styles.title || {}), color: theme.text}}>
+          <p style={{...(styles.title || {}), color: theme.text}}>
             Earn by posting
-          </span>
-          <span style={{...(styles.subTitle || {}), color: theme.secondaryText}}>
+          </p>
+          <p style={{...(styles.subTitle || {}), color: theme.secondaryText}}>
             Earn from sharing contents like Articles, Podcasts, Videos to the Public
-          </span>
+          </p>
 
           <img
             src={
               isDarkMode
-                ? "/assets/../assets/monetize2.png"
-                : "/assets/../assets/monetize.png"
+                ? "/monetize2.png"
+                : "/monetize.png"
             }
             style={styles.image}
           />
@@ -158,26 +170,26 @@ export default function Monetization() {
             style={{...(styles.noticeCard || {}), backgroundColor: theme.cardBackground,
                 borderColor: theme.border,}}
           >
-            <span style={{...(styles.noticeTitle || {}), color: theme.text}}> 
+            <p style={{...(styles.noticeTitle || {}), color: theme.text}}> 
               Creator payment policy
-            </span>
-            <span style={{...(styles.noticeText || {}), color: theme.secondaryText}}> 
+            </p>
+            <p style={{...(styles.noticeText || {}), color: theme.secondaryText}}> 
               Review eligibility, payout timing, and platform fees before you start
               earning on Verrsa.
-            </span>
+            </p>
           </div>
 
           <div
             style={{...(styles.noticeCard || {}), backgroundColor: theme.cardBackground,
                 borderColor: theme.border,}}
           >
-            <span style={{...(styles.noticeTitle || {}), color: theme.text}}> 
+            <p style={{...(styles.noticeTitle || {}), color: theme.text}}> 
               Monetization access
-            </span>
-            <span style={{...(styles.noticeText || {}), color: theme.secondaryText}}> 
+            </p>
+            <p style={{...(styles.noticeText || {}), color: theme.secondaryText}}> 
               You must be verified or on Verrsa Basic or Premium before participating in
               creator monetization features.
-            </span>
+            </p>
           </div>
 
           {POLICY_SECTIONS.map((section) => (
@@ -186,33 +198,31 @@ export default function Monetization() {
               style={{...(styles.policyCard || {}), backgroundColor: theme.cardBackground,
                   borderColor: theme.border,}}
             >
-              <span style={{...(styles.sectionTitle || {}), color: theme.text}}> 
+              <p style={{...(styles.sectionTitle || {}), color: theme.text}}> 
                 {section.title}
-              </span>
+              </p>
 
               {section.description ? (
-                <span
+                <p
                   style={{...(styles.sectionDescription || {}), color: theme.secondaryText}}
                 >
                   {section.description}
-                </span>
+                </p>
               ) : null}
 
               {section.items.map((item) => (
                 <div key={`${section.title}-${item.label}`} style={styles.bulletRow}>
-                  <span style={{...(styles.bullet || {}), color: theme.text}}>•</span>
-                  <span
+                  <p style={{...(styles.bullet || {}), color: theme.text}}>•</p>
+                  <p
                     style={{...(styles.bulletText || {}), color: theme.secondaryText}}
                   >
-                    <span style={{...(styles.bulletLabel || {}), color: theme.text}}> 
+                    <span style={{...(styles.bulletLabel || {}), color: theme.text, fontWeight: "600"}}> 
                       {item.label}: 
                     </span>
                     {item.text}
-                  </span>
+                  </p>
                 </div>
-              ))} 
-
-
+              ))}
             </div>
           ))}
         </div>  
@@ -227,7 +237,7 @@ export default function Monetization() {
                 borderColor: theme.accent,}}
             onClick={() => router.push("/payment-history")}
           >
-            <TbDots />
+            <TbCreditCard size={20} color={colors?.accent || "#00BFFF"} />
             <span style={{...(styles.historyText || {}), color: theme.accent}}>
               View Payment History
             </span>
@@ -249,6 +259,7 @@ export default function Monetization() {
           style={{...(styles.desktopDrawer || {}), backgroundColor: theme.cardBackground,
               borderLeftColor: theme.border,}}
         >
+          <Menu embedded={true} />
         </div>
       )}
     </div>
@@ -257,34 +268,37 @@ export default function Monetization() {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
+    display: "flex",
     flex: 1,
     backgroundColor: "#fff",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   header: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     paddingLeft: spacing.lg,
     paddingRight: spacing.lg,
     paddingTop: spacing.base,
     paddingBottom: spacing.base,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottom: "1px solid #ddd",
     backgroundColor: "#fff",
     marginTop: 55,
     zIndex: 10,
   },
   headerText: {
     flex: 1,
+    display: "flex",
     alignItems: "center",
-  },
-  scrollContent: {
-    paddingBottom: spacing.lg,
+    justifyContent: "center",
   },
   title: {
     fontSize: fontSize.xl2,
     fontWeight: "400",
     paddingLeft: spacing.lg,
     paddingTop: spacing.md,
+    margin: 0,
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   subTitle: {
     fontSize: fontSize.base,
@@ -293,6 +307,8 @@ const styles: Record<string, React.CSSProperties> = {
     paddingTop: spacing.md,
     color: "#777",
     marginBottom: spacing.lg,
+    margin: "0 0 16px 0",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   image: {
     width: "100%",
@@ -307,16 +323,20 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: spacing.base,
     padding: spacing.base,
     borderRadius: radius.lg,
-    borderWidth: 1,
+    border: "1px solid #ddd",
   },
   noticeTitle: {
     fontSize: fontSize.lg,
     fontWeight: "600",
     marginBottom: spacing.sm,
+    margin: "0 0 8px 0",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   noticeText: {
     fontSize: fontSize.md2,
-    lineHeight: 24,
+    lineHeight: "24px",
+    margin: 0,
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   policyCard: {
     marginLeft: spacing.lg,
@@ -324,80 +344,106 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: spacing.base,
     padding: spacing.base,
     borderRadius: radius.lg,
-    borderWidth: 1,
+    border: "1px solid #ddd",
   },
   sectionTitle: {
     fontSize: fontSize.lg,
     fontWeight: "600",
     marginBottom: spacing.md,
+    margin: "0 0 12px 0",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   sectionDescription: {
     fontSize: fontSize.md2,
-    lineHeight: 24,
+    lineHeight: "24px",
     marginBottom: spacing.md,
+    margin: "0 0 12px 0",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   bulletRow: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: spacing.md,
   },
   bullet: {
     fontSize: fontSize.lg,
-    lineHeight: 24,
+    lineHeight: "24px",
     marginRight: spacing.sm,
+    margin: "0 8px 0 0",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   bulletText: {
     flex: 1,
     fontSize: fontSize.md2,
-    lineHeight: 24,
+    lineHeight: "24px",
+    margin: 0,
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   bulletLabel: {
     fontWeight: "600",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   bottomButtons: {
+    display: "flex",
+    flexDirection: "column",
     paddingTop: spacing.md,
     paddingBottom: spacing.lg,
+    justifyContent: "center",
+    alignItems: "center",
+    maxWidth: "600px",
+    margin: "0 auto",
+    width: "100%",
   },
   historyBtn: {
+    display: "flex",
     backgroundColor: "#f0f9ff",
     paddingLeft: spacing.lg,
     paddingRight: spacing.lg,
     paddingTop: spacing.base,
     paddingBottom: spacing.base,
-    margin: spacing.lg,
     marginBottom: spacing.md,
+    width: "90%",
+    maxWidth: "500px",
     borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: "#00BFFF",
+    border: "1px solid #00BFFF",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: spacing.md,
+    cursor: "pointer",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   historyText: {
     color: "#00BFFF",
     fontSize: fontSize.base,
     fontWeight: "600",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   premiumBtn: {
+    display: "flex",
     backgroundColor: "#00BFFF",
     paddingLeft: spacing.lg,
     paddingRight: spacing.lg,
     paddingTop: spacing.base,
     paddingBottom: spacing.base,
-    margin: spacing.lg,
+    width: "90%",
+    maxWidth: "500px",
     borderRadius: radius.xs,
+    border: "none",
+    cursor: "pointer",
+    justifyContent: "center",
+    alignItems: "center",
   },
   premiumText: {
     color: "#fff",
     fontSize: fontSize.lg,
-    alignSelf: "center",
     fontWeight: "600",
     fontFamily: "'Instrument Sans', sans-serif",
   },
   desktopDrawer: {
     flex: 0.2,
-    borderLeftWidth: 1,
+    borderLeft: "1px solid #ddd",
     overflow: "hidden",
   },
 };

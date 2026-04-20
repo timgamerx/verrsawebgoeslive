@@ -1,7 +1,5 @@
-User-agent: *
+User-Agent: *
 Allow: /
-
-# Block internal APIs from crawling
-Disallow: /api/
+Disallow: /private/
 
 Sitemap: https://www.verrsa.org/sitemap.xml

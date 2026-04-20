@@ -359,14 +359,16 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
                   </p>
                 </div>
               </div>
-              <label style={styles.switch}>
-                <input
-                  type="checkbox"
-                  checked={followSystemTheme}
-                  onChange={(e) => setFollowSystemTheme(e.target.checked)}
-                />
-                <span style={styles.slider}></span>
-              </label>
+              <div 
+                className="switch" 
+                style={styles.switch}
+                onClick={() => setFollowSystemTheme(!followSystemTheme)}
+              >
+                <span 
+                  className={followSystemTheme ? "slider active" : "slider"} 
+                  style={styles.slider}
+                ></span>
+              </div>
             </div>
 
             {/* Manual Dark Mode */}
@@ -378,14 +380,16 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
                     Dark Mode
                   </p>
                 </div>
-                <label style={styles.switch}>
-                  <input
-                    type="checkbox"
-                    checked={isDarkMode}
-                    onChange={(e) => setIsDarkMode(e.target.checked)}
-                  />
-                  <span style={styles.slider}></span>
-                </label>
+                <div 
+                  className="switch" 
+                  style={styles.switch}
+                  onClick={() => setIsDarkMode(!isDarkMode)}
+                >
+                  <span 
+                    className={isDarkMode ? "slider active" : "slider"} 
+                    style={styles.slider}
+                  ></span>
+                </div>
               </div>
             )}
           </div>
@@ -889,7 +893,6 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "#e0e0e0",
     transition: "0.4s",
     borderRadius: "24px",
     ":before": {
@@ -906,14 +909,15 @@ const styles = {
   },
 };
 
-// Hide checkbox
+// Toggle switch styles
 if (typeof document !== "undefined") {
   const styleSheet = document.createElement("style");
   styleSheet.textContent = `
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
+    .switch {
+      cursor: pointer;
+    }
+    .switch span {
+      background-color: #e0e0e0;
     }
     .switch span:before {
       position: absolute;
@@ -925,6 +929,12 @@ if (typeof document !== "undefined") {
       background-color: white;
       transition: 0.4s;
       border-radius: 50%;
+    }
+    .switch span.active {
+      background-color: #00bfff !important;
+    }
+    .switch span.active:before {
+      transform: translateX(20px);
     }
   `;
   document.head.appendChild(styleSheet);

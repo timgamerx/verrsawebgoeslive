@@ -5,11 +5,43 @@ import { IoCheckmarkCircle, IoHelpCircle, IoArrowForward } from "react-icons/io5
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import SEO from '../components/SEO';
+import Image from 'next/image'; 
+
 
 export default function LandingPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Content Creator",
+      text: "Verrsa changed my life. I started earning from day one without needing thousands of followers. The platform truly supports emerging creators.",
+      image: "/pixel4.jpg",
+    },
+    {
+      name: "Michael Chen",
+      role: "Podcast Host",
+      text: "The monetization tools are incredible. I can finally focus on creating great content instead of worrying about reaching arbitrary follower thresholds.",
+      image: "/pixel4.jpg",
+    },
+    {
+      name: "Amara Okafor",
+      role: "Writer & Blogger",
+      text: "As a creator from Nigeria, I love that Verrsa supports local payment methods. Getting paid is seamless and the 80% revenue share is unbeatable.",
+      image: "/pixel9.jpg",
+    },
+  ];
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
 
   const features = [
     {
@@ -135,7 +167,7 @@ export default function LandingPage() {
         image="https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
       />
       <div style={styles.container}>
-      {/* Header */}
+  
       <div style={styles.header}>
         <img
           src="/verrsa-logo.png"
@@ -150,7 +182,7 @@ export default function LandingPage() {
         </button>
       </div>
 
-      {/* Hero Section */}
+
       <div style={styles.heroSection}>
         <div style={styles.badge}>
           <span style={styles.badgeText}>
@@ -197,6 +229,230 @@ export default function LandingPage() {
           </button>
         </div>
       </div>
+
+       {/* Features Section */}
+      <div style={styles.featuresSection}>
+        <div style={styles.sectionBadge}>
+          <span style={styles.sectionBadgeText}>FEATURES</span>
+        </div>
+        <h2 style={styles.sectionTitle}>Everything You Need to Succeed</h2>
+        <div style={styles.featuresScroll}>
+          {features.map((feature, idx) => (
+            <div key={idx} style={styles.featureCard}>
+              <img src={feature.img} alt={feature.title} style={styles.featureImage} />
+              <h3 style={styles.featureTitle}>{feature.title}</h3>
+              <p style={styles.featureDesc}>{feature.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+{/* Verrsa Creators */}
+      <section className="bg-white py-10 mb-4">
+        <h2 className="text-3xl font-extrabold text-center text-black">
+          Top Verrsa Creators
+        </h2>
+        <p className="text-gray-600 p-4 text-center max-w-2xl mx-auto">
+          Here are some of our top creators who are making waves on Verrsa. You
+          can be part of them with just few steps.
+        </p>
+        <div className="container mx-auto mt-8 px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[
+              {
+                name: "Alice Johnson",
+                img: "/pixel4.jpg",
+                field: "Writer & Podcaster",
+              },
+              {
+                name: "Michael Smith",
+                img: "/pixel4.jpg",
+                field: "Video Creator",
+              },
+              {
+                name: "Sofia Lee",
+                img: "/pixel9.jpg",
+                field: "Content Creator",
+              },
+              {
+                name: "David Kim",
+                img: "/pixel4.jpg",
+                field: "Blogger & Vlogger",
+              },
+              {
+                name: "Alice Johnson",
+                img: "/post-your-articles-easily.jpg",
+                field: "Writer & Podcaster",
+              },
+              {
+                name: "Michael Smith",
+                img: "/pixel4.jpg",
+                field: "Video Creator",
+              },
+              {
+                name: "Sofia Lee",
+                img: "/pixel9.jpg",
+                field: "Content Creator",
+              },
+              {
+                name: "David Kim",
+                img: "/pixel4.jpg",
+                field: "Blogger & Vlogger",
+              },
+            ].map((creator, idx) => (
+              <div key={idx} className="bg-blue-50 p-4 rounded-lg text-center">
+                <Image
+                  src={creator.img}
+                  alt={creator.name}
+                  width={250}
+                  height={250}
+                  className="mx-auto mb-4 rounded-lg"
+                />
+                <h3 className="text-xl font-semibold text-black mb-1">
+                  {creator.name}
+                </h3>
+                <p className="text-gray-600">{creator.field}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      <section className="bg-white py-10 mb-4">
+        <h2 className="text-3xl font-semibold tracking-tighter text-center text-black">
+          Trending Contents
+        </h2>
+        <p className="text-gray-600 p-4 text-center max-w-2xl mx-auto">
+          Discover the most popular and engaging content on Verrsa right now.
+          See what&apos;s capturing the attention of our community.
+        </p>
+        <div className="container mx-auto mt-8 px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[
+              {
+                title: "The Future of AI in Content Creation",
+                img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=400&fit=crop",
+                category: "Technology",
+                views: "12.5K",
+              },
+              {
+                title: "10 Tips for Better Podcast Production",
+                img: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=400&h=400&fit=crop",
+                category: "Podcasting",
+                views: "8.3K",
+              },
+              {
+                title: "Mastering Visual Storytelling",
+                img: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&h=400&fit=crop",
+                category: "Video",
+                views: "15.2K",
+              },
+              {
+                title: "Building Your Personal Brand Online",
+                img: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=400&fit=crop",
+                category: "Business",
+                views: "9.8K",
+              },
+              {
+                title: "Creative Writing: From Idea to Story",
+                img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=400&fit=crop",
+                category: "Writing",
+                views: "11.4K",
+              },
+              {
+                title: "Monetization Strategies for Creators",
+                img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=400&fit=crop",
+                category: "Finance",
+                views: "13.7K",
+              },
+              {
+                title: "Photography Tips for Content Creators",
+                img: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&h=400&fit=crop",
+                category: "Photography",
+                views: "7.9K",
+              },
+              {
+                title: "Growing Your Audience in 2025",
+                img: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=400&fit=crop",
+                category: "Marketing",
+                views: "10.6K",
+              },
+            ].map((content, idx) => (
+              <div
+                key={idx}
+                className="bg-blue-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <Image
+                  src={content.img}
+                  alt={content.title}
+                  width={400}
+                  height={250}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <span className="text-xs text-cyan-600 font-medium">
+                    {content.category}
+                  </span>
+                  <h3 className="text-lg font-regular tracking-tighter text-black mt-2 mb-2">
+                    {content.title}
+                  </h3>
+                  <p className="text-gray-500 text-sm">
+                    👁️ {content.views} views
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+       
+        <div className="container mx-auto mt-16 px-4 sm:px-6 lg:px-8">
+          <div className="bg-white p-6 rounded-lg text-center max-w-3xl mx-auto relative">
+            <h1 className="text-3xl font-semibold tracking-tighter text-black mb-28">
+              Trusted by Content Creators
+              <br />
+              <span className="text-gray-500"> across the world</span>
+            </h1>
+
+            {/* Left Arrow */}
+            <button
+              onClick={prevTestimonial}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#00bfff] transition-colors text-3xl"
+              aria-label="Previous testimonial"
+            >
+              ‹
+            </button>
+
+            {/* Right Arrow */}
+            <button
+              onClick={nextTestimonial}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#00bfff] transition-colors text-3xl"
+              aria-label="Next testimonial"
+            >
+              ›
+            </button>
+
+            <Image
+              src={testimonials[currentTestimonial].image}
+              alt={testimonials[currentTestimonial].name}
+              width={300}
+              height={300}
+              className="mx-auto mb-4 rounded-full"
+            />
+            <div className="text-2xl mb-4">⭐ ⭐ ⭐ ⭐ ⭐</div>
+            <p className="text-gray-600 italic mb-4">
+              &quot;{testimonials[currentTestimonial].text}&quot;
+            </p>
+            <h3 className="text-lg font-regular tracking-tighter text-black">
+              - {testimonials[currentTestimonial].name},{" "}
+              {testimonials[currentTestimonial].role}
+            </h3>
+          </div>
+        </div>
+
+       
+      </section>
 
       {/* Stats Section */}
       <div style={styles.statsSection}>
@@ -386,24 +642,49 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
+
+        
       </div>
 
-      {/* Features Section */}
-      <div style={styles.featuresSection}>
-        <div style={styles.sectionBadge}>
-          <span style={styles.sectionBadgeText}>FEATURES</span>
-        </div>
-        <h2 style={styles.sectionTitle}>Everything You Need to Succeed</h2>
-        <div style={styles.featuresScroll}>
-          {features.map((feature, idx) => (
-            <div key={idx} style={styles.featureCard}>
-              <img src={feature.img} alt={feature.title} style={styles.featureImage} />
-              <h3 style={styles.featureTitle}>{feature.title}</h3>
-              <p style={styles.featureDesc}>{feature.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+
+ {/* Sign Up Section */}
+        <section className="relative bg-cyan-700 py-14 mt-15 mb-8 rounded-lg mx-4 md:mx-20 lg:mx-32 overflow-hidden">
+          {/* Decorative corner images inside the bg */}
+          <div className="absolute bottom-0 left-0 w-24 h-24 md:w-32 md:h-40 z-0">
+            <Image
+              src="/pngwing.com.png"
+              alt="decor-left"
+              width={128}
+              height={128}
+              className="object-cover"
+            />
+          </div>
+          <div className="absolute bottom-0 right-0 w-24 h-24 md:w-32 md:h-40 z-0 transform scale-x-[-1]">
+            <Image
+              src="/pngwing.com.png"
+              alt="decor-right"
+              width={128}
+              height={128}
+              className="object-cover"
+            />
+          </div>
+
+          <div className="container relative z-10 mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-semibold tracking-tighter text-white mb-4">
+              Ready to get onboard with us?
+            </h2>
+            <p className="text-white max-w-2xl mx-auto mb-6">
+              Step into a world of possibilities where your creativity, passion,
+              and ideas find the platform they deserve.
+            </p>
+            <button 
+            onClick={() => router.push('/auth')}
+            className="bg-cyan-400 text-white px-6 py-3 rounded-lg hover:bg-cyan-500">
+              Get Started
+            </button>
+          </div>
+        </section>
+
 
       {/* FAQ Section */}
       <div style={styles.faqSection}>
@@ -424,6 +705,7 @@ export default function LandingPage() {
           </div>
         ))}
       </div>
+
 
       {/* Footer */}
       <div style={styles.footer}>
@@ -452,7 +734,7 @@ export default function LandingPage() {
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
+const styles = {
   container: {
     minHeight: "100vh",
     backgroundColor: "#FFFFFF",
@@ -800,7 +1082,8 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: "20px",
   },
   featuresSection: {
-    marginBottom: "80px",
+    marginBottom: "40px",
+     marginTop: "40px",
     padding: "0 40px",
   },
   featuresScroll: {
@@ -845,10 +1128,8 @@ const styles: Record<string, React.CSSProperties> = {
   faqSection: {
     margin: "0 40px 80px",
     padding: "48px",
-    backgroundColor: "#FFFFFF",
-    borderRadius: "24px",
-    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.06)",
-    border: "1px solid rgba(0, 0, 0, 0.04)",
+
+   
   },
   faqItem: {
     marginBottom: "32px",
