@@ -22,7 +22,8 @@ import { getActiveModerationExclusions } from '../lib/moderationExclusions';
 import { TbChevronLeft, TbDotsVertical } from 'react-icons/tb'
 import { FiSearch } from 'react-icons/fi'
 import { MdCheck } from 'react-icons/md'
-import { IoChevronBack } from 'react-icons/io5'
+import { IoChevronBack, IoBookmarkOutline } from 'react-icons/io5'
+import Menu from './menu'
 
 // Article interface from Articles
 interface ArticleItem {
@@ -294,22 +295,10 @@ export default function Bookmarks() {
           }
         });
         setPostEnforcements(map);
-        setVisibleBookmarkedPosts(
-          bookmarkedPosts.filter((p) => {
-            const type = String(p.type || "");
-            const key = `${p.id}_${type}`;
-            const ownerId = String(
-              p.user_id || p.author_id || p.created_by || p.profile?.id || "",
-            );
-
-            if (excludedUserIds.has(ownerId)) return false;
-            if (excludedPostKeys.has(key)) return false;
-            return true;
-          }),
-        );
+        setVisibleBookmarkedPosts(bookmarkedPosts);
       } catch (e) {
         console.warn("Bookmarks: enforcement load failed", e);
-        setVisibleBookmarkedPosts([]);
+        setVisibleBookmarkedPosts(bookmarkedPosts);
       }
     };
 
@@ -359,7 +348,7 @@ export default function Bookmarks() {
   // Handle article navigation like in Articles
   const handleNavigateToArticlePost = async (article: BookmarkedPost) => {
     try {
-      if (article.id) incrementViewCount("posts", article.id);
+      if (article.id) incrementViewCount("articles", article.id);
       router.push(`/article/${article.id}`, { state: { article } });
     } catch (err) {
       console.error("Failed to navigate to article", article.id, err);
@@ -457,7 +446,6 @@ export default function Bookmarks() {
 
   // Format date helper function
   const normalizeTimestamp = (value?: string | null) => {
-  const router = useRouter();
     if (!value) {
       return null;
     }
@@ -1060,9 +1048,9 @@ export default function Bookmarks() {
   // Empty state component
   const EmptyBookmarks = () => (
     <div style={styles.emptyContainer}>
-      <IoChevronBack />
-      <span style={{...(styles.emptyTitle || {}), color: theme.text}}>No Bookmarks Yet</span>
-      <span style={{...(styles.emptyText || {}), color: theme.secondaryText}}> 
+      <IoBookmarkOutline size={64} color={theme.iconSecondary || "#ccc"} />
+      <span style={{...(styles.emptyTitle || {}), color: theme.text, fontFamily: "'Instrument Sans', sans-serif"}}>No Bookmarks Yet</span>
+      <span style={{...(styles.emptyText || {}), color: theme.secondaryText, fontFamily: "'Instrument Sans', sans-serif"}}> 
         Posts you bookmark will appear here for easy access
       </span>
     </div>
@@ -1083,7 +1071,7 @@ export default function Bookmarks() {
       >
         <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "60px 20px"}}>
           <div style={{width: "40px", height: "40px", border: "4px solid #f3f3f3", borderTop: "4px solid #00BFFF", borderRadius: "50%", animation: "spin 1s linear infinite", marginBottom: "16px"}} />
-          <span style={{fontSize: "16px", color: "#888", fontFamily: "'Instrument Sans', sans-serif"}}> 
+          <span style={{fontSize: "16px", color: theme.secondaryText, fontFamily: "'Instrument Sans', sans-serif"}}> 
             Loading bookmarks...
           </span>
         </div>
@@ -1112,22 +1100,22 @@ export default function Bookmarks() {
             style={styles.backButton}
             onClick={() => router.back()}
           >
-            <TbChevronLeft />
+            <TbChevronLeft size={24} color={theme.icon} />
           </button>
-          <span style={{...(styles.headerText || {}), color: theme.text}}>Bookmarks</span>
+          <span style={{...(styles.headerText || {}), color: theme.text, fontFamily: "'Instrument Sans', sans-serif"}}>Bookmarks</span>
           <div style={{ flexDirection: "row", gap: spacing.md }}>
             <button
               onClick={async () => {
                 await refreshBookmarks();
               }}
             >
-              <span style={{...(styles.clearAllText || {}), color: "#00BFFF"}}>
+              <span style={{...(styles.clearAllText || {}), color: "#00BFFF", fontFamily: "'Instrument Sans', sans-serif"}}>
                 Refresh
               </span>
             </button>
             {bookmarkedPosts.length > 0 && (
               <button onClick={handleClearAll}>
-                <span style={{...(styles.clearAllText || {}), color: theme.secondaryText}}> 
+                <span style={{...(styles.clearAllText || {}), color: theme.secondaryText, fontFamily: "'Instrument Sans', sans-serif"}}> 
                   Clear All
                 </span>
               </button>
@@ -1214,6 +1202,7 @@ export default function Bookmarks() {
           style={{...(styles.desktopDrawer || {}), backgroundColor: theme.cardBackground,
               borderLeftColor: theme.border,}}
         >
+          <Menu embedded={true} onClose={() => {}} />
         </div>
       )}
     </div>
@@ -1242,16 +1231,19 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
     textAlign: "center",
     marginRight: spacing.xl, // Balance the back button width
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   clearAllText: {
     fontSize: fontSize.base,
     color: "#FF6347",
     fontWeight: "500",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   loadingText: {
     marginTop: spacing.md,
     fontSize: fontSize.base,
     color: "#666",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   emptyContainer: {
     justifyContent: "center",
@@ -1265,6 +1257,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#333",
     marginTop: spacing.base,
     marginBottom: spacing.sm,
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   emptyText: {
     fontSize: fontSize.base,
@@ -1273,6 +1266,7 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 24,
     paddingLeft: spacing.xl3,
     paddingRight: spacing.xl3,
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   avatar: {
     width: 35,
@@ -1286,9 +1280,9 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: "#fff",
   },
   postHeader: { flexDirection: "row", alignItems: "center", marginBottom: spacing.sm },
-  username: { fontWeight: "400", fontSize: fontSize.lg, marginBottom: spacing.xs },
-  time: { fontSize: fontSize.md, color: "#888" },
-  postTitle: { fontSize: fontSize.lg, fontWeight: "400", marginBottom: spacing.sm },
+  username: { fontWeight: "400", fontSize: fontSize.lg, marginBottom: spacing.xs, fontFamily: "'Instrument Sans', sans-serif" },
+  time: { fontSize: fontSize.md, color: "#888", fontFamily: "'Instrument Sans', sans-serif" },
+  postTitle: { fontSize: fontSize.lg, fontWeight: "400", marginBottom: spacing.sm, fontFamily: "'Instrument Sans', sans-serif" },
   postText: {
     flex: 1,
     fontSize: fontSize.base,
@@ -1296,6 +1290,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#555",
     lineHeight: 24,
     marginLeft: -8,
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   thumbnail: {
     width: "100%",
@@ -1337,7 +1332,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: radius.lg,
     padding: spacing.xs,
   },
-  dateText: { fontSize: fontSize.md, color: "#555", marginLeft: spacing.sm, marginRight: 90 },
+  dateText: { fontSize: fontSize.md, color: "#555", marginLeft: spacing.sm, marginRight: 90, fontFamily: "'Instrument Sans', sans-serif" },
   readMoreCircle: {
     width: 25,
     height: 25,
@@ -1428,6 +1423,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: spacing.sm,
     color: "#999",
     fontSize: fontSize.md,
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   videoDescription: {
     marginTop: spacing.sm,
@@ -1437,7 +1433,7 @@ const styles: Record<string, React.CSSProperties> = {
   videoDescriptionText: {
     fontSize: fontSize.md2,
     color: "#555",
-    fontFamily: fontFamily.regular,
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   textContainer: {
     flex: 1,
@@ -1456,6 +1452,7 @@ const styles: Record<string, React.CSSProperties> = {
   communityStatText: {
     fontSize: fontSize.sm,
     color: "#666",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   verseContainer: {
     paddingTop: spacing.sm,
@@ -1466,6 +1463,7 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 24,
     marginBottom: spacing.md,
     color: "#555",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   verseImage: {
     width: "100%",
@@ -1483,6 +1481,7 @@ const styles: Record<string, React.CSSProperties> = {
     paddingBottom: spacing.px,
     borderRadius: radius.md,
     fontWeight: "500",
+    fontFamily: "'Instrument Sans', sans-serif",
   },
   outerContainer: {
     flex: 1,

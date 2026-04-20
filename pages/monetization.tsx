@@ -259,7 +259,7 @@ export default function Monetization() {
           style={{...(styles.desktopDrawer || {}), backgroundColor: theme.cardBackground,
               borderLeftColor: theme.border,}}
         >
-          <Menu embedded={true} />
+          <Menu embedded={true} onClose={() => {}} />
         </div>
       )}
     </div>
