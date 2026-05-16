@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { sendEmail as sendSecureEmail } from "./securePaymentApi";
 
-// SendGrid Email Service Configuration
+// Resend Email Service Configuration
 // API key is handled server-side
-const SENDGRID_API_URL = "https://api.sendgrid.com/v3/mail/send";
+const RESEND_API_URL = "https://api.sendgrid.com/v3/mail/send";
 
 export interface EmailTemplate {
   to: string;
@@ -925,12 +925,12 @@ export const emailTemplates = {
   }),
 };
 
-// SendGrid Email Service
-class SendGridEmailService {
+// Resend Email Service
+class ResendEmailService {
   private apiUrl: string;
 
   constructor() {
-    this.apiUrl = SENDGRID_API_URL;
+    this.apiUrl = RESEND_API_URL;
   }
 
   async sendEmail(
@@ -990,7 +990,7 @@ class SendGridEmailService {
 }
 
 // Export singleton instance
-export const emailService = new SendGridEmailService();
+export const emailService = new ResendEmailService();
 
 // Export utility functions
 export const sendPasswordResetNotifications = async (

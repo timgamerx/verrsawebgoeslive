@@ -152,7 +152,15 @@ export default function LandingPage() {
         body: JSON.stringify({ email }),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        console.error('Unexpected response body:', text);
+        throw new Error('Unexpected server response. Please try again.');
+      }
 
       if (!res.ok) {
         setError(data.error || "Failed to subscribe. Please try again.");
