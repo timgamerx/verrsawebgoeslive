@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from "react";
 import { IoCheckmarkCircle, IoHelpCircle, IoArrowForward } from "react-icons/io5";
 import Link from 'next/link';
@@ -12,6 +10,9 @@ export default function LandingPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   const testimonials = [
@@ -132,27 +133,47 @@ export default function LandingPage() {
     },
   ];
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault() as void;
+    
     if (!email) {
-      alert("Please enter your email address");
+      setError("Please enter your email address");
       return;
     }
 
+    setLoading(true);
+    setError("");
+    setSuccessMessage("");
+
     try {
-      const res = await fetch("https://www.verrsa.org/api/waitlist", {
+      const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
 
       const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to subscribe. Please try again.");
+        return;
+      }
+
       setSubmitted(true);
-      alert("Thank you for subscribing!");
+      setSuccessMessage(data.message || "Thank you for subscribing!");
       setEmail("");
+      
+      // Reset form after 5 seconds
+      setTimeout(() => {
+        setSubmitted(false);
+        setSuccessMessage("");
+        setEmail("");
+      }, 5000);
     } catch (error) {
       console.error("Newsletter subscription error:", error);
-      alert("Failed to subscribe. Please try again.");
+      setError("Failed to subscribe. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -165,6 +186,9 @@ export default function LandingPage() {
         url="https://verrsa.org"
         type="website"
         image="https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
+        publishedTime={new Date().toISOString()}
+        modifiedTime={new Date().toISOString()}
+        structuredData={{}}
       />
       <div style={styles.container}>
   
@@ -174,7 +198,7 @@ export default function LandingPage() {
           alt="Verrsa"
           style={styles.logo}
           onError={(e) => {
-            e.target.style.display = "none";
+            (e.target as HTMLImageElement).style.display = "none";
           }}
         />
         <button style={styles.signInButton} onClick={() => router.push('/auth')}>
@@ -670,10 +694,10 @@ export default function LandingPage() {
           </div>
 
           <div className="container relative z-10 mx-auto text-center px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-semibold tracking-tighter text-white mb-4">
+            <h2 className="text-3xl font-semibold tracking-tighter text-white mb-1">
               Ready to get onboard with us?
             </h2>
-            <p className="text-white max-w-2xl mx-auto mb-6">
+            <p className="text-gray-200 max-w-2xl mx-auto mb-6">
               Step into a world of possibilities where your creativity, passion,
               and ideas find the platform they deserve.
             </p>
@@ -682,6 +706,43 @@ export default function LandingPage() {
             className="bg-cyan-400 text-white px-6 py-3 rounded-lg hover:bg-cyan-500">
               Get Started
             </button>
+          </div>
+
+
+          {/* Newsletter Section */}
+          <div style={styles.newsletterSection}>
+            <h3 style={styles.newsletterTitle}>Stay Ahead with Verrsa</h3>
+            <p style={styles.newsletterSubtitle}>
+              Join our newsletter for creator tips, platform updates, and insights
+              on writing, podcasting, video, and community growth.
+            </p>
+
+            <form style={styles.newsletterForm} onSubmit={handleSubmit}>
+              {error && <div style={styles.errorMessage}>{error}</div>}
+              {successMessage && <div style={styles.successMessage}>{successMessage}</div>}
+              
+              <input
+                type="email"
+                style={styles.emailInput}
+                placeholder="Enter your email..."
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={submitted || loading}
+                required
+              />
+              <button
+                type="submit"
+                style={{
+                  ...styles.subscribeButton,
+                  ...(submitted && styles.subscribeButtonDisabled),
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                }}
+                disabled={submitted || loading}
+              >
+                {loading ? "Subscribing..." : submitted ? "Thank you!" : "Subscribe"}
+              </button>
+            </form>
           </div>
         </section>
 
@@ -747,16 +808,16 @@ const styles = {
     backgroundColor: "#dcf6ff",
     padding: "20px 40px",
     borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
-    position: "sticky",
+    position: "sticky" as const,
     top: 0,
     marginBottom: 0,
     zIndex: 100,
-  },
+  } as React.CSSProperties,
   logo: {
     width: "100px",
     height: "35px",
-    objectFit: "contain",
-  },
+    objectFit: "contain" as const,
+  } as React.CSSProperties,
   signInButton: {
      backgroundColor: "#00bfff",
     padding: "12px 24px",
@@ -774,11 +835,11 @@ const styles = {
   },
   heroSection: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     alignItems: "center",
     backgroundColor: "#dcf6ff",
     padding: "80px 20px",
-  },
+  } as React.CSSProperties,
   badge: {
     backgroundColor: "#F0F9FF",
     border: "1px solid #BAE6FD",
@@ -791,9 +852,9 @@ const styles = {
     fontSize: "15px",
     fontWeight: "400",
     color: "#0369A1",
-    textAlign: "center",
+    textAlign: "center" as const,
     letterSpacing: "0.1px",
-  },
+  } as React.CSSProperties,
   appStoreBadges: {
     display: "flex",
     gap: "16px",
@@ -815,20 +876,20 @@ const styles = {
     fontWeight: "600",
     color: "#0F172A",
     maxWidth: "900px",
-    textAlign: "center",
+    textAlign: "center" as const,
     marginBottom: "20px",
     letterSpacing: "-1.5px",
     lineHeight: "72px",
-  },
+  } as React.CSSProperties,
   heroSubtitle: {
     fontSize: "20px",
     fontWeight: "300",
     color: "#475569",
-    textAlign: "center",
+    textAlign: "center" as const,
     maxWidth: "750px",
     lineHeight: "32px",
     marginBottom: "48px",
-  },
+  } as React.CSSProperties,
   ctaContainer: {
     display: "flex",
     gap: "16px",
@@ -866,10 +927,10 @@ const styles = {
   },
   statItem: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     alignItems: "center",
     flex: 1,
-  },
+  } as React.CSSProperties,
   statNumber: {
     fontSize: "48px",
     fontWeight: "600",
@@ -881,8 +942,8 @@ const styles = {
     fontSize: "13px",
     fontWeight: "400",
     color: "#64748B",
-    textAlign: "center",
-  },
+    textAlign: "center" as const,
+  } as React.CSSProperties,
   statDivider: {
     width: "1px",
     height: "40px",
@@ -902,11 +963,11 @@ const styles = {
     padding: "8px 16px",
     borderRadius: "20px",
     border: "1px solid #BAE6FD",
-    textAlign: "center",
+    textAlign: "center" as const,
     width: "fit-content",
     display: "flex",
     justifyContent: "center",
-  },
+  } as React.CSSProperties,
   sectionBadgeText: {
     fontSize: "11px",
     fontWeight: "400",
@@ -919,32 +980,32 @@ const styles = {
     color: "#0F172A",
     marginBottom: "20px",
     letterSpacing: "-1px",
-    textAlign: "center",
-  },
+    textAlign: "center" as const,
+  } as React.CSSProperties,
   sectionSubtext: {
     fontSize: "15px",
     color: "#64748B",
-    textAlign: "center",
+    textAlign: "center" as const,
     marginBottom: "32px",
     lineHeight: "26px",
     maxWidth: "600px",
     margin: "0 auto 32px",
-  },
+  } as React.CSSProperties,
   sectionText: {
     fontSize: "15px",
     color: "#475569",
     lineHeight: "28px",
     marginBottom: "16px",
-    textAlign: "center",
+    textAlign: "center" as const,
     maxWidth: "700px",
     margin: "0 auto 16px",
-  },
+  } as React.CSSProperties,
   audienceList: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     gap: "20px",
     marginTop: "8px",
-  },
+  } as React.CSSProperties,
   audienceItem: {
     display: "flex",
     alignItems: "flex-start",
@@ -977,10 +1038,10 @@ const styles = {
   },
   stepsList: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     gap: "24px",
     marginTop: "8px",
-  },
+  } as React.CSSProperties,
   stepItem: {
     display: "flex",
     alignItems: "flex-start",
@@ -1012,7 +1073,7 @@ const styles = {
     marginBottom: "8px",
     letterSpacing: "-0.3px",
     margin: "0 0 8px 0",
-  },
+  } as React.CSSProperties,
   stepDesc: {
     fontSize: "15px",
     color: "#64748B",
@@ -1021,10 +1082,10 @@ const styles = {
   },
   comparisonTable: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     gap: "20px",
     marginTop: "8px",
-  },
+  } as React.CSSProperties,
   comparisonRow: {
     display: "flex",
     alignItems: "center",
@@ -1038,8 +1099,8 @@ const styles = {
   comparisonPlatform: {
     flex: 1,
     display: "flex",
-    flexDirection: "column",
-  },
+    flexDirection: "column" as const,
+  } as React.CSSProperties,
   comparisonPlatformName: {
     fontSize: "15px",
     fontWeight: "600",
@@ -1060,8 +1121,8 @@ const styles = {
   comparisonVerrsa: {
     flex: 1,
     display: "flex",
-    flexDirection: "column",
-  },
+    flexDirection: "column" as const,
+  } as React.CSSProperties,
   comparisonVerrsaBadge: {
     padding: "4px 12px",
     borderRadius: "12px",
@@ -1089,11 +1150,11 @@ const styles = {
   featuresScroll: {
     display: "flex",
     gap: "24px",
-    overflowX: "auto",
+    overflowX: "auto" as const,
     padding: "8px 0 16px",
-    scrollbarWidth: "none",
-    msOverflowStyle: "none",
-  },
+    scrollbarWidth: "none" as const,
+    msOverflowStyle: "none" as const,
+  } as React.CSSProperties,
   featureCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: "20px",
@@ -1106,9 +1167,9 @@ const styles = {
   featureImage: {
     width: "100%",
     height: "180px",
-    objectFit: "cover",
+    objectFit: "cover" as const,
     backgroundColor: "#F1F5F9",
-  },
+  } as React.CSSProperties,
   featureTitle: {
     fontSize: "20px",
     fontWeight: "600",
@@ -1117,7 +1178,7 @@ const styles = {
     letterSpacing: "-0.5px",
     padding: "20px 20px 0",
     margin: "0 0 12px 0",
-  },
+  } as React.CSSProperties,
   featureDesc: {
     fontSize: "14px",
     color: "#64748B",
@@ -1141,7 +1202,7 @@ const styles = {
     alignItems: "flex-start",
     gap: "16px",
     marginBottom: "16px",
-  },
+  } as React.CSSProperties,
   faqQuestionText: {
     flex: 1,
     fontSize: "18px",
@@ -1149,7 +1210,7 @@ const styles = {
     color: "#0F172A",
     lineHeight: "26px",
     margin: 0,
-  },
+  } as React.CSSProperties,
   faqAnswer: {
     fontSize: "15px",
     color: "#64748B",
@@ -1165,11 +1226,11 @@ const styles = {
   },
   footerLinks: {
     display: "flex",
-    flexWrap: "wrap",
+    flexWrap: "wrap" as const,
     justifyContent: "center",
     gap: "32px",
     marginBottom: "24px",
-  },
+  } as React.CSSProperties,
   footerLink: {
     fontSize: "14px",
     color: "#475569",
@@ -1179,7 +1240,83 @@ const styles = {
   copyright: {
     fontSize: "13px",
     color: "#94A3B8",
+    textAlign: "center" as const,
+    margin: 0,
+  } as React.CSSProperties,
+  newsletterSection: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "20px",
+    padding: "40px 20px",
     textAlign: "center",
+  } as React.CSSProperties,
+  newsletterTitle: {
+    fontSize: "24px",
+    fontWeight: "600",
+    color: "#fff",
+    margin: "40px 0 -20px 0",
+    letterSpacing: "-0.5px",
+  },
+  newsletterSubtitle: {
+    fontSize: "15px",
+    color: "#edf2f7",
+    lineHeight: "24px",
+    maxWidth: "500px",
     margin: 0,
   },
+  newsletterForm: {
+    display: "flex",
+    gap: "12px",
+    flexDirection: "column",
+    width: "100%",
+    maxWidth: "500px",
+  } as React.CSSProperties,
+  emailInput: {
+    padding: "12px 16px",
+    borderRadius: "8px",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    fontSize: "14px",
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    color: "#1F2937",
+    fontFamily: "'Instrument Sans', sans-serif",
+    width: "100%",
+    boxSizing: "border-box",
+  } as React.CSSProperties,
+  subscribeButton: {
+    padding: "12px 24px",
+    borderRadius: "8px",
+    backgroundColor: "#22D3EE",
+    border: "none",
+    fontSize: "14px",
+    fontWeight: "500",
+    color: "#fff",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    fontFamily: "'Instrument Sans', sans-serif",
+  } as React.CSSProperties,
+  subscribeButtonDisabled: {
+    opacity: 0.5,
+    cursor: "not-allowed",
+  },
+  errorMessage: {
+    padding: "12px 16px",
+    backgroundColor: "#FEE2E2",
+    border: "1px solid #FECACA",
+    borderRadius: "8px",
+    color: "#991B1B",
+    fontSize: "14px",
+    width: "100%",
+    boxSizing: "border-box",
+  } as React.CSSProperties,
+  successMessage: {
+    padding: "12px 16px",
+    backgroundColor: "#DCFCE7",
+    border: "1px solid #BBEF63",
+    borderRadius: "8px",
+    color: "#15803D",
+    fontSize: "14px",
+    width: "100%",
+    boxSizing: "border-box",
+  } as React.CSSProperties,
 };
