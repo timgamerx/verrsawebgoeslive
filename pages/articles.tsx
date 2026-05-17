@@ -268,7 +268,8 @@ function Articles() {
 
         {/* Article Content */}
         <div style={{ cursor: "pointer" }}
-        onClick={() => router.push(`/article/${item.id}`, { state: { article: item } })}
+        // onClick={() => router.push(`/article/${item.id}`, { state: { article: item } })}
+         onClick={() => router.push(`/articlepost?id=${item.id}`)}
         >
           <div style={styles.rowContent}>
               <p style={styles.postText}>{displayContent}</p>

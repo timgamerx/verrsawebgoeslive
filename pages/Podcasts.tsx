@@ -525,7 +525,8 @@ const Podcasts = () => {
                 marginBottom: '16px',
                 cursor: 'pointer',
               }}
-            onClick={() => router.push(`/podcast/${podcast.id}`, { state: { podcast } })}
+             // onClick={() => router.push(`/podcast/${podcast.id}`, { state: { podcast } })}
+             onClick={() => router.push(`/podcastpost?id=${item.id}`)}
               
               >
                 <img

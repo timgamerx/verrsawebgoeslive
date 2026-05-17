@@ -5,6 +5,10 @@ import { spacing, radius, fontSize } from '../lib/theme';
 import { IoArrowBack, IoFlagOutline, IoThumbsUpOutline, IoChatbubbleOutline, IoPlayCircle, IoPauseCircle } from 'react-icons/io5';
 import { incrementViewCount, updatePodcastListenTime } from '../components/api';
 import { trackPodcastListen } from '../lib/engagementTracking';
+import { 
+IoShareSocialOutline,
+
+} from "react-icons/io5";
 import {
   trackAdImpression,
   checkAdAvailability,
@@ -541,6 +545,25 @@ export default function PodcastPost() {
     }
   };
 
+  const handleShare = async () => {
+    try {
+      const podcastUrl = `https://verrsa.org/podcast/${currentPodcast?.id}`;
+      if (navigator.share) {
+        await navigator.share({
+          title: currentPodcast?.title,
+          text: currentPodcast?.title,
+          url: podcastUrl,
+        });
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(podcastUrl);
+        alert("Link copied to clipboard");
+      }
+    } catch (e) {
+      console.error("Share failed:", e);
+    }
+  };
+
   if (!currentPodcast) {
     return (
       <div style={{...styles.container, backgroundColor: theme.background}}>
@@ -571,6 +594,8 @@ export default function PodcastPost() {
           />
         )}
 
+      
+
         {/* Header positioned on top of cover image */}
         <div style={styles.header}>
           <button
@@ -580,12 +605,33 @@ export default function PodcastPost() {
             <IoArrowBack size={24} color="#fff" />
           </button>
           <span style={styles.headerTitle}>Podcast</span>
-          <button
-            style={styles.moreButton}
-            onClick={() => setShowReportModal(true)}
-          >
-            <IoFlagOutline size={20} color="#fff" />
-          </button>
+
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
+           {/* share icon here */}
+                <button
+                  onClick={handleShare}
+                     
+                     style={{
+                       background: "none",
+                       border: "none",
+                       cursor: "pointer",
+                       padding: spacing.md,
+                       color: theme.icon,
+                       fontSize: fontSize.base,
+                     
+                     
+                     }}
+                   >
+                <IoShareSocialOutline size={22} color="#fff" />
+              </button>
+            {/* report icon here */}
+            <button
+              style={styles.moreButton}
+              onClick={() => setShowReportModal(true)}
+            >
+              <IoFlagOutline size={20} color="#fff" />
+            </button>
+          </div>
         </div>
 
         {/* Podcast Info */}

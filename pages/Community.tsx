@@ -82,6 +82,10 @@ function Community() {
     });
   };
 
+   const navigateToCommunityProfile = () => {
+    router.push('/community-profile');
+  };
+
   const toggleJoin = (communityId, isPrivate) => {
     if (isPrivate) return;
     setJoinedCommunities((prev) => {
@@ -226,7 +230,9 @@ function Community() {
                   />
                   <div>
                     <h3 style={styles.communityName}>{community.name}</h3>
-                    <p style={styles.description}>
+                    <p style={styles.description}
+                    onClick={() => router.push(`/community/${community.id}`)}
+                    >
                       {community.description.slice(0, 50)}
                       {community.description.length > 50 ? "..." : ""}
                     </p>
