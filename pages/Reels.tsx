@@ -168,7 +168,7 @@ function Reels() {
         
         // Update URL without navigation
         if (videos[index]) {
-          window.history.replaceState(null, '', `/reel/${videos[index].id}`);
+          window.history.replaceState(null, '', `/Reels?id=${videos[index].id}`);
         }
       }
 

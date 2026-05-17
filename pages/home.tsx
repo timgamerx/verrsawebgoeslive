@@ -169,7 +169,7 @@ function Home() {
   };
 
     const navigateToReels = () => {
-    router.push('/reels');
+    router.push('/Reels');
   };
 
   const navigateToWriteArticle = () => {
@@ -355,7 +355,7 @@ function Home() {
           <div style={styles.fullWidthVideoWrapper}>
             <div style={{ cursor: "pointer", position: "relative" }}>
               <div style={styles.videoWrapper}
-               onClick ={() => router.push(`/reel/${item.id}`, { state: { video: item } })}
+               onClick ={() => router.push(`/Reels?id=${item.id}`)}
               >
                 {videoThumbnail && (
                   <img src={videoThumbnail} alt="Video" style={styles.videoPlayer} 
@@ -454,7 +454,7 @@ function Home() {
           )}
           {item.type === "video" && (
             <div style={{ ...styles.readMoreCircle, borderColor: "#FF6347" }}
-              onClick={() => router.push(`/reel/${item.id}`, { state: { video: item } })}>
+              onClick={() => router.push(`/Reels?id=${item.id}`)}>
               <IoPlayCircle size={14} color="#FF6347" />
             </div>
           )}
