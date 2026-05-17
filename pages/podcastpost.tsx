@@ -79,6 +79,58 @@ export default function PodcastPost() {
     initialPodcast || null,
   );
 
+  // If navigation didn't pass the full podcast object, try to recover it from
+  // the query (possibly JSON-stringified) or fetch it by id from Supabase.
+  useEffect(() => {
+    const initFromQueryOrFetch = async () => {
+      if (currentPodcast) return;
+
+      const q: any = router.query || {};
+
+      // 1) Try to parse a serialized podcast object passed in the query
+      if (q?.podcast) {
+        try {
+          const parsed = typeof q.podcast === 'string' ? JSON.parse(q.podcast) : q.podcast;
+          if (parsed && parsed.id) {
+            setCurrentPodcast(parsed);
+            return;
+          }
+        } catch (e) {
+          // ignore parse errors and fallthrough to id-based fetch
+        }
+      }
+
+      // 2) Fallback: check for an id or podcastId in the query and fetch it
+      const rawId = q?.id || q?.podcastId || q?.postId;
+      if (!rawId) return;
+      const id = Array.isArray(rawId) ? rawId[0] : rawId;
+
+      try {
+        const { data, error } = await supabase
+          .from('posts')
+          .select(`*, profiles:user_id (full_name, username, avatar_url, is_verified, bio)`)
+          .eq('id', id)
+          .eq('post_type', 'podcast')
+          .maybeSingle();
+
+        if (error) {
+          console.warn('Failed to fetch podcast by id:', error);
+          return;
+        }
+        if (!data) return;
+
+        // Normalize profiles field
+        const profiles = Array.isArray(data.profiles) ? data.profiles[0] : data.profiles;
+        setCurrentPodcast({ ...data, profiles });
+      } catch (err) {
+        console.error('Error fetching podcast by id:', err);
+      }
+    };
+
+    if (router.isReady) initFromQueryOrFetch();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, router.query]);
+
   // Use TrackPlayer hooks only on native platforms
   const playbackState =
     false ? usePlaybackState() : { state: null };
@@ -873,6 +925,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    marginTop: 20,
   },
   username: {
     fontSize: fontSize.base,

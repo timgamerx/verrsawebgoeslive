@@ -513,7 +513,6 @@ const ArticlePost: React.FC<any> = ({ initialMeta }) => {
 
 {/*share icon here  */}
 
-
         <button
           onClick={() => {
             setShowShareModal(true);

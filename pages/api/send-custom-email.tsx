@@ -25,13 +25,13 @@ const INVITE_HTML = `
   </div>
 `;
 
-async function sendViaSendGrid(
+async function sendViaResend(
   toEmails: string[],
   subject: string,
   html: string,
   apiKey: string,
 ): Promise<{ ok: boolean; status: number }> {
-  const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+  const response = await fetch('https://api.resend.com/mail/send', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -55,8 +55,8 @@ export default async function handler(req: any, res: any) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-  if (!SENDGRID_API_KEY) {
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+  if (!RESEND_API_KEY) {
     return res.status(500).json({ error: 'Email service not configured' });
   }
 
@@ -70,11 +70,11 @@ export default async function handler(req: any, res: any) {
   // ── Team invite mode ──
   if (mode === 'invite') {
     try {
-      const result = await sendViaSendGrid(
+      const result = await sendViaResend(
         INVITE_RECIPIENTS,
         'Call for Team Members: Verrsa',
         INVITE_HTML,
-        SENDGRID_API_KEY,
+        RESEND_API_KEY,
       );
       if (!result.ok) {
         return res.status(result.status).json({ success: false, error: 'Failed to send invites' });
@@ -118,7 +118,7 @@ export default async function handler(req: any, res: any) {
     // Send one by one to personalise (avoids recipients seeing each other)
     await Promise.all(
       emails.map((email: string) =>
-        sendViaSendGrid([email], subject.trim(), html, SENDGRID_API_KEY),
+        sendViaResend([email], subject.trim(), html, RESEND_API_KEY),
       ),
     );
     return res.status(200).json({

@@ -25,6 +25,9 @@ import MetaTags from '../components/MetaTags';
 import VerificationBadge from '../components/VerificationBadge';
 import { getAllPosts, toggleLike as apiToggleLike, getUserLikeStatusBatch, toggleBookmark as apiToggleBookmark, getUserBookmarkStatusBatch, trackShare } from '../components/api';
 import { supabase } from '../components/supabase';
+import PodcastPost from "./podcastpost";
+import { stat } from "fs";
+import Link from 'next/link'
 
 
 // Dummy posts data
@@ -160,6 +163,14 @@ function Home() {
 
     fetchUserAvatar();
   }, []);
+
+   const navigateToPodcastPost = () => {
+    router.push('/podcastpost');
+  };
+
+    const navigateToReels = () => {
+    router.push('/reels');
+  };
 
   const navigateToWriteArticle = () => {
     router.push('/write-article');
@@ -325,15 +336,18 @@ function Home() {
 
         {/* Article Content */}
         {item.type === "article" && (
-          <div style={{ cursor: "pointer" }} onClick={() => router.push(`/article/${item.id}`, { state: { article: item } })}>
-            <div style={styles.rowContent}>
-              <p style={styles.postText}>{displayContent}</p>
-              {postImage && (
-                <img src={postImage} alt="Post" style={styles.thumbnail} />
-              )}
-              
+
+            <div style={{ cursor: "pointer" }} 
+             onClick={() => router.push(`/articlepost?id=${item.id}`)}
+             >
+              <div style={styles.rowContent}>
+                <p style={styles.postText}>{displayContent}</p>
+                {postImage && (
+                  <img src={postImage} alt="Post" style={styles.thumbnail} />
+                )}
+              </div>
             </div>
-          </div>
+       
         )}
 
         {/* Video Content */}
@@ -365,7 +379,7 @@ function Home() {
         )}
 
         {/* Podcast Content */}
-        {item.type === "podcast" && (
+        {item.type === "podcast" && ( 
           <div>
             <p style={{ ...styles.postText, marginTop: "12px", marginLeft: 0, marginBottom: "12px" }}>
               {displayContent}
@@ -373,7 +387,7 @@ function Home() {
             <div style={{ cursor: "pointer" }}>
               {postImage && (
                 <img src={postImage} alt="Podcast" style={styles.thumbnail} 
-                onClick ={() => router.push(`/podcast/${item.id}`, { state: { podcast: item } })}
+                onClick={() => router.push(`/podcastpost?id=${item.id}`)}
                 />
               )}
             </div>
@@ -434,7 +448,7 @@ function Home() {
 
           {/* Action Button */}
           {item.type === "article" && (
-            <div style={styles.readMoreCircle} onClick={() => router.push(`/article/${item.id}`, { state: { article: item } })}>
+            <div style={styles.readMoreCircle} onClick={() => router.push(`/article/${item.id}`)}>
               <MdArrowForwardIos size={14} color="#00BFFF" />
             </div>
           )}
@@ -445,7 +459,9 @@ function Home() {
             </div>
           )}
           {item.type === "podcast" && (
-            <div style={{ ...styles.readMoreCircle, borderColor: "#32CD32" }}>
+            <div style={{ ...styles.readMoreCircle, borderColor: "#32CD32" }}
+              onClick={() => router.push(`/podcastpost?id=${item.id}`)}
+            >
               <IoMicOutline size={14} color="#32CD32" />
             </div>
           )}
