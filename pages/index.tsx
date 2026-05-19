@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoCheckmarkCircle, IoHelpCircle, IoArrowForward } from "react-icons/io5";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import SEO from '../components/SEO';
 import Image from 'next/image'; 
+import Head from 'next/head';
 
 
 export default function LandingPage() {
@@ -14,6 +15,69 @@ export default function LandingPage() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [topCreators, setTopCreators] = useState<any[]>([]);
+  const [loadingCreators, setLoadingCreators] = useState(true);
+
+  // Fetch top creators based on post count
+  useEffect(() => {
+    const fetchTopCreators = async () => {
+      try {
+        setLoadingCreators(true);
+        const { supabase } = await import('../components/supabase');
+        
+        // Get top 8 creators by post count
+        const { data, error } = await supabase
+          .from('posts')
+          .select('user_id')
+          .not('user_id', 'is', null);
+
+        if (error) throw error;
+
+        // Count posts per user
+        const creatorMap = new Map<string, number>();
+        data?.forEach((post: any) => {
+          creatorMap.set(post.user_id, (creatorMap.get(post.user_id) || 0) + 1);
+        });
+
+        // Sort by count and get top 8 user IDs
+        const topUserIds = Array.from(creatorMap.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8)
+          .map(([userId]) => userId);
+
+        if (topUserIds.length === 0) {
+          setTopCreators([]);
+          setLoadingCreators(false);
+          return;
+        }
+
+        // Fetch profile data for top creators
+        const { data: profiles, error: profileError } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, username')
+          .in('id', topUserIds);
+
+        if (profileError) throw profileError;
+
+        // Map profiles with post count
+        const creatorsWithCount = profiles?.map((profile: any) => ({
+          id: profile.id,
+          name: profile.full_name || profile.username || 'Creator',
+          img: profile.avatar_url || '/pixel4.jpg',
+          field: `${creatorMap.get(profile.id)} posts`,
+        })) || [];
+
+        setTopCreators(creatorsWithCount);
+      } catch (err) {
+        console.error('Error fetching top creators:', err);
+        setTopCreators([]);
+      } finally {
+        setLoadingCreators(false);
+      }
+    };
+
+    fetchTopCreators();
+  }, []);
 
   const testimonials = [
     {
@@ -187,6 +251,14 @@ export default function LandingPage() {
 
   return (
     <>
+     <Head>
+        <title>Verrsa - Write, Post, Live, Earn | Monetization-First Creator Platform</title>
+        <meta name="description" content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required." />
+        <meta property="og:title" content="Verrsa" />
+        <meta property="og:description" content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required." />
+        <meta property="og:image" content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png" />
+      </Head>
+
       <SEO
         title="Verrsa - Write, Post, Live, Earn | Monetization-First Creator Platform"
         description="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required."
@@ -290,62 +362,31 @@ export default function LandingPage() {
         </p>
         <div className="container mx-auto mt-8 px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[
-              {
-                name: "Alice Johnson",
-                img: "/pixel4.jpg",
-                field: "Writer & Podcaster",
-              },
-              {
-                name: "Michael Smith",
-                img: "/pixel4.jpg",
-                field: "Video Creator",
-              },
-              {
-                name: "Sofia Lee",
-                img: "/pixel9.jpg",
-                field: "Content Creator",
-              },
-              {
-                name: "David Kim",
-                img: "/pixel4.jpg",
-                field: "Blogger & Vlogger",
-              },
-              {
-                name: "Alice Johnson",
-                img: "/post-your-articles-easily.jpg",
-                field: "Writer & Podcaster",
-              },
-              {
-                name: "Michael Smith",
-                img: "/pixel4.jpg",
-                field: "Video Creator",
-              },
-              {
-                name: "Sofia Lee",
-                img: "/pixel9.jpg",
-                field: "Content Creator",
-              },
-              {
-                name: "David Kim",
-                img: "/pixel4.jpg",
-                field: "Blogger & Vlogger",
-              },
-            ].map((creator, idx) => (
-              <div key={idx} className="bg-blue-50 p-4 rounded-lg text-center">
-                <Image
-                  src={creator.img}
-                  alt={creator.name}
-                  width={250}
-                  height={250}
-                  className="mx-auto mb-4 rounded-lg"
-                />
-                <h3 className="text-xl font-semibold text-black mb-1">
-                  {creator.name}
-                </h3>
-                <p className="text-gray-600">{creator.field}</p>
+            {loadingCreators ? (
+              <div className="col-span-full text-center py-8 text-gray-500">
+                Loading creators...
               </div>
-            ))}
+            ) : topCreators.length === 0 ? (
+              <div className="col-span-full text-center py-8 text-gray-500">
+                No creators found
+              </div>
+            ) : (
+              topCreators.map((creator) => (
+                <div key={creator.id} className="bg-blue-50 p-4 rounded-lg text-center">
+                  <Image
+                    src={creator.img}
+                    alt={creator.name}
+                    width={250}
+                    height={250}
+                    className="mx-auto mb-4 rounded-lg"
+                  />
+                  <h3 className="text-xl font-semibold text-black mb-1">
+                    {creator.name}
+                  </h3>
+                  <p className="text-gray-600">{creator.field}</p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>
