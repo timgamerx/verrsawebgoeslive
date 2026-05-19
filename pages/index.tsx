@@ -63,7 +63,7 @@ export default function LandingPage() {
         const creatorsWithCount = profiles?.map((profile: any) => ({
           id: profile.id,
           name: profile.full_name || profile.username || 'Creator',
-          img: profile.avatar_url || '/pixel4.jpg',
+          img: profile.avatar_url || '/avatar.jpg',
           field: `${creatorMap.get(profile.id)} posts`,
         })) || [];
 
