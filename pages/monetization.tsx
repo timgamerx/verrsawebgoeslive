@@ -8,6 +8,7 @@ import { supabase } from '../components/supabase';
 import { useTheme } from '../context/ThemeProvider';
 import { TbChevronLeft, TbCreditCard } from 'react-icons/tb'
 import Menu from './menu';
+import Head from 'next/head';
 
 const POLICY_SECTIONS = [
   {
@@ -107,7 +108,16 @@ export default function Monetization() {
   const isDesktop = screenWidth >= 1024;
 
   return (
-    <div
+    <>
+    <Head>
+        <title>Verrsa - Write, Post, Live, Earn | Monetization-First Creator Platform</title>
+        <meta name="description" content="How to earn on Verrsa." />
+        <meta property="og:title" content="Verrsa - Write, Post, Live, Earn | Monetization-First Creator Platform" />
+        <meta property="og:description" content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required." />
+        <meta property="og:image" content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png" />
+      </Head>
+
+ <div
       style={{...(styles.container || {}), backgroundColor: theme.background,
           flexDirection: isDesktop ? "row" : "column",}}
     >
@@ -263,6 +273,8 @@ export default function Monetization() {
         </div>
       )}
     </div>
+    </>
+   
   );
 }
 
