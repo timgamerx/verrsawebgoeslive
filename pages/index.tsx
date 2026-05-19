@@ -6,7 +6,6 @@ import SEO from '../components/SEO';
 import Image from 'next/image'; 
 import Head from 'next/head';
 
-
 export default function LandingPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -17,48 +16,42 @@ export default function LandingPage() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [topCreators, setTopCreators] = useState<any[]>([]);
   const [loadingCreators, setLoadingCreators] = useState(true);
+  const [trendingPosts, setTrendingPosts] = useState<any[]>([]);
+  const [loadingTrending, setLoadingTrending] = useState(true);
 
-  // Fetch top creators based on post count
+  // Fetch top creators and trending posts
   useEffect(() => {
     const fetchTopCreators = async () => {
       try {
         setLoadingCreators(true);
         const { supabase } = await import('../components/supabase');
-        
         // Get top 8 creators by post count
         const { data, error } = await supabase
           .from('posts')
           .select('user_id')
           .not('user_id', 'is', null);
-
         if (error) throw error;
-
         // Count posts per user
         const creatorMap = new Map<string, number>();
         data?.forEach((post: any) => {
           creatorMap.set(post.user_id, (creatorMap.get(post.user_id) || 0) + 1);
         });
-
         // Sort by count and get top 8 user IDs
         const topUserIds = Array.from(creatorMap.entries())
           .sort((a, b) => b[1] - a[1])
           .slice(0, 8)
           .map(([userId]) => userId);
-
         if (topUserIds.length === 0) {
           setTopCreators([]);
           setLoadingCreators(false);
           return;
         }
-
         // Fetch profile data for top creators
         const { data: profiles, error: profileError } = await supabase
           .from('profiles')
           .select('id, full_name, avatar_url, username')
           .in('id', topUserIds);
-
         if (profileError) throw profileError;
-
         // Map profiles with post count
         const creatorsWithCount = profiles?.map((profile: any) => ({
           id: profile.id,
@@ -66,7 +59,6 @@ export default function LandingPage() {
           img: profile.avatar_url || '/avatar.jpg',
           field: `${creatorMap.get(profile.id)} posts`,
         })) || [];
-
         setTopCreators(creatorsWithCount);
       } catch (err) {
         console.error('Error fetching top creators:', err);
@@ -76,7 +68,48 @@ export default function LandingPage() {
       }
     };
 
+
+    const fetchTrendingPosts = async () => {
+  try {
+    setLoadingTrending(true);
+
+    const { supabase } = await import("../components/supabase");
+
+    const { data, error } = await supabase
+      .from("posts")
+      .select(`
+        id,
+        title,
+        content,
+        description,
+        cover_image_url,
+        images, 
+        thumbnail_url,
+        video_url,
+        category,
+        view_count
+      `)
+      .order("view_count", { ascending: false })
+      .limit(8);
+
+    if (error) {
+      console.error("Supabase error:", error);
+      throw error;
+    }
+
+    console.log("Trending posts:", data);
+
+    setTrendingPosts(data || []);
+  } catch (err) {
+    console.error("Error fetching trending posts:", err);
+    setTrendingPosts([]);
+  } finally {
+    setLoadingTrending(false);
+  }
+};
+
     fetchTopCreators();
+    fetchTrendingPosts();
   }, []);
 
   const testimonials = [
@@ -90,7 +123,7 @@ export default function LandingPage() {
       name: "Michael Chen",
       role: "Podcast Host",
       text: "The monetization tools are incredible. I can finally focus on creating great content instead of worrying about reaching arbitrary follower thresholds.",
-      image: "/pixel4.jpg",
+      image: "/podcast.jpg",
     },
     {
       name: "Amara Okafor",
@@ -390,6 +423,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      
+
+    
 
 
       <section className="bg-white py-10 mb-4">
@@ -402,80 +438,41 @@ export default function LandingPage() {
         </p>
         <div className="container mx-auto mt-8 px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[
-              {
-                title: "The Future of AI in Content Creation",
-                img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=400&fit=crop",
-                category: "Technology",
-                views: "12.5K",
-              },
-              {
-                title: "10 Tips for Better Podcast Production",
-                img: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=400&h=400&fit=crop",
-                category: "Podcasting",
-                views: "8.3K",
-              },
-              {
-                title: "Mastering Visual Storytelling",
-                img: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&h=400&fit=crop",
-                category: "Video",
-                views: "15.2K",
-              },
-              {
-                title: "Building Your Personal Brand Online",
-                img: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=400&fit=crop",
-                category: "Business",
-                views: "9.8K",
-              },
-              {
-                title: "Creative Writing: From Idea to Story",
-                img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=400&fit=crop",
-                category: "Writing",
-                views: "11.4K",
-              },
-              {
-                title: "Monetization Strategies for Creators",
-                img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=400&fit=crop",
-                category: "Finance",
-                views: "13.7K",
-              },
-              {
-                title: "Photography Tips for Content Creators",
-                img: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&h=400&fit=crop",
-                category: "Photography",
-                views: "7.9K",
-              },
-              {
-                title: "Growing Your Audience in 2025",
-                img: "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=400&fit=crop",
-                category: "Marketing",
-                views: "10.6K",
-              },
-            ].map((content, idx) => (
-              <div
-                key={idx}
-                className="bg-blue-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
-              >
-                <Image
-                  src={content.img}
-                  alt={content.title}
-                  width={400}
-                  height={250}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <span className="text-xs text-cyan-600 font-medium">
-                    {content.category}
-                  </span>
-                  <h3 className="text-lg font-regular tracking-tighter text-black mt-2 mb-2">
-                    {content.title}
-                  </h3>
-                  <p className="text-gray-500 text-sm">
-                    👁️ {content.views} views
-                  </p>
-                </div>
+            {loadingTrending ? (
+              <div className="col-span-full text-center py-8 text-gray-500">
+                Loading trending contents...
               </div>
-            ))}
+            ) : trendingPosts.length === 0 ? (
+              <div className="col-span-full text-center py-8 text-gray-500">
+                No trending contents found
+              </div>
+            ) : (
+              trendingPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="bg-blue-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  <Image
+                    src={post.cover_image_url || post.images?.[0]?.url || post.thumbnail_url || post.video_url || '/hero-image.jpg'}
+                    alt={post.title}
+                    width={400}
+                    height={250}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4">
+                    <span className="text-xs text-cyan-600 font-medium">
+                      {post.category || 'General'}
+                    </span>
+                    <h3 className="text-lg font-regular tracking-tighter text-black mt-2 mb-2">
+                      {post.title || post.content}
+                    </h3>
+                    <p className="text-gray-500 text-sm">
+                      👁️ {post.view_count || 0} views
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
