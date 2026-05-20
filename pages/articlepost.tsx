@@ -493,7 +493,7 @@ const ArticlePost: React.FC = () => {
 
   const handleShare = async () => {
     try {
-      const articleUrl = `https://verrsa.org/article/${article?.id}`;
+      const articleUrl = `https://verrsa.org/${article?.id}`;
       if (navigator.share) {
         await navigator.share({
           title: article?.title,
@@ -529,27 +529,51 @@ const ArticlePost: React.FC = () => {
   return (
     <>
       <Head>
-        <title>{article.title}</title>
+        <title>{article.title || "Verrsa Article"}</title>
         <meta
           name="description"
           content={
             authorName
-              ? `By ${authorName} - ${(article.excerpt || article.content || article.title).slice(0, 160)}`
-              : (article.excerpt || article.content || article.title).slice(0, 160)
+              ? `By ${authorName} - ${(article.title || article.excerpt || article.content || "Read this article on Verrsa").slice(0, 160)}`
+              : (article.title || article.excerpt || article.content || "Read this article on Verrsa").slice(0, 160)
           }
         />
-        <meta property="og:title" content={article.title} />
+        <meta property="og:title" content={article.title || "Verrsa Article"} />
         <meta
           property="og:description"
           content={
             authorName
-              ? `By ${authorName} - ${(article.excerpt || article.content || article.title).slice(0, 160)}`
-              : (article.excerpt || article.content || article.title).slice(0, 160)
+              ? `By ${authorName} - ${(article.title || article.excerpt || article.content || "Read this article on Verrsa").slice(0, 160)}`
+              : (article.title || article.excerpt || article.content || "Read this article on Verrsa").slice(0, 160)
           }
         />
         <meta
           property="og:image"
-          content={article.cover_image_url || "https://ik.imagekit.io/te9biwxvl/verrsa-team.png"}
+          content={
+            article.cover_image_url && article.cover_image_url.trim() !== ""
+              ? article.cover_image_url
+              : "https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
+          }
+        />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://verrsa.org/${article.id}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={article.title || "Verrsa Article"} />
+        <meta
+          name="twitter:description"
+          content={
+            authorName
+              ? `By ${authorName} - ${(article.title || article.excerpt || article.content || "Read this article on Verrsa").slice(0, 160)}`
+              : (article.title || article.excerpt || article.content || "Read this article on Verrsa").slice(0, 160)
+          }
+        />
+        <meta
+          name="twitter:image"
+          content={
+            article.cover_image_url && article.cover_image_url.trim() !== ""
+              ? article.cover_image_url
+              : "https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
+          }
         />
       </Head>
 
