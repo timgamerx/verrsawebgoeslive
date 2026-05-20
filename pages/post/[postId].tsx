@@ -675,8 +675,7 @@ const formatted = formatContent(post.content || "");
         marginBottom: "16px",
         fontSize: "18px",
         lineHeight: "28px",
-        // color: "#1e293b",
-          color: theme.background === "#ffffff" ? "#ffffff" : "#161616",
+        color: theme.background === "#ffffff" ? "#1e293b" : "#cbd5e1",
       }}
     >
       {para}

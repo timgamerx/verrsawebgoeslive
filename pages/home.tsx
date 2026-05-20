@@ -392,7 +392,7 @@ function Home() {
             <div style={{ cursor: "pointer" }}>
               {postImage && (
                 <img src={postImage} alt="Podcast" style={styles.thumbnail} 
-                onClick={() => router.push(`/podcastpost?id=${item.id}`)}
+                onClick={ () => router.push(`/post/${item.id}`) }
                 />
               )}
             </div>
