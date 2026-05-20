@@ -204,6 +204,10 @@ function Home() {
     if (userId) router.push(`/user/${userId}`);
   };
 
+    const navigateToPost = (postId) => {
+    if (postId) router.push(`/post/${postId}`);
+  };
+
   const [loading, setLoading] = useState(true);
   const hasLoadedPosts = useRef(false);
 
@@ -338,7 +342,8 @@ function Home() {
         {item.type === "article" && (
 
             <div style={{ cursor: "pointer" }} 
-             onClick={() => router.push(`/articlepost?id=${item.id}`)}
+             onClick={ () => router.push(`/post/${item.id}`) }
+        
              >
               <div style={styles.rowContent}>
                 <p style={styles.postText}>{displayContent}</p>
