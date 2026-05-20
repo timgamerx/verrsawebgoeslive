@@ -46,8 +46,8 @@ export const getAppLinks = (deviceType: DeviceType): AppLinks => {
       deepLink: 'verrsa://', // Deep link to open the app if installed
     },
     android: {
-      appStoreUrl: 'https://play.google.com/store/apps/details?id=com.verrsa.app',
-      deepLink: 'intent://verrsa#Intent;scheme=verrsa;package=com.verrsa.app;end',
+      appStoreUrl: 'https://play.google.com/store/apps/details?id=com.verrsaapp.verrsa',
+      deepLink: 'intent://verrsa#Intent;scheme=verrsa;package=com.verrsaapp.verrsa;end',
     },
     desktop: {
       appStoreUrl: '',
@@ -92,5 +92,7 @@ export const openApp = (deviceType: DeviceType): void => {
  */
 export const isMobileDevice = (): boolean => {
   const deviceType = detectDeviceType();
-  return deviceType === 'ios' || deviceType === 'android';
+  const isMobile = deviceType === 'ios' || deviceType === 'android';
+  console.log('[DeviceDetection] Device type:', deviceType, '| Is mobile:', isMobile);
+  return isMobile;
 };

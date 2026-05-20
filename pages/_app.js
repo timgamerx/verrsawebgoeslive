@@ -16,6 +16,7 @@ import {
   getPromptDelay
 } from '../lib/appDownloadPromptManager';
 import { isMobileDevice } from '../lib/deviceDetection';
+import { setupAppDownloadModalTesting } from '../lib/testAppDownloadModal';
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -55,16 +56,32 @@ function MyApp({ Component, pageProps }) {
     setIsMobileMenuOpen(false);
   }, [router.pathname]);
 
+  // Setup testing utilities in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      setupAppDownloadModalTesting();
+    }
+  }, []);
+
   // App Download Prompt Logic
   useEffect(() => {
     // Only show on mobile devices
-    if (!isMobileDevice()) return;
+    if (!isMobileDevice()) {
+      console.log('[AppDownload] Not a mobile device, skipping prompt');
+      return;
+    }
 
     // Check if we should show the prompt
-    if (!shouldShowAppDownloadPrompt()) return;
+    if (!shouldShowAppDownloadPrompt()) {
+      console.log('[AppDownload] Prompt already shown or dismissed, skipping');
+      return;
+    }
 
+    console.log('[AppDownload] Will show prompt in 30 seconds...');
+    
     // Set a timer to show the modal after 30 seconds
     const timer = setTimeout(() => {
+      console.log('[AppDownload] Showing modal now');
       setShowAppDownloadModal(true);
       markAppDownloadPromptShown();
     }, getPromptDelay());

@@ -48,7 +48,12 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
     };
   }, [visible]);
 
-  if (!visible || !isMobileDevice()) return null;
+  if (!visible || !isMobileDevice()) {
+    if (visible && !isMobileDevice()) {
+      console.log('[AppDownloadModal] Modal is visible but not on mobile device');
+    }
+    return null;
+  }
 
   const handleOpenApp = () => {
     openApp(deviceType);
