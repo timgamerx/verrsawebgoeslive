@@ -493,7 +493,7 @@ const ArticlePost: React.FC = () => {
 
   const handleShare = async () => {
     try {
-      const articleUrl = `https://verrsa.org/${article?.id}`;
+      const articleUrl = `https://verrsa.org/article/${article?.id}`;
       if (navigator.share) {
         await navigator.share({
           title: article?.title,
@@ -556,7 +556,7 @@ const ArticlePost: React.FC = () => {
           }
         />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={`https://verrsa.org/${article.id}`} />
+        <meta property="og:url" content={`https://verrsa.org/article/${article.id}`} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={article.title || "Verrsa Article"} />
         <meta
