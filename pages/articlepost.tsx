@@ -97,7 +97,7 @@ const renderFormattedText = (text: string, textClass: string): React.ReactNode =
   return parts.length > 0 ? parts : <span className={textClass}>{normalizedText}</span>;
 };
 
-interface ArticleItem {
+interface PostItem {
   id: string;
   title: string;
   excerpt?: string;
@@ -123,17 +123,20 @@ interface ArticleItem {
 const ArticlePost: React.FC = () => {
   const { theme, colors } = useTheme();
   const router = useRouter();
-  const rawArticleId = router.query.id;
-  const articleId =
-    typeof rawArticleId === "string"
-      ? rawArticleId
-      : Array.isArray(rawArticleId)
-      ? rawArticleId[0]
-      : undefined;
 
-  const [article, setArticle] = useState<ArticleItem | null>(null);
+const rawPostId = router.query.postId;
+
+const postId =
+  typeof rawPostId === "string"
+    ? rawPostId
+    : Array.isArray(rawPostId)
+    ? rawPostId[0]
+    : undefined;
+
+  const [article, setArticle] = useState<PostItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [authorName, setAuthorName] = useState<string>("");
+  const [post, setPost] = useState<PostItem | null>(null);
 
   // Comments state
   type ArticleComment = {
@@ -245,13 +248,13 @@ const ArticlePost: React.FC = () => {
 
   // Fetch article on mount or when article ID changes
   useEffect(() => {
-    if (!articleId || !router.isReady) return;
+    if (!postId || !router.isReady) return;
 
     const fetchArticle = async () => {
       try {
         // Try sessionStorage first on web
         try {
-          const stored = sessionStorage.getItem(`article_${articleId}`);
+          const stored = sessionStorage.getItem(`article_${postId}`);
           if (stored) {
             const articleData = JSON.parse(stored);
             setArticle(articleData);
@@ -271,13 +274,15 @@ const ArticlePost: React.FC = () => {
           console.log("No cached article data, fetching from database");
         }
 
+        
         // Fetch from database if not in cache
         const { data, error } = await supabase
           .from("posts")
           .select("*, profiles:user_id(*)")
-          .eq("id", articleId)
-          .eq("post_type", "article")
+          .eq("id", postId)
           .maybeSingle();
+        
+setPost(data);
 
         if (error) throw error;
         if (data) {
@@ -309,7 +314,7 @@ const ArticlePost: React.FC = () => {
     };
 
     fetchArticle();
-  }, [articleId, router.isReady, router]);
+  }, [postId, router.isReady, router]);
 
   // Load user profile and comments
   useEffect(() => {
@@ -642,7 +647,7 @@ const ArticlePost: React.FC = () => {
                   color: theme.text,
                 }}
               >
-                {article?.title || ""}
+                {article?.title || "".slice(0, 60)}
               </h1>
             </div>
           </div>
