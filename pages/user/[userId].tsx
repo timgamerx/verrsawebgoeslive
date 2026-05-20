@@ -416,7 +416,7 @@ export default function UserProfile({ initialMeta, initialProfile }) {
             src={userAvatar}
             alt="Avatar"
             style={styles.postAvatar}
-            onError={(e) => { e.target.src = "/avatar.jpg"; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = "/avatar.jpg"; }}
           />
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -484,7 +484,7 @@ export default function UserProfile({ initialMeta, initialProfile }) {
 
         {/* Article */}
         {item.type === "article" && (
-          <div style={{ marginBottom: "12px", cursor: "pointer" }} onClick={() => router.push(`/article/${item.id}`, { state: { article: item } })}>
+          <div style={{ marginBottom: "12px", cursor: "pointer" }} onClick={() => router.push(`/article/${item.id}`)}>
              <p style={styles.postText}>{truncate(item.content || item.description, 25)}</p>
             {item.cover_image_url && (
               <img src={item.cover_image_url} alt="" style={styles.thumbnail} />
@@ -589,7 +589,7 @@ export default function UserProfile({ initialMeta, initialProfile }) {
           src={item.avatar_url || "/avatar.jpg"}
           alt="Avatar"
           style={styles.followerAvatar}
-          onError={(e) => { e.target.src = "/avatar.jpg"; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = "/avatar.jpg"; }}
         />
         <div style={{ flex: 1 }}>
           <span style={styles.followerName}>{item.full_name || item.username}</span>
@@ -793,7 +793,7 @@ export default function UserProfile({ initialMeta, initialProfile }) {
                         <span style={{ marginLeft: "10px", color: "#333" }}>Message</span>
                       </button>
                       <div style={styles.menuDivider} />
-                      <button style={styles.dropdownItem} onClick={() => { setShowHeaderMenu(false); handleFollowToggle(); }}>
+                      <button style={styles.dropdownItem} onClick={() => { setShowHeaderMenu(false); handleFollowToggle(userId); }}>
                         {isFollowing ? (
                           <IoCheckmark size={18} color="#00BFFF" />
                         ) : (
@@ -830,7 +830,7 @@ export default function UserProfile({ initialMeta, initialProfile }) {
             src={profile?.avatar_url || "/avatar.jpg"}
             alt="Profile"
             style={styles.avatar}
-            onError={(e) => { e.target.src = "/avatar.jpg"; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = "/avatar.jpg"; }}
           />
           <div style={styles.profileInfo}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -854,7 +854,7 @@ export default function UserProfile({ initialMeta, initialProfile }) {
           {!isOwnProfile && (
             <button
               style={isFollowing ? styles.followingButton : styles.followButton}
-              onClick={() => handleFollowToggle()}
+              onClick={() => handleFollowToggle(userId)}
               disabled={followLoading}
             >
               {followLoading ? "..." : isFollowing ? "Following" : "Follow"}
@@ -969,7 +969,7 @@ export async function getServerSideProps(context) {
 }
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     minHeight: "100vh",
     backgroundColor: "#fff",
@@ -1226,7 +1226,7 @@ const styles = {
   },
   placeholderVideo: {
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "column" as const,
     alignItems: "center",
     justifyContent: "center",
     height: "380px",

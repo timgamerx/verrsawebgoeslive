@@ -164,14 +164,6 @@ function Home() {
     fetchUserAvatar();
   }, []);
 
-   const navigateToPodcastPost = () => {
-    router.push('/podcastpost');
-  };
-
-    const navigateToReels = () => {
-    router.push('/Reels');
-  };
-
   const navigateToWriteArticle = () => {
     router.push('/write-article');
   };
@@ -360,7 +352,7 @@ function Home() {
           <div style={styles.fullWidthVideoWrapper}>
             <div style={{ cursor: "pointer", position: "relative" }}>
               <div style={styles.videoWrapper}
-               onClick ={() => router.push(`/Reels?id=${item.id}`)}
+               onClick={ () => router.push(`/post/${item.id}`) }
               >
                 {videoThumbnail && (
                   <img src={videoThumbnail} alt="Video" style={styles.videoPlayer} 

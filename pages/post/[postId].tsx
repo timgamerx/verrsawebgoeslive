@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -7,6 +7,9 @@ import DOMPurify from "dompurify";
 import {
   IoShareSocialOutline,
   IoFlagOutline,
+  IoPlayCircle,
+  IoPauseCircle,
+  IoVideocam,
 } from "react-icons/io5";
 import CommentModal from "../../components/CommentModal";
 import ReportContentModal from "../../components/ReportContentModal";
@@ -30,6 +33,7 @@ import {
   getCommentLikeStatus,
   createReplyComment,
   deleteComment,
+  getVideos,
 } from "../../components/api";
 import { spacing, radius, fontSize } from "../../lib/theme";
 
@@ -107,6 +111,16 @@ export default function PostPage({ post: initialPost, authorName: initialAuthorN
   const [followingArticleAuthor, setFollowingArticleAuthor] = useState(false);
   const articleFollowingSetRef = React.useRef<Set<string>>(new Set());
   const readStartTimeRef = React.useRef<number>(0);
+  
+  // Podcast player state
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioProgress, setAudioProgress] = useState({ position: 0, duration: 0 });
+  
+  // Video navigation state
+  const [relatedVideos, setRelatedVideos] = useState<Post[]>([]);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   if (!post) {
     return (
@@ -126,12 +140,16 @@ export default function PostPage({ post: initialPost, authorName: initialAuthorN
     );
   }
 
-  // Load user profile and comments
+  // Load user profile and comments (skip comments for videos)
   useEffect(() => {
     if (!post) return;
 
     fetchCurrentUserProfile().then(setUserProfile);
-    fetchArticleComments();
+    
+    // Only fetch comments for non-video posts
+    if (post.post_type !== 'video') {
+      fetchArticleComments();
+    }
 
     // Start tracking read time
     readStartTimeRef.current = Date.now();
@@ -394,6 +412,118 @@ export default function PostPage({ post: initialPost, authorName: initialAuthorN
     }
   };
 
+  // Podcast audio player setup
+  useEffect(() => {
+    if (post?.post_type === 'podcast' && post?.audio_url) {
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+        
+        audioRef.current.addEventListener("loadedmetadata", () => {
+          setAudioProgress((prev) => ({
+            ...prev,
+            duration: audioRef.current?.duration || 0,
+          }));
+        });
+
+        audioRef.current.addEventListener("timeupdate", () => {
+          setAudioProgress({
+            position: audioRef.current?.currentTime || 0,
+            duration: audioRef.current?.duration || 0,
+          });
+        });
+
+        audioRef.current.addEventListener("ended", () => {
+          setIsPlaying(false);
+        });
+
+        audioRef.current.addEventListener("play", () => {
+          setIsPlaying(true);
+        });
+
+        audioRef.current.addEventListener("pause", () => {
+          setIsPlaying(false);
+        });
+      }
+
+      audioRef.current.src = post.audio_url;
+      audioRef.current.load();
+      setIsPlaying(false);
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    };
+  }, [post?.audio_url, post?.post_type]);
+
+  const handlePlayPause = async () => {
+    try {
+      if (audioRef.current) {
+        if (isPlaying) {
+          audioRef.current.pause();
+        } else {
+          await audioRef.current.play();
+        }
+      }
+    } catch (error) {
+      console.error("Error playing/pausing audio:", error);
+    }
+  };
+
+  const formatTime = (seconds: number): string => {
+    const totalSeconds = Math.floor(seconds);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Fetch related videos for video posts
+  useEffect(() => {
+    if (post?.post_type === 'video') {
+      const fetchRelatedVideos = async () => {
+        try {
+          const videos = await getVideos(20);
+          // Filter out current video and set related videos
+          const filtered = videos.filter(v => v.id !== post.id);
+          setRelatedVideos([post, ...filtered]);
+          setCurrentVideoIndex(0);
+        } catch (err) {
+          console.error('Error fetching related videos:', err);
+          setRelatedVideos([post]);
+        }
+      };
+      fetchRelatedVideos();
+    }
+  }, [post?.id, post?.post_type]);
+
+  // Handle scroll-based video navigation
+  useEffect(() => {
+    if (post?.post_type !== 'video' || !containerRef.current) return;
+
+    const handleScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      
+      // Calculate which video should be shown based on scroll position
+      const newIndex = Math.round(scrollTop / windowHeight);
+      
+      if (newIndex !== currentVideoIndex && newIndex >= 0 && newIndex < relatedVideos.length) {
+        setCurrentVideoIndex(newIndex);
+        const nextVideo = relatedVideos[newIndex];
+        if (nextVideo && nextVideo.id !== post.id) {
+          // Update URL and post without full page reload
+          window.history.replaceState(null, '', `/post/${nextVideo.id}`);
+          setPost(nextVideo);
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [post?.post_type, currentVideoIndex, relatedVideos, post?.id]);
+
  // const sanitizedContent = DOMPurify.sanitize(post.content || "");
   const description =
     authorName
@@ -602,121 +732,408 @@ const formatted = formatContent(post.content || "");
             paddingRight: spacing.md,
           }}
         >
-          {post.cover_image_url && (
-            <img
-              src={post.cover_image_url}
-              alt="Post cover"
-              style={{
-                width: "100%",
-                height: 200,
-                objectFit: "cover",
-                marginBottom: spacing.base,
-              }}
-            />
+          {/* Video UI */}
+          {post.post_type === 'video' && (
+            <>
+              {post.video_url ? (
+                <div style={{
+                  position: "relative",
+                  width: "100%",
+                  maxWidth: "600px",
+                  margin: "0 auto",
+                  marginBottom: spacing.base,
+                  borderRadius: radius.md,
+                  overflow: "hidden",
+                  backgroundColor: "#000",
+                }}>
+                  <video
+                    src={post.video_url}
+                    poster={post.cover_image_url || undefined}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      maxHeight: "600px",
+                      objectFit: "contain",
+                    }}
+                    controls
+                    playsInline
+                    preload="metadata"
+                  />
+                </div>
+              ) : post.cover_image_url ? (
+                <div style={{
+                  position: "relative",
+                  width: "100%",
+                  maxWidth: "600px",
+                  margin: "0 auto",
+                  marginBottom: spacing.base,
+                  borderRadius: radius.md,
+                  overflow: "hidden",
+                }}>
+                  <img
+                    src={post.cover_image_url}
+                    alt={post.title}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      objectFit: "cover",
+                    }}
+                  />
+                </div>
+              ) : (
+                <div style={{
+                  width: "100%",
+                  maxWidth: "600px",
+                  height: "400px",
+                  margin: "0 auto",
+                  marginBottom: spacing.base,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#1a1a1a",
+                  borderRadius: radius.md,
+                }}>
+                  <IoVideocam size={48} color="#444" />
+                </div>
+              )}
+
+              <div style={{ padding: spacing.base, backgroundColor: theme.background }}>
+                <h2
+                  style={{
+                    fontSize: fontSize.xl2,
+                    fontWeight: "500",
+                    marginBottom: spacing.md,
+                    color: theme.text,
+                  }}
+                >
+                  {post.title}
+                </h2>
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: fontSize.base,
+                      color: theme.secondaryText,
+                    }}
+                  >
+                    By{" "}
+                    {post.profiles?.full_name ||
+                      post.profiles?.username ||
+                      authorName ||
+                      "Unknown Author"}
+                  </span>
+                  {post.profiles?.is_verified && (
+                    <span style={{ marginLeft: spacing.xs, color: "#00BFFF" }}>✓</span>
+                  )}
+                </div>
+
+                {post.category && (
+                  <p
+                    style={{
+                      fontSize: fontSize.md,
+                      marginBottom: spacing.base,
+                      textTransform: "capitalize",
+                      color: theme.accent,
+                    }}
+                  >
+                    {post.category}
+                  </p>
+                )}
+
+                {post.description && (
+                  <p
+                    style={{
+                      fontSize: fontSize.base,
+                      lineHeight: "24px",
+                      marginBottom: spacing.base,
+                      color: theme.text,
+                    }}
+                  >
+                    {post.description}
+                  </p>
+                )}
+              </div>
+            </>
           )}
 
-          <div style={{ padding: spacing.base, backgroundColor: theme.background }}>
-            <h2
-              style={{
-                fontSize: fontSize.xl2,
-                fontWeight: "500",
-                marginBottom: spacing.md,
-                color: theme.text,
-              }}
-            >
-              {post.title}
-            </h2>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: spacing.sm,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: fontSize.base,
-                  color: theme.secondaryText,
-                }}
-              >
-                By{" "}
-                {post.profiles?.full_name ||
-                  post.profiles?.username ||
-                  authorName ||
-                  "Unknown Author"}
-              </span>
-              {post.profiles?.is_verified && (
-                <span style={{ marginLeft: spacing.xs, color: "#00BFFF" }}>✓</span>
+          {/* Podcast UI */}
+          {post.post_type === 'podcast' && (
+            <>
+              {post.cover_image_url && (
+                <img
+                  src={post.cover_image_url}
+                  alt={post.title}
+                  style={{
+                    width: "100%",
+                    maxWidth: "600px",
+                    height: "300px",
+                    objectFit: "cover",
+                    margin: "0 auto",
+                    marginBottom: spacing.base,
+                    borderRadius: radius.md,
+                  }}
+                />
               )}
-            </div>
 
+              <div style={{ padding: spacing.base, backgroundColor: theme.background }}>
+                <h2
+                  style={{
+                    fontSize: fontSize.xl2,
+                    fontWeight: "500",
+                    marginBottom: spacing.md,
+                    color: theme.text,
+                  }}
+                >
+                  {post.title}
+                </h2>
 
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: fontSize.base,
+                      color: theme.secondaryText,
+                    }}
+                  >
+                    By{" "}
+                    {post.profiles?.full_name ||
+                      post.profiles?.username ||
+                      authorName ||
+                      "Unknown Author"}
+                  </span>
+                  {post.profiles?.is_verified && (
+                    <span style={{ marginLeft: spacing.xs, color: "#00BFFF" }}>✓</span>
+                  )}
+                </div>
 
+                {post.category && (
+                  <div style={{
+                    display: "inline-block",
+                    backgroundColor: "#00BFFF",
+                    padding: `${spacing.xs}px ${spacing.md}px`,
+                    borderRadius: radius.lg,
+                    marginBottom: spacing.base,
+                  }}>
+                    <span style={{
+                      color: "#fff",
+                      fontSize: fontSize.sm,
+                      fontWeight: "500",
+                    }}>
+                      {post.category}
+                    </span>
+                  </div>
+                )}
 
-            {post.category && (
-              <p
+                {/* Audio Progress */}
+                {post.audio_url && (
+                  <div style={{ marginBottom: spacing.base }}>
+                    <span style={{
+                      fontSize: fontSize.sm,
+                      color: theme.secondaryText,
+                      marginBottom: spacing.sm,
+                      display: "block",
+                      textAlign: "center",
+                    }}>
+                      {formatTime(audioProgress.position)} / {formatTime(audioProgress.duration)}
+                    </span>
+                    <div style={{
+                      height: 4,
+                      backgroundColor: theme.border,
+                      borderRadius: radius.xs,
+                      overflow: "hidden",
+                      width: "100%",
+                      marginBottom: spacing.base,
+                    }}>
+                      <div style={{
+                        height: "100%",
+                        width: audioProgress.duration
+                          ? `${(audioProgress.position / audioProgress.duration) * 100}%`
+                          : "0%",
+                        backgroundColor: "#00BFFF",
+                        borderRadius: radius.xs,
+                        transition: "width 0.2s ease",
+                      }} />
+                    </div>
+
+                    {/* Play Button */}
+                    <button
+                      style={{
+                        backgroundColor: "#00BFFF",
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: spacing.base,
+                        borderRadius: radius.lg,
+                        marginBottom: spacing.lg,
+                        border: "none",
+                        cursor: "pointer",
+                        width: "100%",
+                      }}
+                      onClick={handlePlayPause}
+                    >
+                      {isPlaying ? (
+                        <IoPauseCircle size={24} color="#fff" />
+                      ) : (
+                        <IoPlayCircle size={24} color="#fff" />
+                      )}
+                      <span style={{
+                        color: "#fff",
+                        fontSize: fontSize.base,
+                        fontWeight: "600",
+                        marginLeft: spacing.sm,
+                      }}>
+                        {isPlaying ? "Pause" : "Play"} Podcast
+                      </span>
+                    </button>
+                  </div>
+                )}
+
+                {post.description && (
+                  <p
+                    style={{
+                      fontSize: fontSize.base,
+                      lineHeight: "24px",
+                      marginBottom: spacing.base,
+                      color: theme.text,
+                    }}
+                  >
+                    {post.description}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Article UI (existing) */}
+          {(!post.post_type || post.post_type === 'article') && (
+            <>
+              {post.cover_image_url && (
+                <img
+                  src={post.cover_image_url}
+                  alt="Post cover"
+                  style={{
+                    width: "100%",
+                    height: 200,
+                    objectFit: "cover",
+                    marginBottom: spacing.base,
+                  }}
+                />
+              )}
+
+              <div style={{ padding: spacing.base, backgroundColor: theme.background }}>
+                <h2
+                  style={{
+                    fontSize: fontSize.xl2,
+                    fontWeight: "500",
+                    marginBottom: spacing.md,
+                    color: theme.text,
+                  }}
+                >
+                  {post.title}
+                </h2>
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: spacing.sm,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: fontSize.base,
+                      color: theme.secondaryText,
+                    }}
+                  >
+                    By{" "}
+                    {post.profiles?.full_name ||
+                      post.profiles?.username ||
+                      authorName ||
+                      "Unknown Author"}
+                  </span>
+                  {post.profiles?.is_verified && (
+                    <span style={{ marginLeft: spacing.xs, color: "#00BFFF" }}>✓</span>
+                  )}
+                </div>
+
+                {post.category && (
+                  <p
+                    style={{
+                      fontSize: fontSize.md,
+                      marginBottom: spacing.base,
+                      textTransform: "capitalize",
+                      color: theme.accent,
+                    }}
+                  >
+                    {post.category}
+                  </p>
+                )}
+
+                {Array.isArray(formatted) ? (
+                  formatted.map((para, index) => (
+                    <p
+                      key={index}
+                      style={{
+                        marginBottom: "16px",
+                        fontSize: "18px",
+                        lineHeight: "28px",
+                        color: theme.background === "#ffffff" ? "#1e293b" : "#cbd5e1",
+                      }}
+                    >
+                      {para}
+                    </p>
+                  ))
+                ) : (
+                  <p
+                    style={{
+                      fontSize: "18px",
+                      lineHeight: "32px",
+                      color: "#1e293b",
+                    }}
+                  >
+                    {formatted}
+                  </p>
+                )}
+
+                <p
+                  style={{
+                    fontSize: fontSize.lg,
+                    lineHeight: "26px",
+                    marginBottom: spacing.base,
+                    fontWeight: "400",
+                    color: theme.text,
+                  }}
+                />
+              </div>
+            </>
+          )}
+
+          {/* Comments section - hidden for videos */}
+          {post.post_type !== 'video' && (
+            <>
+              <hr
                 style={{
-                  fontSize: fontSize.md,
+                  backgroundColor: theme.border,
+                  marginTop: spacing.base,
                   marginBottom: spacing.base,
-                  textTransform: "capitalize",
-                  color: theme.accent,
+                  border: "none",
+                  height: 1,
                 }}
-              >
-                {post.category}
-              </p>
-            )}
+              />
 
- {Array.isArray(formatted) ? (
-  formatted.map((para, index) => (
-    <p
-      key={index}
-      style={{
-        marginBottom: "16px",
-        fontSize: "18px",
-        lineHeight: "28px",
-        color: theme.background === "#ffffff" ? "#1e293b" : "#cbd5e1",
-      }}
-    >
-      {para}
-    </p>
-  ))
-) : (
-  <p
-    style={{
-      fontSize: "18px",
-      lineHeight: "32px",
-      color: "#1e293b",
-    }}
-  >
-    {formatted}
-  </p>
-)}
-
-            <p
-              style={{
-                fontSize: fontSize.lg,
-                lineHeight: "26px",
-                marginBottom: spacing.base,
-                fontWeight: "400",
-                color: theme.text,
-              }}
-         //     dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-            />
-          </div>
-
-          <hr
-            style={{
-              backgroundColor: theme.border,
-              marginTop: spacing.base,
-              marginBottom: spacing.base,
-              border: "none",
-              height: 1,
-            }}
-          />
-
-          {/* Comments section */}
-          <div style={{ marginTop: spacing.base }}>
+              <div style={{ marginTop: spacing.base }}>
             <div
               style={{
                 display: "flex",
@@ -1140,7 +1557,9 @@ const formatted = formatContent(post.content || "");
             >
               See All Responses
             </button>
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
