@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { spacing, radius, fontSize } from '../lib/theme';
 import { IoChevronBack } from 'react-icons/io5';
 import { useTheme } from '../context/ThemeProvider';
-import { supabase } from '../components/supabase';
+import { supabase, signOut } from '../components/supabase';
 import { TbChevronLeft, TbDots } from 'react-icons/tb'
 import { MdCheck } from 'react-icons/md'
 import {
@@ -92,7 +92,7 @@ const VerrsaSettings = () => {
         console.warn("Preference cleanup error", storageError);
       });
 
-      await supabase.auth.signOut();
+      await signOut();
 
       window.alert(/* Alert: */ 
         "Account Deleted",
@@ -586,7 +586,7 @@ const VerrsaSettings = () => {
                               {
                                 text: "OK",
                                 onPress: async () => {
-                                  await supabase.auth.signOut();
+                                  await signOut();
                                   router.push("/");
                                 },
                               },

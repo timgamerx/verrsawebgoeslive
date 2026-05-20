@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import React, { useState, useEffect } from "react";
 import { spacing, radius, fontSize } from '../lib/theme';
 import { IoAdd, IoArrowBack, IoBookmark, IoChatbubble, IoCheckmark, IoChevronBack, IoChevronDown, IoChevronForward, IoChevronUp, IoClose, IoCopy, IoCreate, IoEye, IoEyeOff, IoHeart, IoHeartOutline, IoHome, IoMenu, IoMic, IoNewspaper, IoNotifications, IoPeople, IoSearch, IoSettings, IoShare, IoStar, IoTrash, IoVideocam } from 'react-icons/io5';
-import { supabase } from '../components/supabase';
+import { supabase, signOut } from '../components/supabase';
 
 
 const SetNewPassword = () => {
@@ -86,7 +86,7 @@ const SetNewPassword = () => {
       console.log("✅ Password updated successfully");
 
       // Sign out after password update
-      await supabase.auth.signOut();
+      await signOut();
 
       window.alert(/* Alert: */ 
         "Success!",

@@ -36,6 +36,7 @@ import {
   getVideos,
 } from "../../components/api";
 import { spacing, radius, fontSize } from "../../lib/theme";
+import { getVideoMetaThumbnail } from "../../lib/videoThumbnailGenerator";
 
 interface Post {
   id: string;
@@ -479,6 +480,16 @@ export default function PostPage({ post: initialPost, authorName: initialAuthorN
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (audioRef.current && audioProgress.duration) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const percentage = clickX / rect.width;
+      const newTime = percentage * audioProgress.duration;
+      audioRef.current.currentTime = newTime;
+    }
+  };
+
   // Fetch related videos for video posts
   useEffect(() => {
     if (post?.post_type === 'video') {
@@ -530,10 +541,12 @@ export default function PostPage({ post: initialPost, authorName: initialAuthorN
       ? `By ${authorName} - ${(post.title || post.excerpt || post.content || "Discover amazing content on Verrsa").slice(0, 160)}`
       : (post.title || post.excerpt || post.content || "Discover amazing content on Verrsa").slice(0, 160);
 
-  const image =
-    post.cover_image_url && post.cover_image_url.trim() !== ""
-      ? post.cover_image_url
-      : "https://ik.imagekit.io/te9biwxvl/verrsa-team.png";
+  // Generate appropriate image/thumbnail based on post type
+  const image = post.post_type === 'video'
+    ? getVideoMetaThumbnail(post.video_url, post.cover_image_url)
+    : post.cover_image_url && post.cover_image_url.trim() !== ""
+    ? post.cover_image_url
+    : "https://ik.imagekit.io/te9biwxvl/verrsa-team.png";
 
   const url = `https://verrsa.org/post/${post.id}`;
 
@@ -952,86 +965,138 @@ const formatted = formatContent(post.content || "");
                   </div>
                 )}
 
-                {/* Audio Progress */}
-                {post.audio_url && (
-                  <div style={{ marginBottom: spacing.base }}>
-                    <span style={{
-                      fontSize: fontSize.sm,
-                      color: theme.secondaryText,
-                      marginBottom: spacing.sm,
-                      display: "block",
-                      textAlign: "center",
-                    }}>
-                      {formatTime(audioProgress.position)} / {formatTime(audioProgress.duration)}
-                    </span>
-                    <div style={{
-                      height: 4,
-                      backgroundColor: theme.border,
-                      borderRadius: radius.xs,
-                      overflow: "hidden",
-                      width: "100%",
-                      marginBottom: spacing.base,
-                    }}>
-                      <div style={{
-                        height: "100%",
-                        width: audioProgress.duration
-                          ? `${(audioProgress.position / audioProgress.duration) * 100}%`
-                          : "0%",
-                        backgroundColor: "#00BFFF",
-                        borderRadius: radius.xs,
-                        transition: "width 0.2s ease",
-                      }} />
-                    </div>
-
-                    {/* Play Button */}
-                    <button
-                      style={{
-                        backgroundColor: "#00BFFF",
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        padding: spacing.base,
-                        borderRadius: radius.lg,
-                        marginBottom: spacing.lg,
-                        border: "none",
-                        cursor: "pointer",
-                        width: "100%",
-                      }}
-                      onClick={handlePlayPause}
-                    >
-                      {isPlaying ? (
-                        <IoPauseCircle size={24} color="#fff" />
-                      ) : (
-                        <IoPlayCircle size={24} color="#fff" />
-                      )}
-                      <span style={{
-                        color: "#fff",
-                        fontSize: fontSize.base,
-                        fontWeight: "600",
-                        marginLeft: spacing.sm,
-                      }}>
-                        {isPlaying ? "Pause" : "Play"} Podcast
-                      </span>
-                    </button>
-                  </div>
-                )}
 
                 {post.description && (
                   <p
                     style={{
                       fontSize: fontSize.base,
                       lineHeight: "24px",
-                      marginBottom: spacing.base,
+                      marginBottom: spacing.lg,
                       color: theme.text,
                     }}
                   >
                     {post.description}
                   </p>
                 )}
+
+                
               </div>
             </>
           )}
+
+
+ {/* Podcast Player Controls - Fixed at bottom for podcasts */}
+      {post.post_type === 'podcast' && post.audio_url && (
+        <div style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: theme.cardBackground,
+          borderTop: `1px solid ${theme.border}`,
+          padding: spacing.base,
+          zIndex: 1000,
+          boxShadow: "0 -2px 10px rgba(0,0,0,0.1)",
+        }}>
+          <div style={{
+            maxWidth: "600px",
+            margin: "0 auto",
+          }}>
+            {/* Time Display */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: spacing.xs,
+            }}>
+              <span style={{
+                fontSize: fontSize.sm,
+                color: theme.secondaryText,
+              }}>
+                {formatTime(audioProgress.position)}
+              </span>
+              <span style={{
+                fontSize: fontSize.sm,
+                color: theme.secondaryText,
+              }}>
+                {formatTime(audioProgress.duration)}
+              </span>
+            </div>
+
+            {/* Progress Bar */}
+            <div
+              onClick={handleSeek}
+              style={{
+                height: 6,
+                backgroundColor: theme.border,
+                borderRadius: radius.xs,
+                overflow: "hidden",
+                width: "100%",
+                marginBottom: spacing.md,
+                cursor: "pointer",
+                position: "relative",
+              }}
+            >
+              <div style={{
+                height: "100%",
+                width: audioProgress.duration
+                  ? `${(audioProgress.position / audioProgress.duration) * 100}%`
+                  : "0%",
+                backgroundColor: "#00BFFF",
+                borderRadius: radius.xs,
+                transition: "width 0.2s ease",
+              }} />
+            </div>
+
+            {/* Play/Pause Button */}
+            <button
+              style={{
+                backgroundColor: "#00BFFF",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: `${spacing.sm}px ${spacing.base}px`,
+                borderRadius: radius.lg,
+                border: "none",
+                cursor: "pointer",
+                width: "100%",
+              }}
+              onClick={handlePlayPause}
+            >
+              {isPlaying ? (
+                <IoPauseCircle size={28} color="#fff" />
+              ) : (
+                <IoPlayCircle size={28} color="#fff" />
+              )}
+              <span style={{
+                color: "#fff",
+                fontSize: fontSize.base,
+                fontWeight: "600",
+                marginLeft: spacing.sm,
+              }}>
+                {isPlaying ? "Pause" : "Play"} Podcast
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
           {/* Article UI (existing) */}
           {(!post.post_type || post.post_type === 'article') && (
@@ -1577,8 +1642,109 @@ const formatted = formatContent(post.content || "");
               </div>
             </>
           )}
+
+          {/* Add padding at bottom for podcast player controls */}
+          {post.post_type === 'podcast' && post.audio_url && (
+            <div style={{ height: 140 }} />
+          )}
         </div>
       </div>
+
+      {/* Podcast Player Controls - Fixed at bottom for podcasts */}
+      {post.post_type === 'podcast' && post.audio_url && (
+        <div style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: theme.cardBackground,
+          borderTop: `1px solid ${theme.border}`,
+          padding: spacing.base,
+          zIndex: 1000,
+          boxShadow: "0 -2px 10px rgba(0,0,0,0.1)",
+        }}>
+          <div style={{
+            maxWidth: "600px",
+            margin: "0 auto",
+          }}>
+            {/* Time Display */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: spacing.xs,
+            }}>
+              <span style={{
+                fontSize: fontSize.sm,
+                color: theme.secondaryText,
+              }}>
+                {formatTime(audioProgress.position)}
+              </span>
+              <span style={{
+                fontSize: fontSize.sm,
+                color: theme.secondaryText,
+              }}>
+                {formatTime(audioProgress.duration)}
+              </span>
+            </div>
+
+            {/* Progress Bar */}
+            <div
+              onClick={handleSeek}
+              style={{
+                height: 6,
+                backgroundColor: theme.border,
+                borderRadius: radius.xs,
+                overflow: "hidden",
+                width: "100%",
+                marginBottom: spacing.md,
+                cursor: "pointer",
+                position: "relative",
+              }}
+            >
+              <div style={{
+                height: "100%",
+                width: audioProgress.duration
+                  ? `${(audioProgress.position / audioProgress.duration) * 100}%`
+                  : "0%",
+                backgroundColor: "#00BFFF",
+                borderRadius: radius.xs,
+                transition: "width 0.2s ease",
+              }} />
+            </div>
+
+            {/* Play/Pause Button */}
+            <button
+              style={{
+                backgroundColor: "#00BFFF",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: `${spacing.sm}px ${spacing.base}px`,
+                borderRadius: radius.lg,
+                border: "none",
+                cursor: "pointer",
+                width: "100%",
+              }}
+              onClick={handlePlayPause}
+            >
+              {isPlaying ? (
+                <IoPauseCircle size={28} color="#fff" />
+              ) : (
+                <IoPlayCircle size={28} color="#fff" />
+              )}
+              <span style={{
+                color: "#fff",
+                fontSize: fontSize.base,
+                fontWeight: "600",
+                marginLeft: spacing.sm,
+              }}>
+                {isPlaying ? "Pause" : "Play"} Podcast
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       {showCommentModal && (

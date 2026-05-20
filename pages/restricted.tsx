@@ -5,7 +5,7 @@ import React from "react";
 import { useRouter } from 'next/router';
 import { spacing, radius, fontSize } from "../lib/theme";
 import AppText from "../components/AppText";
-import { supabase } from "../components/supabase";
+import { supabase, signOut } from "../components/supabase";
 import { useTheme } from "../context/ThemeProvider";
 
 type RestrictedRoute = {
@@ -35,7 +35,7 @@ export default function Restricted({
 
   const onSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      await signOut();
     } finally {
       router.push('/home');
     }

@@ -19,7 +19,7 @@ import {
   IoPhonePortraitOutline,
   IoMoonOutline,
 } from "react-icons/io5";
-import { supabase } from "../components/supabase";
+import { supabase, signOut } from "../components/supabase";
 import VerificationBadge from "../components/VerificationBadge";
 
 export default function Menu({ isOpen = false, onClose, embedded = false }) {
@@ -129,7 +129,7 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
     setSwitchModalVisible(false);
     
     if (window.confirm("You will be redirected to the login screen to add another account.")) {
-      supabase.auth.signOut().then(() => {
+      signOut().then(() => {
         router.push("/auth");
       });
     }
@@ -151,7 +151,7 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
   };
 
   const handleSignOut = () => {
-    supabase.auth.signOut().then(() => {
+    signOut().then(() => {
       router.push("/auth");
       setSignOutModalVisible(false);
     });

@@ -6,7 +6,7 @@
  * Supabase Edge Functions via notificationService — no secrets in this file.
  */
 
-import { supabase } from './supabase';
+import { supabase, getCachedUser } from './supabase';
 import { getActiveModerationExclusions } from '../lib/moderationExclusions';
 import { notificationService } from '../lib/notificationService';
 
@@ -181,7 +181,7 @@ export const createArticle = async (articleData: {
   reading_time?: number;
 }): Promise<Article | null> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) throw new Error('No authenticated user');
 
     const { data: profile } = await supabase.from('profiles').select('id').eq('id', user.id).maybeSingle();
@@ -241,7 +241,7 @@ export const getPodcasts = async (limit = 10, offset = 0): Promise<Podcast[]> =>
 
 export const createPodcast = async (podcastData: any) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) throw new Error('No authenticated user');
 
     const { data, error } = await supabase
@@ -327,7 +327,7 @@ export const createVideo = async (videoData: {
   tags?: string[];
 }): Promise<Video | null> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) throw new Error('No authenticated user');
 
     const { data, error } = await supabase
@@ -405,7 +405,7 @@ export const getVerses = async (limit = 10, offset = 0): Promise<Verse[]> => {
 
 export const createVerse = async (verseData: { content: string; image_url?: string }): Promise<Verse | null> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) throw new Error('No authenticated user');
 
     const { data, error } = await supabase
@@ -428,7 +428,7 @@ export const toggleLike = async (
   contentType: 'article' | 'podcast' | 'video' | 'community' | 'community_post' | 'verse',
 ): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return false;
 
     const { data: userLike } = await supabase.from('likes').select('id')
@@ -485,7 +485,7 @@ export const getUserLikeStatus = async (
   contentType: 'article' | 'podcast' | 'video' | 'community' | 'community_post' | 'verse',
 ): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return false;
 
     const { data } = await supabase.from('likes').select('id')
@@ -501,7 +501,7 @@ export const getUserLikeStatusBatch = async (
   contentItems: { id: string; type: 'article' | 'podcast' | 'video' | 'community' | 'community_post' | 'verse' }[],
 ): Promise<Record<string, boolean>> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user || contentItems.length === 0) return {};
 
     const contentIds = contentItems.map((item) => item.id);
@@ -561,7 +561,7 @@ export const trackShare = async (
   try {
     if (!contentId || !contentType) return false;
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
 
     const { error } = await supabase.from('shares').insert([{
       user_id: user?.id || null, content_id: contentId, content_type: contentType,
@@ -609,7 +609,7 @@ export const toggleBookmark = async (
   folder?: string,
 ): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return false;
 
     const { data: existing } = await supabase.from('bookmarks').select('id')
@@ -646,7 +646,7 @@ export const toggleBookmark = async (
 
 export const getUserBookmarkStatus = async (contentId: string, contentType: string): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return false;
     const { data } = await supabase.from('bookmarks').select('id')
       .eq('user_id', user.id).eq('content_id', contentId).eq('content_type', contentType).single();
@@ -658,7 +658,7 @@ export const getUserBookmarkStatusBatch = async (
   contentItems: { id: string; type: string }[],
 ): Promise<Record<string, boolean>> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user || contentItems.length === 0) return {};
 
     const { data: bookmarks } = await supabase.from('bookmarks').select('content_id, content_type')
@@ -674,7 +674,7 @@ export const getUserBookmarkStatusBatch = async (
 
 export const getUserBookmarks = async (limit = 50, offset = 0): Promise<any[]> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return [];
 
     const { data: allUserBookmarks, error } = await supabase.from('bookmarks').select('*')
@@ -749,7 +749,7 @@ export const getComments = async (contentId: string, contentType: string): Promi
 
 export const createComment = async (contentId: string, contentType: string, comment: string) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) throw new Error('No authenticated user');
     if (!contentId || !contentType || !comment.trim()) throw new Error('Missing required parameters');
 
@@ -803,7 +803,7 @@ export const createReplyComment = async (
   const result = await createComment(contentId, contentType, marker + replyText);
 
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return result;
 
     const { data: parentComment } = await supabase.from('comments').select('user_id').eq('id', parentCommentId).single();
@@ -820,7 +820,7 @@ export const createReplyComment = async (
 
 export const deleteComment = async (commentId: string): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return false;
 
     const { error } = await supabase.from('comments').delete().eq('id', commentId).eq('user_id', user.id);
@@ -834,7 +834,7 @@ export const deleteComment = async (commentId: string): Promise<boolean> => {
 
 export const toggleCommentLike = async (commentId: string): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return false;
 
     const { data: existing } = await supabase.from('comment_likes').select('id')
@@ -860,7 +860,7 @@ export const toggleCommentLike = async (commentId: string): Promise<boolean> => 
 
 export const getCommentLikeStatus = async (commentId: string): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return false;
     const { data } = await supabase.from('comment_likes').select('id').eq('user_id', user.id).eq('comment_id', commentId).single();
     return !!data;
@@ -950,7 +950,7 @@ export const getUserAllPosts = async (userId: string): Promise<(Article | Podcas
 
 export const getUserProfile = async (userId?: string) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     const targetUserId = userId || user?.id;
     if (!targetUserId) throw new Error('No user ID provided');
 
@@ -968,7 +968,7 @@ export const updateUserProfile = async (updates: {
   website?: string; location?: string; skills?: string[];
 }) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) throw new Error('No authenticated user');
 
     const { data, error } = await supabase.from('profiles')
@@ -987,7 +987,7 @@ export const updateUserProfile = async (updates: {
 
 export const getNotifications = async (limit = 50, offset = 0) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return [];
 
     const { data: notifications, error } = await supabase.from('notifications')
@@ -1024,7 +1024,7 @@ export const markNotificationAsRead = async (notificationId: string): Promise<bo
 
 export const markAllNotificationsAsRead = async (): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return false;
     const { error } = await supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false);
     return !error;
@@ -1033,7 +1033,7 @@ export const markAllNotificationsAsRead = async (): Promise<boolean> => {
 
 export const getUnreadNotificationCount = async (): Promise<number> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return 0;
     const { count } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false);
     return count || 0;
@@ -1115,7 +1115,7 @@ export const trackView = async (
   deviceType?: string,
 ): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     await supabase.from('views').insert([{
       user_id: user?.id || null, content_id: contentId, content_type: contentType,
       duration: duration || null, device_type: deviceType || null,
@@ -1212,7 +1212,7 @@ export const getPriceForDuration = async (days: number): Promise<number> => {
 
 export const createPromotedPost = async (campaignData: any) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) throw new Error('No authenticated user');
 
     const { data, error } = await supabase.from('promoted_posts').insert([{
@@ -1256,7 +1256,7 @@ export const updatePromotedPostPayment = async (promotedPostId: string, paymentD
 
 export const getUserPromotedPosts = async () => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCachedUser();
     if (!user) return [];
     const { data, error } = await supabase.from('promoted_posts').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
     return error ? [] : (data || []);

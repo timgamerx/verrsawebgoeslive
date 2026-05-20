@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import React, { useState, useEffect } from "react";
 import { spacing, radius, fontSize } from '../lib/theme';
 import { IoChevronBack, IoChevronForward } from 'react-icons/io5';
-import { supabase } from '../components/supabase';
+import { supabase, signOut } from '../components/supabase';
 import {
   fetchCurrentUserProfile,
   getMemberSinceDate,
@@ -595,7 +595,7 @@ export default function ProfileSetting() {
         console.warn("Preference cleanup error", storageError);
       });
 
-      await supabase.auth.signOut();
+      await signOut();
 
       window.alert(/* Alert: */ 
         "Account Deleted",
@@ -910,7 +910,7 @@ export default function ProfileSetting() {
                                 {
                                   text: "OK",
                                   onPress: async () => {
-                                    await supabase.auth.signOut();
+                                    await signOut();
                                     router.push("/");
                                   },
                                 },

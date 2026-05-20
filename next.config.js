@@ -21,13 +21,19 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '*.supabase.co',
+        hostname: 'ysmrnxmvuijzvdegfdmm.supabase.co',
       },
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
       },
     ],
+    unoptimized: false,
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    minimumCacheTTL: 60,
+    formats: ['image/webp'],
   },
 }
 

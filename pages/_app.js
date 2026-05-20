@@ -8,11 +8,20 @@ import { HelmetProvider } from 'react-helmet-async';
 import { useRouter } from 'next/router';
 import MainTab from '../components/maintab';
 import Menu from './menu';
+import AppDownloadModal from '../components/AppDownloadModal';
+import {
+  shouldShowAppDownloadPrompt,
+  markAppDownloadPromptShown,
+  markAppDownloadPromptDismissed,
+  getPromptDelay
+} from '../lib/appDownloadPromptManager';
+import { isMobileDevice } from '../lib/deviceDetection';
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [showAppDownloadModal, setShowAppDownloadModal] = useState(false);
   const tabRoutes = ['/home', '/articles', '/Podcasts', '/Reels', '/Community'];
   const showMainTabs = tabRoutes.includes(router.pathname);
   const rightMenuRoutes = [
@@ -46,6 +55,33 @@ function MyApp({ Component, pageProps }) {
     setIsMobileMenuOpen(false);
   }, [router.pathname]);
 
+  // App Download Prompt Logic
+  useEffect(() => {
+    // Only show on mobile devices
+    if (!isMobileDevice()) return;
+
+    // Check if we should show the prompt
+    if (!shouldShowAppDownloadPrompt()) return;
+
+    // Set a timer to show the modal after 30 seconds
+    const timer = setTimeout(() => {
+      setShowAppDownloadModal(true);
+      markAppDownloadPromptShown();
+    }, getPromptDelay());
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleDismissAppDownload = () => {
+    setShowAppDownloadModal(false);
+    markAppDownloadPromptDismissed();
+  };
+
+  const handleOpenApp = () => {
+    setShowAppDownloadModal(false);
+    markAppDownloadPromptShown();
+  };
+
   return (
     <HelmetProvider>
       <ThemeProvider>
@@ -69,6 +105,13 @@ function MyApp({ Component, pageProps }) {
                 )}
               </div>
               {showMainTabs && <MainTab />}
+              
+              {/* App Download Prompt Modal */}
+              <AppDownloadModal
+                visible={showAppDownloadModal}
+                onDismiss={handleDismissAppDownload}
+                onOpenApp={handleOpenApp}
+              />
             </LiveStreamProvider>
           </BookmarkProvider>
         </AuthProvider>

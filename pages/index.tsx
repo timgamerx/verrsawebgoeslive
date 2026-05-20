@@ -453,7 +453,7 @@ export default function LandingPage() {
                   className="bg-blue-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
                 >
                   <Image
-                    src={post.cover_image_url || post.images?.[0]?.url || post.thumbnail_url || post.video_url || '/hero-image.jpg'}
+                    src={post.cover_image_url || post.images?.[0]?.url || post.thumbnail_url || '/hero-image.jpg'}
                     alt={post.title}
                     width={400}
                     height={250}
