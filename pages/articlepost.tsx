@@ -100,6 +100,8 @@ const renderFormattedText = (text: string, textClass: string): React.ReactNode =
 interface ArticleItem {
   id: string;
   title: string;
+  excerpt?: string;
+  description?: string;
   content?: string;
   cover_image_url?: string;
   category?: string;
@@ -131,6 +133,7 @@ const ArticlePost: React.FC = () => {
 
   const [article, setArticle] = useState<ArticleItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authorName, setAuthorName] = useState<string>("");
 
   // Comments state
   type ArticleComment = {
@@ -252,6 +255,15 @@ const ArticlePost: React.FC = () => {
           if (stored) {
             const articleData = JSON.parse(stored);
             setArticle(articleData);
+            // Fetch author name if possible
+            if (articleData.user_id) {
+              const { data: profile } = await supabase
+                .from("profiles")
+                .select("full_name, username")
+                .eq("id", articleData.user_id)
+                .maybeSingle();
+              setAuthorName(profile?.full_name || profile?.username || "");
+            }
             setLoading(false);
             return;
           }
@@ -274,6 +286,15 @@ const ArticlePost: React.FC = () => {
             data.profiles = data.profiles[0];
           }
           setArticle(data);
+          // Fetch author name
+          if (data.user_id) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("full_name, username")
+              .eq("id", data.user_id)
+              .maybeSingle();
+            setAuthorName(profile?.full_name || profile?.username || "");
+          }
         } else {
           alert("Article not found");
           router.back();
@@ -509,12 +530,27 @@ const ArticlePost: React.FC = () => {
     <>
       <Head>
         <title>{article.title}</title>
-        <meta name="description" content={(article.content || article.title).slice(0, 160)} />
+        <meta
+          name="description"
+          content={
+            authorName
+              ? `By ${authorName} - ${(article.excerpt || article.content || article.title).slice(0, 160)}`
+              : (article.excerpt || article.content || article.title).slice(0, 160)
+          }
+        />
         <meta property="og:title" content={article.title} />
-        <meta property="og:description" content={(article.content || article.title).slice(0, 160)} />
-        {article.cover_image_url && (
-          <meta property="og:image" content={article.cover_image_url} />
-        )}
+        <meta
+          property="og:description"
+          content={
+            authorName
+              ? `By ${authorName} - ${(article.excerpt || article.content || article.title).slice(0, 160)}`
+              : (article.excerpt || article.content || article.title).slice(0, 160)
+          }
+        />
+        <meta
+          property="og:image"
+          content={article.cover_image_url || "https://ik.imagekit.io/te9biwxvl/verrsa-team.png"}
+        />
       </Head>
 
       <div

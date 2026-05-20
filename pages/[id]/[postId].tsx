@@ -881,20 +881,35 @@ export async function getServerSideProps(context: any) {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
-    const { data } = await supabase
+    // Fetch post and author info for articles
+    const { data: post } = await supabase
       .from('posts')
-      .select('id, post_type, title, content, description, cover_image_url, thumbnail_url, video_url')
+      .select('id, post_type, title, content, description, cover_image_url, thumbnail_url, video_url, user_id')
       .eq('id', postId)
       .maybeSingle();
 
-    if (!data) {
+    if (!post) {
       return { props: { initialMeta: fallbackMeta } };
     }
 
-    const title = (data.title || data.content || 'Verrsa Post').toString();
-    const description = (data.description || data.content || 'Discover this post on Verrsa.').toString();
-    const image = data.cover_image_url || data.thumbnail_url || `${SITE_URL}/api/post?id=${encodeURIComponent(postId)}`;
-    const postType = String(data.post_type || '').toLowerCase();
+    let authorName = '';
+    if (post.post_type === 'article' && post.user_id) {
+      // Fetch author profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, username')
+        .eq('id', post.user_id)
+        .maybeSingle();
+      authorName = profile?.full_name || profile?.username || '';
+    }
+
+    const title = post.title || post.content || 'Verrsa Post';
+    const description =
+      post.post_type === 'article' && authorName
+        ? `By ${authorName} - ${(post.description || post.content || 'Discover this post on Verrsa.').toString().slice(0, 160)}`
+        : (post.description || post.content || 'Discover this post on Verrsa.').toString();
+    const image = post.cover_image_url || post.thumbnail_url || `${SITE_URL}/api/post?id=${encodeURIComponent(postId)}`;
+    const postType = String(post.post_type || '').toLowerCase();
     const type = postType === 'video' ? 'video.other' : 'article';
     const canonicalSection =
       postType === 'video' ? 'reel' :
@@ -911,7 +926,7 @@ export async function getServerSideProps(context: any) {
           image,
           url: `${SITE_URL}/${canonicalSection}/${postId}`,
           type,
-          video: postType === 'video' ? data.video_url || null : null,
+          video: postType === 'video' ? post.video_url || null : null,
         },
       },
     };
