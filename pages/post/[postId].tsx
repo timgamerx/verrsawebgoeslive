@@ -568,12 +568,29 @@ const formatted = formatContent(post.content || "");
         <meta name="description" content={description} />
 
         {/* Open Graph */}
-        <meta property="og:type" content="article" />
+        <meta
+  property="og:type"
+  content={
+    post.post_type === "video"
+      ? "video.other"
+      : post.post_type === "podcast"
+      ? "music.song"
+      : "article"
+  }
+/>
         <meta property="og:title" content={post.title || "Verrsa Post"} />
         <meta property="og:description" content={description} />
         <meta property="og:image" content={image} />
         <meta property="og:url" content={url} />
         <meta property="og:site_name" content="Verrsa" />
+        {post.post_type === "video" && (
+  <>
+    <meta property="og:video" content={post.video_url} />
+    <meta property="og:video:type" content="video/mp4" />
+    <meta name="twitter:player:stream" content={post.video_url} />
+    <meta name="twitter:player:stream:content_type" content="video/mp4" />
+  </>
+)}
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
