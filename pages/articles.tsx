@@ -157,6 +157,9 @@ function Articles() {
     fetchUserAvatar();
   }, []);
 
+   const navigateToPost = (postId) => {
+    if (postId) router.push(`/post/${postId}`);
+  };
 
   const navigateToWriteArticle = () => {
     router.push('/write-article');
@@ -269,7 +272,7 @@ function Articles() {
         {/* Article Content */}
         <div style={{ cursor: "pointer" }}
         // onClick={() => router.push(`/article/${item.id}`, { state: { article: item } })}
-         onClick={() => router.push(`/articlepost?id=${item.id}`)}
+         onClick={ () => router.push(`/post/${item.id}`) }
         >
           <div style={styles.rowContent}>
               <p style={styles.postText}>{displayContent}</p>

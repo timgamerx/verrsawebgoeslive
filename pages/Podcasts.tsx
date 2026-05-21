@@ -125,7 +125,10 @@ const Podcasts = () => {
 
   const router = useRouter();
   
-  
+  const navigateToPost = (postId) => {
+    if (postId) router.push(`/post/${postId}`);
+  };
+
   const navigateToCreatePodcast = () => {
     router.push('/create-podcast');
   };
@@ -526,7 +529,7 @@ const Podcasts = () => {
                 cursor: 'pointer',
               }}
              // onClick={() => router.push(`/podcast/${podcast.id}`, { state: { podcast } })}
-             onClick={() => router.push(`/podcastpost?id=${item.id}`)}
+             onClick={ () => router.push(`/post/${podcast.id}`) }
               
               >
                 <img

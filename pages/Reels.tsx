@@ -300,7 +300,7 @@ function Reels() {
       <MetaTags
         title={currentVideo?.title || "Reels - Verrsa"}
         description={currentVideo?.description || "Watch short videos and reels from creators on Verrsa. Discover entertaining and educational video content."}
-        image={currentVideo?.id ? `https://www.verrsa.org/api/post?id=${encodeURIComponent(currentVideo.id)}` : currentVideo?.thumbnail_url}
+        image={currentVideo?.id ? `https://www.verrsa.org/post/post?id=${encodeURIComponent(currentVideo.id)}` : currentVideo?.thumbnail_url}
         url={typeof window !== "undefined" ? window.location.href : ""}
         type="video.other"
         video={currentVideo?.video_url}
