@@ -7,6 +7,7 @@ import { MdAnalytics } from 'react-icons/md';
 import { FiMessageCircle, FiBookmark } from 'react-icons/fi';
 import MetaTags from '../components/MetaTags';
 import VerificationBadge from '../components/VerificationBadge';
+import PodcastAppPromptModal from '../components/PodcastAppPromptModal';
 import { getPodcasts, toggleLike as apiToggleLike, getUserLikeStatusBatch, toggleBookmark as apiToggleBookmark, getUserBookmarkStatusBatch, trackShare } from '../components/api';
 import { supabase } from '../components/supabase';
 import { useRouter } from 'next/router';
@@ -121,6 +122,8 @@ const Podcasts = () => {
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [userAvatar, setUserAvatar] = useState('/avatar.jpg');
+  const [showPodcastPrompt, setShowPodcastPrompt] = useState(false);
+  const [selectedPodcast, setSelectedPodcast] = useState(null);
   const categoryRefs = useRef({});
 
   const router = useRouter();
@@ -131,6 +134,20 @@ const Podcasts = () => {
 
   const navigateToCreatePodcast = () => {
     router.push('/create-podcast');
+  };
+
+  const handlePodcastClick = (podcast) => {
+    // Show app prompt modal instead of navigating directly
+    setSelectedPodcast(podcast);
+    setShowPodcastPrompt(true);
+  };
+
+  const handleDismissPodcastPrompt = () => {
+    setShowPodcastPrompt(false);
+    // If user dismisses, navigate to the podcast page in browser
+    if (selectedPodcast) {
+      router.push(`/post/${selectedPodcast.id}`);
+    }
   };
 
   const navigateToMenu = () => {
@@ -528,8 +545,7 @@ const Podcasts = () => {
                 marginBottom: '16px',
                 cursor: 'pointer',
               }}
-             // onClick={() => router.push(`/podcast/${podcast.id}`, { state: { podcast } })}
-             onClick={ () => router.push(`/post/${podcast.id}`) }
+             onClick={() => handlePodcastClick(podcast)}
               
               >
                 <img
@@ -738,6 +754,14 @@ const Podcasts = () => {
       </div>
 
     </div>
+
+    {/* Podcast App Prompt Modal */}
+    <PodcastAppPromptModal
+      visible={showPodcastPrompt}
+      onDismiss={handleDismissPodcastPrompt}
+      podcastId={selectedPodcast?.id}
+      podcastTitle={selectedPodcast?.title}
+    />
     </>
   );
 };

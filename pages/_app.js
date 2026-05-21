@@ -35,9 +35,9 @@ function MyApp({ Component, pageProps }) {
   ];
   const showRightMenu = rightMenuRoutes.includes(router.pathname);
   
-  // Routes where app download modal should appear
-  const appDownloadRoutes = ['/home', '/articles', '/Podcasts', '/Reels', '/profile', '/user/[userId]'];
-  const shouldShowAppDownload = appDownloadRoutes.includes(router.pathname);
+  // Routes where app download modal should NOT appear (e.g., auth pages)
+  const excludedAppDownloadRoutes = ['/auth', '/login', '/signup', '/resetpassword', '/setnewpassword'];
+  const shouldShowAppDownload = !excludedAppDownloadRoutes.includes(router.pathname);
 
   useEffect(() => {
     const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
@@ -67,7 +67,7 @@ function MyApp({ Component, pageProps }) {
     }
   }, []);
 
-  // App Download Prompt Logic
+  // App Download Prompt Logic - Show every 1 minute
   useEffect(() => {
     // Only show on specific routes
     if (!shouldShowAppDownload) {
@@ -75,32 +75,34 @@ function MyApp({ Component, pageProps }) {
       return;
     }
 
-    // Check if we should show the prompt
-    if (!shouldShowAppDownloadPrompt()) {
-      console.log('[AppDownload] Prompt already shown or dismissed, skipping');
-      return;
-    }
-
-    console.log('[AppDownload] Will show prompt in 30 seconds on route:', router.pathname);
+    console.log('[AppDownload] Setting up recurring prompt every 60 seconds on route:', router.pathname);
     
-    // Set a timer to show the modal after 30 seconds
-    const timer = setTimeout(() => {
-      console.log('[AppDownload] Showing modal now');
+    // Show the modal after 30 seconds initially
+    const initialTimer = setTimeout(() => {
+      console.log('[AppDownload] Showing initial modal');
       setShowAppDownloadModal(true);
-      markAppDownloadPromptShown();
-    }, getPromptDelay());
+    }, 30000); // 30 seconds
 
-    return () => clearTimeout(timer);
+    // Then show it every 60 seconds
+    const recurringTimer = setInterval(() => {
+      console.log('[AppDownload] Showing recurring modal');
+      setShowAppDownloadModal(true);
+    }, 60000); // 60 seconds = 1 minute
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(recurringTimer);
+    };
   }, [router.pathname, shouldShowAppDownload]);
 
   const handleDismissAppDownload = () => {
+    // Just close the modal - it will show again after 1 minute
     setShowAppDownloadModal(false);
-    markAppDownloadPromptDismissed();
   };
 
   const handleOpenApp = () => {
+    // Close the modal when user clicks to open app
     setShowAppDownloadModal(false);
-    markAppDownloadPromptShown();
   };
 
   return (
