@@ -66,18 +66,18 @@ export const PodcastAppPromptModal: React.FC<PodcastAppPromptModalProps> = ({
       window.location.href = deepLink;
       // Fallback to App Store after a delay if app is not installed
       setTimeout(() => {
-        window.location.href = 'https://apps.apple.com/app/verrsa/id123456789'; // Replace with actual App Store URL
+        window.location.href = 'https://apps.apple.com/us/app/verrsa/id6756518229'; // Replace with actual App Store URL
       }, 2000);
     } else if (deviceType === 'android') {
       // Android deep linking
       window.location.href = deepLink;
       // Fallback to Play Store after a delay if app is not installed
       setTimeout(() => {
-        window.location.href = 'https://play.google.com/store/apps/details?id=com.verrsa.app'; // Replace with actual Play Store URL
+        window.location.href = 'https://play.google.com/store/apps/details?id=com.verrsaapp.verrsa'; // Replace with actual Play Store URL
       }, 2000);
     } else {
       // Desktop - show download options
-      window.open('https://www.verrsa.org/download', '_blank');
+      window.open('https://www.verrsa.org', '_blank');
     }
     
     onDismiss();
