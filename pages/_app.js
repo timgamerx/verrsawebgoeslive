@@ -34,6 +34,10 @@ function MyApp({ Component, pageProps }) {
     '/Community',
   ];
   const showRightMenu = rightMenuRoutes.includes(router.pathname);
+  
+  // Routes where app download modal should appear
+  const appDownloadRoutes = ['/home', '/articles', '/Podcasts', '/Reels', '/profile', '/user/[userId]'];
+  const shouldShowAppDownload = appDownloadRoutes.includes(router.pathname);
 
   useEffect(() => {
     const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
@@ -65,9 +69,9 @@ function MyApp({ Component, pageProps }) {
 
   // App Download Prompt Logic
   useEffect(() => {
-    // Only show on mobile devices
-    if (!isMobileDevice()) {
-      console.log('[AppDownload] Not a mobile device, skipping prompt');
+    // Only show on specific routes
+    if (!shouldShowAppDownload) {
+      console.log('[AppDownload] Not on a route that shows app download modal');
       return;
     }
 
@@ -77,7 +81,7 @@ function MyApp({ Component, pageProps }) {
       return;
     }
 
-    console.log('[AppDownload] Will show prompt in 30 seconds...');
+    console.log('[AppDownload] Will show prompt in 30 seconds on route:', router.pathname);
     
     // Set a timer to show the modal after 30 seconds
     const timer = setTimeout(() => {
@@ -87,7 +91,7 @@ function MyApp({ Component, pageProps }) {
     }, getPromptDelay());
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [router.pathname, shouldShowAppDownload]);
 
   const handleDismissAppDownload = () => {
     setShowAppDownloadModal(false);

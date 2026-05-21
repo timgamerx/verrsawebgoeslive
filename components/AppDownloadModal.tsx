@@ -48,10 +48,7 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
     };
   }, [visible]);
 
-  if (!visible || !isMobileDevice()) {
-    if (visible && !isMobileDevice()) {
-      console.log('[AppDownloadModal] Modal is visible but not on mobile device');
-    }
+  if (!visible) {
     return null;
   }
 
@@ -63,7 +60,8 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
   const getDeviceName = (): string => {
     if (deviceType === 'ios') return 'iPhone';
     if (deviceType === 'android') return 'Android';
-    return 'mobile';
+    if (deviceType === 'desktop') return 'device';
+    return 'device';
   };
 
   const getStoreName = (): string => {
@@ -71,6 +69,8 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
     if (deviceType === 'android') return 'Play Store';
     return 'app store';
   };
+
+  const isDesktopDevice = deviceType === 'desktop';
 
   return (
     <div
@@ -167,7 +167,10 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
             padding: `0 ${spacing.sm}px`,
           }}
         >
-          Experience the best of Verrsa on your {getDeviceName()}. Enjoy a faster, smoother experience with exclusive mobile features.
+          {isDesktopDevice
+            ? 'Download the Verrsa mobile app for the best experience. Enjoy exclusive features, faster performance, and seamless content creation on the go.'
+            : `Experience the best of Verrsa on your ${getDeviceName()}. Enjoy a faster, smoother experience with exclusive mobile features.`
+          }
         </p>
 
         {/* Features List */}
@@ -222,7 +225,7 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
           }}
         >
           <span style={{ color: "#fff", fontWeight: "600", fontSize: 15 }}>
-            Open App
+            {isDesktopDevice ? 'Download App' : 'Open App'}
           </span>
         </button>
 
@@ -252,7 +255,10 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
             opacity: 0.7,
           }}
         >
-          Opens {getStoreName()} if app is not installed
+          {isDesktopDevice
+            ? 'Available on iOS and Android'
+            : `Opens ${getStoreName()} if app is not installed`
+          }
         </p>
       </div>
     </div>

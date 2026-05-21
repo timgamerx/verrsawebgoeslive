@@ -79,8 +79,18 @@ export const openApp = (deviceType: DeviceType): void => {
   } else if (deviceType === 'android') {
     // Android intent will handle both opening app and fallback to Play Store
     window.location.href = deepLink;
+  } else if (deviceType === 'desktop') {
+    // For desktop, show both app store links
+    const iosLink = getAppLinks('ios').appStoreUrl;
+    const androidLink = getAppLinks('android').appStoreUrl;
+    
+    // Open iOS App Store in new tab
+    window.open(iosLink, '_blank');
+    
+    // Optionally open Android Play Store as well
+    // setTimeout(() => window.open(androidLink, '_blank'), 500);
   } else {
-    // For desktop or unknown, just open the appropriate store if available
+    // For unknown, try to open any available store
     if (appStoreUrl) {
       window.open(appStoreUrl, '_blank');
     }

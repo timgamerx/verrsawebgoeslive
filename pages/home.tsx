@@ -28,6 +28,7 @@ import { supabase } from '../components/supabase';
 import PodcastPost from "./podcastpost";
 import { stat } from "fs";
 import Link from 'next/link'
+import Head from 'next/head';
 
 
 // Dummy posts data
