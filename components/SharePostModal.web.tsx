@@ -68,15 +68,15 @@ export default function SharePostModal({
     id?: string,
   ): string | null => {
     if (!type || !id) return null;
-    if (type === "article") return `/article/${encodeURIComponent(id)}`;
-    if (type === "podcast") return `/podcast/${encodeURIComponent(id)}`;
-    if (type === "video") return `/reel/${encodeURIComponent(id)}`;
-    if (type === "verse") return `/verse/${encodeURIComponent(id)}`;
+    if (type === "article") return `/post/${encodeURIComponent(id)}`;
+    if (type === "podcast") return `/post/${encodeURIComponent(id)}`;
+    if (type === "video") return `/post/${encodeURIComponent(id)}`;
+    if (type === "verse") return `/post/${encodeURIComponent(id)}`;
     if (type === "community") return `/community/${encodeURIComponent(id)}`;
     if (type === "communitypost") {
-      return `/community-posts/${encodeURIComponent(id)}`;
+      return `/post/${encodeURIComponent(id)}`;
     }
-    if (type === "profile") return `/profile/${encodeURIComponent(id)}`;
+    if (type === "profile") return `/user/${encodeURIComponent(id)}`;
     return null;
   };
 

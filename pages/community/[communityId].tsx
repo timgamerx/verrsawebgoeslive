@@ -1477,7 +1477,7 @@ const CommunityProfile = () => {
     [
       community,
       members.length,
-      navigation,
+      router,
       cleanCommunityId,
       showGoLive,
       currentUser?.id,
