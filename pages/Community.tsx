@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import React, { useState, useEffect } from "react";
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { supabase } from '../components/supabase';
 import { getActiveModerationExclusions } from '../lib/moderationExclusions';
@@ -99,6 +100,26 @@ function Community() {
     });
   };
 
+  const handleShare = async (community) => {
+    try {
+      const communityUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/community/${community.id}`;
+      
+      if (navigator.share) {
+        await navigator.share({
+          title: community.name,
+          text: community.description,
+          url: communityUrl,
+        });
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(communityUrl);
+        alert("Community link copied to clipboard!");
+      }
+    } catch (error) {
+      console.error("Error sharing community:", error);
+    }
+  };
+
   const formatCount = (count) => {
     const n = count ?? 0;
     if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
@@ -128,9 +149,22 @@ function Community() {
   });
 
   return (
-    <div style={styles.container}>
-      {/* Top Header (title only) */}
-      <div style={styles.fixedHeader}>
+    <>
+      <Head>
+        <title>Communities - Verrsa</title>
+        <meta name="description" content="Discover and join communities on Verrsa. Connect with like-minded creators and enthusiasts across various topics including Tech, Fitness, Creative, Education, and Travel." />
+        <meta property="og:title" content="Communities - Verrsa" />
+        <meta property="og:description" content="Discover and join communities on Verrsa. Connect with like-minded creators and enthusiasts across various topics." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.verrsa.org/community" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Communities - Verrsa" />
+        <meta name="twitter:description" content="Discover and join communities on Verrsa. Connect with like-minded creators and enthusiasts." />
+      </Head>
+      
+      <div style={styles.container}>
+        {/* Top Header (title only) */}
+        <div style={styles.fixedHeader}>
         <h1 style={styles.headerTitle}>Community</h1>
       </div>
 
@@ -306,7 +340,7 @@ function Community() {
                   </span>
                 </button>
 
-                <button style={styles.engagementButton}>
+                <button style={styles.engagementButton} onClick={() => handleShare(community)}>
                   <IoShareOutline size={18} color="#999" />
                 </button>
 
@@ -333,6 +367,7 @@ function Community() {
         <span style={styles.fabText}>+</span>
       </button>
     </div>
+    </>
   );
 }
 

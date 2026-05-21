@@ -547,7 +547,7 @@ export default function PodcastPost() {
 
   const handleShare = async () => {
     try {
-      const podcastUrl = `https://verrsa.org/podcast/${currentPodcast?.id}`;
+      const podcastUrl = `https://verrsa.org/post/${currentPodcast?.id}`;
       if (navigator.share) {
         await navigator.share({
           title: currentPodcast?.title,

@@ -503,7 +503,7 @@ function Reels() {
           title={selectedVideo.title}
           description={selectedVideo.description}
           imageUrl={selectedVideo.thumbnail_url}
-          postUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/reel/${selectedVideo.id}`}
+          postUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/post/${selectedVideo.id}`}
         />
       )}
     </div>

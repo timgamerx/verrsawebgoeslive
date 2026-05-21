@@ -446,7 +446,7 @@ function Home() {
 
           {/* Action Button */}
           {item.type === "article" && (
-            <div style={styles.readMoreCircle} onClick={() => router.push(`/article/${item.id}`)}>
+            <div style={styles.readMoreCircle} onClick={() => router.push(`/post/${item.id}`)}>
               <MdArrowForwardIos size={14} color="#00BFFF" />
             </div>
           )}

@@ -351,7 +351,7 @@ export default function Profile() {
 
         {/* Post Content */}
         {item.type === "article" && (
-          <div style={{ ...styles.articleContent, cursor: "pointer" }} onClick={() => router.push(`/article/${item.id}`, { state: { article: item } })}>
+          <div style={{ ...styles.articleContent, cursor: "pointer" }} onClick={() => router.push(`/post/${item.id}`, { state: { article: item } })}>
             {item.cover_image_url && (
               <img src={item.cover_image_url} alt="" style={styles.thumbnail} />
             )}

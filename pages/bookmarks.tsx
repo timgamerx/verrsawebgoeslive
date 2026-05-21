@@ -349,10 +349,10 @@ export default function Bookmarks() {
   const handleNavigateToArticlePost = async (article: BookmarkedPost) => {
     try {
       if (article.id) incrementViewCount("articles", article.id);
-      router.push(`/article/${article.id}`, { state: { article } });
+      router.push(`/post/${article.id}`, { state: { article } });
     } catch (err) {
       console.error("Failed to navigate to article", article.id, err);
-      router.push(`/article/${article.id}`, { state: { article } });
+      router.push(`/post/${article.id}`, { state: { article } });
     }
   };
 

@@ -472,7 +472,7 @@ function Articles() {
           title={selectedArticle.title}
           description={selectedArticle.content}
           imageUrl={selectedArticle.cover_image_url}
-          postUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/article/${selectedArticle.id}`}
+          postUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/post/${selectedArticle.id}`}
         />
       )}
     </div>
