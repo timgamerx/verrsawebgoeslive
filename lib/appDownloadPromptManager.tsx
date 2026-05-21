@@ -6,7 +6,8 @@
 const STORAGE_KEY = 'app_download_prompt_shown';
 const STORAGE_DISMISSED_KEY = 'app_download_prompt_dismissed';
 const PROMPT_DELAY_MS = 30 * 1000; // 30 seconds
-const RESHOW_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+//const RESHOW_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const RESHOW_INTERVAL_MS = 1 * 60 * 1000; // 1 minute
 
 /**
  * Check if the app download prompt should be shown
@@ -19,7 +20,7 @@ export const shouldShowAppDownloadPrompt = (): boolean => {
     const dismissedRaw = localStorage.getItem(STORAGE_DISMISSED_KEY);
     if (dismissedRaw) {
       const dismissedTime = parseInt(dismissedRaw, 10);
-      // Don't show again for 7 days after dismissal
+      // Don't show again for 1 minute after dismissal
       if (Date.now() - dismissedTime < RESHOW_INTERVAL_MS) {
         return false;
       }
