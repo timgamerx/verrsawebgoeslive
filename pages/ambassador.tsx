@@ -164,7 +164,7 @@ export default function Ambassador() {
                />
               <button
                 onClick={() => router.push('/home')}
-                className="text-white  hover:text-gray-400 font-medium"
+                className="text-gray-500 hover:text-white font-medium bg-gray-200 hover:bg-gray-700"
               >
                 Back to Home
               </button>
@@ -308,7 +308,7 @@ export default function Ambassador() {
                       value={formData.fullName}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
                       placeholder="Enter your full name"
                     />
                   </div>
@@ -325,7 +325,7 @@ export default function Ambassador() {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
                       placeholder="your.email@example.com"
                     />
                   </div>
@@ -342,7 +342,7 @@ export default function Ambassador() {
                       value={formData.phone}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
                       placeholder="+234 XXX XXX XXXX"
                     />
                   </div>
@@ -359,7 +359,7 @@ export default function Ambassador() {
                       value={formData.country}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
                       placeholder="Enter your country"
                     />
                   </div>
@@ -376,7 +376,7 @@ export default function Ambassador() {
                       value={formData.socialMedia}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
                       placeholder="@username (Twitter, Instagram, etc.)"
                     />
                   </div>
@@ -393,7 +393,7 @@ export default function Ambassador() {
                       onChange={handleInputChange}
                       required
                       rows={4}
-                      className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition resize-none"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition resize-none"
                       placeholder="Tell us about your experience in community building, social media, or marketing..."
                     />
                   </div>
@@ -410,7 +410,7 @@ export default function Ambassador() {
                       onChange={handleInputChange}
                       required
                       rows={4}
-                      className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition resize-none"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition resize-none"
                       placeholder="Share your motivation and what you hope to achieve as an ambassador..."
                     />
                   </div>
@@ -425,7 +425,7 @@ export default function Ambassador() {
                       name="referralSource"
                       value={formData.referralSource}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 text-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
                     >
                       <option value="">Select an option</option>
                       <option value="social-media">Social Media</option>
