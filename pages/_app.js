@@ -36,7 +36,7 @@ function MyApp({ Component, pageProps }) {
   const showRightMenu = rightMenuRoutes.includes(router.pathname);
   
   // Routes where app download modal should NOT appear (e.g., auth pages)
-  const excludedAppDownloadRoutes = ['/auth', '/login', '/signup', '/resetpassword', '/setnewpassword'];
+  const excludedAppDownloadRoutes = ['/auth', '/login', '/signup', '/resetpassword', '/setnewpassword', '/ambassador', '/index'];
   const shouldShowAppDownload = !excludedAppDownloadRoutes.includes(router.pathname);
 
   useEffect(() => {
