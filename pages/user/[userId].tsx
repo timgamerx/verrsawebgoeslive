@@ -15,6 +15,7 @@ import {
   IoClose,
   IoPersonAddOutline,
   IoCheckmark,
+  IoWalletOutline,
 } from "react-icons/io5";
 import { MdAnalytics, MdMoreVert, MdBlock } from "react-icons/md";
 import {
@@ -873,9 +874,17 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
             </button>
           )}
           {isOwnProfile && (
-            <div style={styles.selfNotice}>
-              <span style={styles.selfNoticeText}>This is your profile</span>
-            </div>
+            <>
+              <button style={styles.editButton} onClick={() => router.push("/editprofileinformation")}>
+                Edit Profile
+              </button>
+              <button style={styles.iconButtonCircle} onClick={() => router.push("/balance")}>
+                <IoWalletOutline size={22} color="#333" />
+              </button>
+              <button style={styles.iconButtonCirclePrimary} onClick={() => router.push("/verrsachat")}>
+                <IoMailOutline size={22} color="#fff" />
+              </button>
+            </>
           )}
         </div>
 
@@ -1112,17 +1121,35 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     flexShrink: 0,
   },
-  selfNotice: {
+  editButton: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#00BFFF",
+    color: "#fff",
+    border: "none",
     borderRadius: "10px",
     padding: "12px",
-    textAlign: "center",
-  },
-  selfNoticeText: {
     fontSize: "15px",
-    color: "#666",
+    fontWeight: "500",
+    cursor: "pointer",
     fontFamily: "'Instrument Sans', sans-serif",
+  },
+  iconButtonCircle: {
+    padding: 10,
+    borderRadius: "50%",
+    backgroundColor: "#f0f0f0",
+    border: "none",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+  },
+  iconButtonCirclePrimary: {
+    padding: 10,
+    borderRadius: "50%",
+    backgroundColor: "#00BFFF",
+    border: "none",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
   },
   tabRow: {
     display: "flex",
