@@ -79,9 +79,10 @@ const VideoPost = ({ videoUrl, thumbnailUrl }) => {
 };
 
 // ── Main Component ─────────────────────────────────────────────────────────────
-export default function UserProfile({ initialMeta, initialProfile }) {
+export default function UserProfile({ initialMeta, initialProfile, isOwnProfile: initialIsOwnProfile }) {
   const router = useRouter();
-  const { userId } = router.query
+  const { userId } = router.query;
+  const [isOwnProfile, setIsOwnProfile] = useState(initialIsOwnProfile || false);
 
   const [activeTab, setActiveTab] = useState("Posts");
   const [profile, setProfile] = useState(initialProfile || null);
@@ -103,8 +104,16 @@ export default function UserProfile({ initialMeta, initialProfile }) {
 
   useEffect(() => {
     if (!userId) return;
+    checkIfOwnProfile();
     init();
   }, [userId]);
+
+  const checkIfOwnProfile = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user && session.user.id === userId) {
+      setIsOwnProfile(true);
+    }
+  };
 
   const init = async () => {
     await fetchCurrentUser();
@@ -715,11 +724,9 @@ export default function UserProfile({ initialMeta, initialProfile }) {
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
-  const isOwnProfile = currentUser?.id === userId;
   const profileUsername = profile?.username || "";
-  const profileImage = profileUsername
-    ? `https://www.verrsa.org/api/user?username=${encodeURIComponent(profileUsername)}`
-    : profile?.avatar_url || "https://ik.imagekit.io/te9biwxvl/verrsa-team.png";
+  const profileImage = profile?.avatar_url ||
+    (profileUsername ? `https://www.verrsa.org/api/user?username=${encodeURIComponent(profileUsername)}` : "https://ik.imagekit.io/te9biwxvl/verrsa-team.png");
 
   return (
     <>
@@ -926,7 +933,7 @@ export async function getServerSideProps(context) {
   };
 
   if (!uid) {
-    return { props: { initialMeta: fallbackMeta, initialProfile: null } };
+    return { props: { initialMeta: fallbackMeta, initialProfile: null, isOwnProfile: false } };
   }
 
   try {
@@ -934,10 +941,15 @@ export async function getServerSideProps(context) {
     const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      return { props: { initialMeta: fallbackMeta, initialProfile: null } };
+      return { props: { initialMeta: fallbackMeta, initialProfile: null, isOwnProfile: false } };
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    // Check if this is the user's own profile by checking the session
+    const { data: { session } } = await supabase.auth.getSession();
+    const isOwnProfile = session?.user?.id === uid;
+
     const { data } = await supabase
       .from('profiles')
       .select('id, username, full_name, bio, avatar_url')
@@ -945,26 +957,30 @@ export async function getServerSideProps(context) {
       .maybeSingle();
 
     if (!data) {
-      return { props: { initialMeta: fallbackMeta, initialProfile: null } };
+      return { props: { initialMeta: fallbackMeta, initialProfile: null, isOwnProfile: false } };
     }
 
     const username = data.username || 'creator';
     const fullName = data.full_name || username;
     const bio = data.bio || 'View this creator profile on Verrsa.';
+    
+    // Use avatar_url if available, otherwise fall back to API endpoint
+    const metaImage = data.avatar_url || `${SITE_URL}/api/user?username=${encodeURIComponent(username)}`;
 
     return {
       props: {
         initialProfile: data,
+        isOwnProfile,
         initialMeta: {
           title: `${fullName} (@${username}) - Verrsa`,
           description: bio.length > 180 ? `${bio.slice(0, 177)}...` : bio,
-          image: `${SITE_URL}/api/user?username=${encodeURIComponent(username)}`,
+          image: metaImage,
           url: `${SITE_URL}/user/${uid}`,
         },
       },
     };
   } catch {
-    return { props: { initialMeta: fallbackMeta, initialProfile: null } };
+    return { props: { initialMeta: fallbackMeta, initialProfile: null, isOwnProfile: false } };
   }
 }
 
