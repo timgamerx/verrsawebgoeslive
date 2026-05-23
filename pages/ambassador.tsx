@@ -146,7 +146,7 @@ export default function Ambassador() {
         <meta name="description" content="Join the Verrsa Ambassador Program and help us grow our community while earning exclusive rewards and benefits." />
         <meta property="og:title" content="Verrsa Ambassador Program - Join Our Team" />
         <meta property="og:description" content="Join the Verrsa Ambassador Program and help us grow our community while earning exclusive rewards and benefits." />
-        <meta property="og:image" content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png" />
+        <meta property="og:image" content="https://ik.imagekit.io/verrsa/amb.jpg" />
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
