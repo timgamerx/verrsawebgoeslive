@@ -726,8 +726,7 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
 
   // ── Render ─────────────────────────────────────────────────────────────────
   const profileUsername = profile?.username || "";
-  const profileImage = profile?.avatar_url ||
-    (profileUsername ? `https://www.verrsa.org/api/user?username=${encodeURIComponent(profileUsername)}` : "https://ik.imagekit.io/te9biwxvl/verrsa-team.png");
+  const profileImage = profile?.avatar_url || "https://ik.imagekit.io/te9biwxvl/verrsa-team.png";
 
   return (
     <>
