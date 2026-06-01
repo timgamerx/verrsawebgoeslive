@@ -149,12 +149,12 @@ export default function Ambassador() {
         <meta property="og:image" content="https://ik.imagekit.io/verrsa/amb.jpg" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-50">
         {/* Header */}
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
-              {/* <h1 className="text-2xl font-bold text-purple-600 cursor-pointer" onClick={() => router.push('/home')}>
+              {/* <h1 className="text-2xl font-bold text-sky-600 cursor-pointer" onClick={() => router.push('/home')}>
                 Verrsa
               </h1> */}
                <img src="/verrsa-logo.png" alt="Verrsa" 
@@ -173,7 +173,7 @@ export default function Ambassador() {
         </div>
 
         {/* Hero Section */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+        <div className="relative overflow-hidden bg-gradient-to-r from-sky-500 to-sky-400 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
               <IoSparklesOutline className="w-5 h-5" />
@@ -182,7 +182,7 @@ export default function Ambassador() {
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Become a Verrsa Ambassador
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-purple-100 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl mb-8 text-white max-w-3xl mx-auto">
               Help us grow the Verrsa community and earn exclusive rewards while making a real impact
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm md:text-base">
@@ -246,7 +246,7 @@ export default function Ambassador() {
                     className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow border border-gray-100"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 text-purple-600">
+                      <div className="flex-shrink-0 text-sky-600">
                         {benefit.icon}
                       </div>
                       <div>
@@ -263,7 +263,7 @@ export default function Ambassador() {
               </div>
 
               {/* What We're Looking For */}
-              <div className="mt-12 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl p-8">
+              <div className="mt-12 bg-gradient-to-br from-sky-100 to-blue-100 rounded-xl p-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
                   What We're Looking For
                 </h3>
@@ -277,7 +277,7 @@ export default function Ambassador() {
                     'Enthusiastic about helping others discover Verrsa'
                   ].map((item, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <IoCheckmarkCircle className="w-6 h-6 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <IoCheckmarkCircle className="w-6 h-6 text-sky-600 flex-shrink-0 mt-0.5" />
                       <span className="text-gray-700">{item}</span>
                     </li>
                   ))}
@@ -308,7 +308,7 @@ export default function Ambassador() {
                       value={formData.fullName}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition"
                       placeholder="Enter your full name"
                     />
                   </div>
@@ -325,7 +325,7 @@ export default function Ambassador() {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition"
                       placeholder="your.email@example.com"
                     />
                   </div>
@@ -342,7 +342,7 @@ export default function Ambassador() {
                       value={formData.phone}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition"
                       placeholder="+234 XXX XXX XXXX"
                     />
                   </div>
@@ -359,7 +359,7 @@ export default function Ambassador() {
                       value={formData.country}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition"
                       placeholder="Enter your country"
                     />
                   </div>
@@ -376,7 +376,7 @@ export default function Ambassador() {
                       value={formData.socialMedia}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition"
                       placeholder="@username (Twitter, Instagram, etc.)"
                     />
                   </div>
@@ -393,7 +393,7 @@ export default function Ambassador() {
                       onChange={handleInputChange}
                       required
                       rows={4}
-                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition resize-none"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition resize-none"
                       placeholder="Tell us about your experience in community building, social media, or marketing..."
                     />
                   </div>
@@ -410,7 +410,7 @@ export default function Ambassador() {
                       onChange={handleInputChange}
                       required
                       rows={4}
-                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition resize-none"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition resize-none"
                       placeholder="Share your motivation and what you hope to achieve as an ambassador..."
                     />
                   </div>
@@ -425,7 +425,7 @@ export default function Ambassador() {
                       name="referralSource"
                       value={formData.referralSource}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                      className="w-full px-4 py-3 text-gray-500 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition"
                     >
                       <option value="">Select an option</option>
                       <option value="social-media">Social Media</option>
@@ -440,7 +440,7 @@ export default function Ambassador() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-4 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+                    className="w-full bg-gradient-to-r from-sky-500 to-sky-400 text-white font-semibold py-4 rounded-lg hover:from-sky-700 hover:to-sky-700 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center justify-center gap-2">
@@ -465,17 +465,17 @@ export default function Ambassador() {
         </div>
 
         {/* Footer CTA */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-16">
+        <div className="bg-gradient-to-r from-sky-500 to-sky-400 text-white py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Ready to Make an Impact?
             </h2>
-            <p className="text-xl text-purple-100 mb-8">
+            <p className="text-xl text-white mb-8">
               Join our growing community of ambassadors and help shape the future of Verrsa
             </p>
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="bg-white text-purple-600 font-semibold px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
+              className="bg-white text-sky-500 font-semibold px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
             >
               Apply Now
             </button>

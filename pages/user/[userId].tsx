@@ -418,6 +418,9 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
     const likeCount = item.like_count || 0;
     const commentCount = item.comment_count || item.comments || 0;
 
+
+ 
+
     return (
       <div key={item.id} style={styles.postCard}>
         {/* Header */}
@@ -736,6 +739,9 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
           100% { transform: rotate(360deg); }
         }
       `}</style>
+
+     
+
       <Head>
         <title>{initialMeta?.title || 'Creator - Verrsa'}</title>
         <meta name="description" content={initialMeta?.description || 'View this creator profile on Verrsa.'} />
@@ -745,14 +751,14 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
         <meta property="og:url" content={initialMeta?.url || `${SITE_URL}/user/${userId || ''}`} />
         <meta property="og:title" content={initialMeta?.title || 'Creator - Verrsa'} />
         <meta property="og:description" content={initialMeta?.description || 'View this creator profile on Verrsa.'} />
-        <meta property="og:image" content={initialMeta?.image || `${SITE_URL}/api/user?username=creator`} />
+        <meta property="og:image" content={initialMeta?.image || `${SITE_URL}/user?username=creator`} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content={initialMeta?.url || `${SITE_URL}/user/${userId || ''}`} />
         <meta name="twitter:title" content={initialMeta?.title || 'Creator - Verrsa'} />
         <meta name="twitter:description" content={initialMeta?.description || 'View this creator profile on Verrsa.'} />
-        <meta name="twitter:image" content={initialMeta?.image || `${SITE_URL}/api/user?username=creator`} />
+        <meta name="twitter:image" content={initialMeta?.image || `${SITE_URL}/user?username=creator`} />
       </Head>
       <MetaTags
         title={initialMeta?.title || (profile?.full_name ? `${profile.full_name} (@${profileUsername || "creator"}) - Verrsa` : `@${profileUsername || "creator"} - Verrsa`)}
@@ -936,7 +942,7 @@ export async function getServerSideProps(context) {
   const fallbackMeta = {
     title: 'Creator - Verrsa',
     description: 'View this creator profile on Verrsa.',
-    image: `${SITE_URL}/api/user?username=creator`,
+    image: `${SITE_URL}/user?username=creator`,
     url: `${SITE_URL}/user/${uid}`,
   };
 
