@@ -716,7 +716,7 @@ const formatted = formatContent(post.content || "");
                 border: "none",
                 cursor: "pointer",
                 padding: spacing.md,
-                color: theme.icon,
+                color: theme.iconSecondary,
                 fontSize: fontSize.base,
               }}
             >

@@ -235,7 +235,8 @@ export default function LandingPage() {
             />
           </a>
           <a
-            href="https://play.google.com/store/apps/verrsa"
+            // href="https://play.google.com/store/apps/verrsa"
+            href="https://tr.ee/DbjYXzkP-b"
             target="_blank"
             rel="noopener noreferrer"
           >

@@ -24,7 +24,7 @@ export default function Privacy() {
 
       <div style={styles.contentContainer}>
         <div style={styles.section}>
-          <p style={styles.lastUpdated}>Last updated: January 06, 2025</p>
+          <p style={styles.lastUpdated}>Last updated: November 06, 2025</p>
 
           <p style={styles.sectionText}>
             At Verrsa, we are committed to protecting your privacy and ensuring

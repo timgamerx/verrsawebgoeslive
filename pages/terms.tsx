@@ -21,7 +21,7 @@ export default function TermsandConditions() {
           <h1 style={styles.headerTitle}>Terms and Conditions</h1>
         </div>
 
-        <p style={styles.lastUpdated}>Last updated: January 06, 2025</p>
+        <p style={styles.lastUpdated}>Last updated: November 06, 2025</p>
 
         <h2 style={styles.sectionTitle}>1. Introduction</h2>
         <p style={styles.paragraph}>
