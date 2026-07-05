@@ -578,6 +578,7 @@ const formatted = formatContent(post.content || "");
     <>
       <Head>
         <title>{post.title || "Verrsa Post"}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content={description} />
 
         {/* Open Graph */}
@@ -629,6 +630,7 @@ const formatted = formatContent(post.content || "");
           color: theme.text,
         }}
       >
+        <div style={{ maxWidth: "800px", width: "100%", margin: "0 auto" }}>
         {/* Header */}
         <div
           style={{
@@ -636,7 +638,7 @@ const formatted = formatContent(post.content || "");
             alignItems: "center",
             justifyContent: "space-between",
             marginBottom: spacing.base,
-            marginTop: 55,
+            marginTop: 16,
             paddingLeft: spacing.base,
             paddingRight: spacing.base,
           }}
@@ -756,8 +758,6 @@ const formatted = formatContent(post.content || "");
         {/* Main content */}
         <div
           style={{
-            flex: 1,
-            overflowY: "auto",
             paddingLeft: spacing.md,
             paddingRight: spacing.md,
           }}
@@ -1107,9 +1107,11 @@ const formatted = formatContent(post.content || "");
                   alt="Post cover"
                   style={{
                     width: "100%",
-                    height: 200,
+                    height: "auto",
+                    maxHeight: 400,
                     objectFit: "cover",
                     marginBottom: spacing.base,
+                    display: "block",
                   }}
                 />
               )}
@@ -1647,6 +1649,7 @@ const formatted = formatContent(post.content || "");
           {post.post_type === 'podcast' && post.audio_url && (
             <div style={{ height: 140 }} />
           )}
+        </div>
         </div>
       </div>
 
