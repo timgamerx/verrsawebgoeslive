@@ -687,24 +687,8 @@ const formatted = formatContent(post.content || "");
                   whiteSpace: "nowrap",
                   color: theme.text,
                 }}>
-          {typeof window !== "undefined" && window.innerWidth < 768
-            ? (post?.title.slice(0, 0) || "").split(" ").slice(0, 30).join(" ") +
-              ((post?.title || "").split(" ").length > 30 ? "..." : "")
-            : post?.title || ""}
+          {post?.title || ""}
         </h1>
-              {/*<h1
-                style={{
-                  fontSize: fontSize.lg,
-                  fontWeight: "400",
-                  margin: 0,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                  color: theme.text,
-                }}
-              >
-                {post?.title || ""}
-              </h1> */}
 
 
             </div>

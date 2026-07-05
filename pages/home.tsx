@@ -887,6 +887,8 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: "16px",
     color: "#333",
     fontFamily: "'Instrument Sans', sans-serif",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
   },
   verseImage: {
     width: "100%",

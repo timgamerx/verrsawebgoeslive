@@ -1295,6 +1295,8 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#111",
     margin: "0 0 12px",
     fontFamily: "'Instrument Sans', sans-serif",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
   },
   verseImage: {
     width: "100%",
