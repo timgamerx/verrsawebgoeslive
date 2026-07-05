@@ -657,7 +657,7 @@ const formatted = formatContent(post.content || "");
               ←
             </button>
 
-            <a href={`/profile/${post.user_id}`}>
+            <a href={`/user/${post.user_id}`}>
               <img
                 src={post.profiles?.avatar_url || "/avatar.jpg"}
                 alt="Author"
@@ -1096,7 +1096,7 @@ const formatted = formatContent(post.content || "");
                 alignItems: "center",
                 marginBottom: spacing.base,
               }}>
-                <a href={`/profile/${post.user_id}`} style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+                <a href={`/user/${post.user_id}`} style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
                   <img
                     src={post.profiles?.avatar_url || "/avatar.jpg"}
                     alt="Author"
