@@ -394,7 +394,7 @@ function Home() {
 
         {/* Verse Content */}
         {item.type === "verse" && (
-          <div style={styles.verseContainer}>
+          <div style={{ ...styles.verseContainer, cursor: "pointer" }} onClick={() => router.push(`/post/${item.id}`)}>
             <p style={styles.verseText}>{item.content}</p>
             {item.image_url && (
               <img src={item.image_url} alt="Verse" style={styles.verseImage} />
