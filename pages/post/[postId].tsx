@@ -50,6 +50,7 @@ interface Post {
   category?: string;
   video_url?: string;
   audio_url?: string;
+  image_url?: string;
   view_count?: number;
   user_id: string;
   profiles?: {
@@ -1097,6 +1098,91 @@ const formatted = formatContent(post.content || "");
 
 
 
+
+          {/* Verse UI */}
+          {post.post_type === 'verse' && (
+            <div style={{
+              maxWidth: "640px",
+              margin: "0 auto",
+              padding: `${spacing.lg}px ${spacing.base}px`,
+            }}>
+              {/* Author row */}
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: spacing.base,
+              }}>
+                <a href={`/profile/${post.user_id}`} style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+                  <img
+                    src={post.profiles?.avatar_url || "/avatar.jpg"}
+                    alt="Author"
+                    onError={(e) => { (e.target as HTMLImageElement).src = "/avatar.jpg"; }}
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: "50%",
+                      marginRight: spacing.md,
+                      objectFit: "cover",
+                      border: `2px solid ${theme.border}`,
+                    }}
+                  />
+                </a>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{
+                      fontSize: fontSize.base,
+                      fontWeight: "500",
+                      color: theme.text,
+                    }}>
+                      {post.profiles?.full_name || post.profiles?.username || authorName || "Creator"}
+                    </span>
+                    {post.profiles?.is_verified && (
+                      <span style={{ color: "#00BFFF", fontSize: fontSize.sm }}>✓</span>
+                    )}
+                  </div>
+                  {post.created_at && (
+                    <span style={{ fontSize: fontSize.sm, color: theme.secondaryText }}>
+                      {new Date(post.created_at).toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Verse text */}
+              <p style={{
+                fontSize: "20px",
+                lineHeight: "32px",
+                color: theme.text,
+                marginBottom: spacing.base,
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+              }}>
+                {post.content}
+              </p>
+
+              {/* Verse image */}
+              {post.image_url && (
+                <img
+                  src={post.image_url}
+                  alt="Verse image"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    maxHeight: 480,
+                    objectFit: "cover",
+                    borderRadius: 12,
+                    display: "block",
+                    marginTop: spacing.md,
+                  }}
+                />
+              )}
+            </div>
+          )}
 
           {/* Article UI (existing) */}
           {(!post.post_type || post.post_type === 'article') && (
