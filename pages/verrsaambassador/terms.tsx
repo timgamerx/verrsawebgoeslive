@@ -14,7 +14,7 @@ export default function AmbassadorTerms() {
           <button style={styles.backButton} onClick={() => router.back()}>
             <IoChevronBack size={28} color="#000" />
           </button>
-          <h1 style={styles.headerTitle}>Ambassador Program Terms &amp; Conditions</h1>
+          <h1 style={styles.headerTitle}>Verrsa Ambassador Program Terms &amp; Conditions</h1>
         </div>
 
         <p style={styles.lastUpdated}>Date: 06 July, 2026</p>
