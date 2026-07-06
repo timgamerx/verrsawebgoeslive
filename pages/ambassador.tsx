@@ -456,7 +456,7 @@ export default function Ambassador() {
                   </button>
 
                   <p className="text-sm text-gray-500 text-center">
-                    By submitting this form, you agree to our terms and conditions
+                    By submitting this form, you agree to our <span className="underline cursor-pointer" onClick={() => router.push('/verrsaambassador/terms')}>terms and conditions</span>
                   </p>
                 </form>
               </div>
