@@ -320,7 +320,8 @@ export default function Auth() {
       setLoading(true);
       setHandlingOAuth(true);
 
-      const redirectTo = `${typeof window !== "undefined" ? window.location.origin : "https://www.verrsa.org"}/auth/callback`;
+      // Must match the Next.js page file name: pages/authcallback.tsx → route /authcallback
+      const redirectTo = `${typeof window !== "undefined" ? window.location.origin : "https://www.verrsa.org"}/authcallback`;
         
 
       const { data, error } = await supabase.auth.signInWithOAuth({
