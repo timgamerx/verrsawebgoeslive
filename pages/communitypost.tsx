@@ -11,9 +11,9 @@ import { fetchCurrentUserProfile, UserProfile } from '../lib/profileUtils';
 import { renderTextWithLinks } from '../lib/linkUtils';
 import { updateLastActive } from '../lib/activityTracker';
 import { getActiveModerationExclusions } from '../lib/moderationExclusions';
-import { FiSearch } from 'react-icons/fi'
+import { FiShare2 } from 'react-icons/fi'
 import { TbChevronLeft } from 'react-icons/tb'
-import { IoChevronBack } from 'react-icons/io5'
+import { IoThumbsUp, IoThumbsUpOutline, IoFlagOutline } from 'react-icons/io5'
 
 export default function CommunityPost() {
   const router = useRouter();
@@ -310,29 +310,30 @@ export default function CommunityPost() {
       <div>
       <div
         style={{
+          display: "flex",
           flexDirection: "row",
           alignItems: "center",
           marginBottom: spacing.base,
           marginTop: 55,
           position: "relative",
-          alignSelf: "flex-start",
+          width: "100%",
+          paddingLeft: spacing.md,
+          paddingRight: spacing.md,
         }}
       >
+        {/* Back button – absolutely pinned left */}
         <button
           onClick={() => router.back()}
-          style={{ left: 0, zIndex: 1 }}
+          style={{ position: "absolute", left: spacing.md, zIndex: 1, padding: spacing.sm, background: "none", border: "none", cursor: "pointer" }}
         >
-          <TbChevronLeft />
+          <TbChevronLeft size={26} color="#333" />
         </button>
 
-        <div style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+        {/* Center: avatar + title + live badge */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
           <img
-            src={
-              post?.author_profile?.avatar_url
-                ? { uri: post.author_profile.avatar_url }
-                : "/assets/../assets/avatar.jpg"
-            }
-            style={{...(styles.headerImage || {}), marginRight: spacing.md}}
+            src={post?.author_profile?.avatar_url || "/avatar.png"}
+            style={{...styles.headerImage, marginRight: spacing.sm}}
           />
           <span style={styles.headerTitle}>
             {post?.title || "Community Post"}
@@ -341,15 +342,16 @@ export default function CommunityPost() {
             <div style={styles.liveBadge}>
               <span style={styles.liveText}>🟢 LIVE</span>
             </div>
-        )}
-          {/* Report button */}
-          <button
-            onClick={() => setShowReportModal(true)}
-            style={{ marginLeft: "auto", padding: spacing.md }}
-          >
-            <IoChevronBack />
-          </button>
+          )}
         </div>
+
+        {/* Report button – absolutely pinned right */}
+        <button
+          onClick={() => setShowReportModal(true)}
+          style={{ position: "absolute", right: spacing.md, zIndex: 1, padding: spacing.sm, background: "none", border: "none", cursor: "pointer" }}
+        >
+          <IoFlagOutline size={22} color="#333" />
+        </button>
       </div>
 
       <div style={{ flex: 1, overflowY: "auto" }}>
@@ -456,15 +458,15 @@ export default function CommunityPost() {
                   )}
             </div>
         )}
-          <div style={styles.iconRow}>
+          <div style={{...styles.iconRow, display: "flex"}}>
             <button
               onClick={handleLike}
-              style={{ flexDirection: "row", alignItems: "center" }}
+              style={{ display: "flex", flexDirection: "row", alignItems: "center", background: "none", border: "none", cursor: "pointer" }}
             >
               {isLiked ? (
-                <IoChevronBack />
+                <IoThumbsUp size={18} color="#00bfff" />
               ) : (
-                <IoChevronBack />
+                <IoThumbsUpOutline size={18} color="#333" />
               )}
               <span style={{ marginLeft: spacing.sm, color: "#666" }}>{likeCount}</span>
             </button>
@@ -472,12 +474,16 @@ export default function CommunityPost() {
             <button
               onClick={() => setShowShareModal(true)}
               style={{
+                display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
                 marginLeft: spacing.base,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
               }}
             >
-              <FiSearch />
+              <FiShare2 size={18} color="#333" />
             </button>
           </div>
           <div
@@ -513,11 +519,7 @@ export default function CommunityPost() {
                 }}
               >
                 <img
-                  src={
-                    comment.profiles?.avatar_url
-                      ? { uri: comment.profiles.avatar_url }
-                      : "/assets/../assets/avatar.jpg"
-                  }
+                  src={comment.profiles?.avatar_url || "/avatar.png"}
                   style={{
                     width: 30,
                     height: 30,

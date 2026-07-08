@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { spacing, radius, fontSize, fontFamily } from '../../lib/theme';
 import { TbChevronLeft, TbChevronRight, TbDots, TbDotsVertical } from 'react-icons/tb';
 import { supabase } from '../../components/supabase';
-import { MdAdd, MdArrowBack, MdArrowForward, MdBlock, MdCheck, MdClose, MdDelete, MdEdit, MdFavorite, MdHome, MdNotifications, MdPerson, MdRemove, MdReport, MdSearch, MdSettings, MdShare, MdStar, MdVerified } from 'react-icons/md';
+import { MdAdd, MdArrowBack, MdArrowForward, MdBlock, MdCheck, MdClose, MdDelete, MdEdit, MdFavorite, MdHome, MdNotifications, MdPerson, MdRemove, MdReport, MdSearch, MdSettings, MdShare, MdStar, MdVerified, MdGroupAdd, MdExitToApp, MdAddBox, MdPeople, MdVideocam, MdPushPin, MdEye, MdChatBubbleOutline } from 'react-icons/md';
 import VerificationBadge from '../../components/VerificationBadge';
 import SharePostModal from '../../components/SharePostModal.web';
 import CommentModal from '../../components/CommentModal';
@@ -18,8 +18,8 @@ import { renderTextWithLinks } from '../../lib/linkUtils';
 import { updateCommunityLastActive } from '../../lib/communityActivityTracker';
 import { useTheme } from '../../context/ThemeProvider';
 import { getActiveModerationExclusions } from '../../lib/moderationExclusions';
-import { IoChevronBack, IoChevronForward, IoVideocam } from 'react-icons/io5'
-import { FiSearch } from 'react-icons/fi'
+import { IoChevronBack, IoChevronForward, IoVideocam, IoThumbsUp, IoThumbsUpOutline, IoFlagOutline } from 'react-icons/io5'
+import { FiShare2, FiMessageCircle } from 'react-icons/fi'
 
 const CommunityProfile = () => {
   const router = useRouter();
@@ -1109,8 +1109,8 @@ const CommunityProfile = () => {
         <img
           src={
             community?.cover_image_url
-              ? { uri: community.cover_image_url }
-              : "/assets/../assets/positivity-life2.jpg"
+              ? community.cover_image_url
+              : "/positivity-life2.jpg"
           }
           style={styles.coverImage}
         />
@@ -1149,13 +1149,18 @@ const CommunityProfile = () => {
               : "rgba(255, 255, 255, 0.5)",
             borderRadius: radius.xl2,
             padding: spacing.sm,
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
           onClick={(e) => {
             e.stopPropagation();
             handleGoLiveToggle();
           }}
         >
-          <FiSearch />
+          <TbDotsVertical size={24} color={theme.icon || "#333"} />
         </button>
         {showGoLive && (
           <div
@@ -1196,7 +1201,7 @@ const CommunityProfile = () => {
                   handleJoinCommunity();
                 }}
               >
-                <MdCheck />
+                <MdGroupAdd size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
                 <span style={{ fontSize: fontSize.base, color: theme.text }}>
                   Join Community
                 </span>
@@ -1219,7 +1224,7 @@ const CommunityProfile = () => {
                     handleLeaveCommunity();
                   }}
                 >
-                  <MdCheck />
+                  <MdExitToApp size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
                   <span style={{ fontSize: fontSize.base, color: theme.text }}>
                     Leave Community
                   </span>
@@ -1245,7 +1250,7 @@ const CommunityProfile = () => {
                   handleBlockCommunity();
                 }}
               >
-                <MdCheck />
+                <MdBlock size={20} color="#e53935" style={{ marginRight: spacing.md }} />
                 <span style={{ fontSize: fontSize.base, color: "#e53935" }}>
                   Block Community
                 </span>
@@ -1271,13 +1276,13 @@ const CommunityProfile = () => {
                   router.push("/community-live");
                 }}
               >
-                <MdCheck />
+                <MdVideocam size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
                 <div style={{ flex: 1 }}>
                   <span style={{ fontSize: fontSize.base, color: theme.text }}>
                     Go Live
                   </span>
                 </div>
-                <IoVideocam />
+                <IoVideocam size={18} color="#00BFFF" />
               </button>
           )}
             {/* Make a New Post Option - Only for community owner and members */}
@@ -1298,7 +1303,7 @@ const CommunityProfile = () => {
                   router.push("/create-community-post");
                 }}
               >
-                <MdCheck />
+                <MdAddBox size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
                 <span style={{ fontSize: fontSize.base, color: theme.text }}>
                   Make a New Post
                 </span>
@@ -1323,7 +1328,7 @@ const CommunityProfile = () => {
                     router.push("/edit-community");
                   }}
                 >
-                  <MdCheck />
+                  <MdEdit size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
                   <span style={{ fontSize: fontSize.base, color: theme.text }}>
                     Edit Community Info
                   </span>
@@ -1346,7 +1351,7 @@ const CommunityProfile = () => {
                     router.push("/community-members");
                   }}
                 >
-                  <MdCheck />
+                  <MdPeople size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
                   <span style={{ fontSize: fontSize.base, color: theme.text }}>
                     See Community Members
                   </span>
@@ -1407,7 +1412,7 @@ const CommunityProfile = () => {
                     );
                   }}
                 >
-                  <MdCheck />
+                  <MdDelete size={20} color="#e53935" style={{ marginRight: spacing.sm }} />
                   <span style={{ fontSize: fontSize.base, color: "#e53935" }}>
                     Delete Community
                   </span>
@@ -1436,15 +1441,16 @@ const CommunityProfile = () => {
               }}
             >
               <button
-                style={{ marginRight: spacing.md }}
+                style={{ marginRight: spacing.md, background: "none", border: "none", cursor: "pointer" }}
                 onClick={handleShareModalToggle}
               >
-                <FiSearch />
+                <FiShare2 size={20} color={theme.icon || "#333"} />
               </button>
               <button
-                onClick={() => router.push("/notifications")}
+                onClick={() => router.push("/notification")}
+                style={{ background: "none", border: "none", cursor: "pointer" }}
               >
-                <IoChevronBack />
+                <MdNotifications size={24} color={theme.icon || "#333"} />
               </button>
             </div>
           </div>
@@ -1455,11 +1461,7 @@ const CommunityProfile = () => {
             {members.slice(0, 3).map((m, i) => (
               <img
                 key={m.user_id || i}
-                src={
-                  m.profiles?.avatar_url
-                    ? { uri: m.profiles.avatar_url }
-                    : "/assets/../assets/avatar.jpg"
-                }
+                src={m.profiles?.avatar_url || "/avatar.png"}
                 style={i === 0 ? styles.avatarImage : styles.avatarImageTwo}
               />
             ))}
@@ -1609,7 +1611,7 @@ const CommunityProfile = () => {
                 <img
                   src={
                     post.author_profile?.avatar_url
-                      ? { uri: post.author_profile.avatar_url }
+                      ? post.author_profile.avatar_url
                       : "/assets/../assets/avatar.jpg"
                   }
                   style={{...(styles.profileImage || {}), marginRight: spacing.xs}}
@@ -1626,7 +1628,7 @@ const CommunityProfile = () => {
                     <span style={{...(styles.profileName || {}), color: theme.text}}>
                       {community?.name}
                     </span>
-                    <MdCheck />
+                    {community?.is_verified && <VerificationBadge size={14} style={{ marginLeft: spacing.xs }} />}
                   </div>
                   <div style={{ flexDirection: "row", alignItems: "center" }}>
                     <div
@@ -1732,7 +1734,7 @@ const CommunityProfile = () => {
                                 );
                               }}
                             >
-                              <FiSearch />
+                              <MdDelete size={16} color="#FF3B30" style={{ marginRight: 6 }} />
                               <span style={{ fontSize: fontSize.base, color: "#FF3B30" }}>
                                 Delete Post
                               </span>
@@ -1797,7 +1799,7 @@ const CommunityProfile = () => {
                       if (post.id) {
                         trackView(post.id, "community");
                       }
-                      router.push("/community-post");
+                      router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
                     }}
                     style={{ marginTop: spacing.base }}
                   >
@@ -1823,7 +1825,7 @@ const CommunityProfile = () => {
                     if (post.id) {
                       trackView(post.id, "community");
                     }
-                    router.push("/community-post");
+                    router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
                   }}
                   style={{ marginTop: spacing.base }}
                 >
@@ -1853,13 +1855,16 @@ const CommunityProfile = () => {
                   if (post.id) {
                     trackView(post.id, "community");
                   }
-                  router.push("/community-post");
+                  router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
                 }}
                 style={{
                   marginTop: spacing.base,
                   marginBottom: spacing.md,
                   marginLeft: -28,
     marginRight: -28,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
                 }}
               >
                 <div
@@ -1872,15 +1877,12 @@ const CommunityProfile = () => {
                     position: "relative",
                   }}
                 >
-                  <VideoView
-                    player={useVideoPlayer(post.video_url, (player) => {
-                      player.loop = false;
-                      player.muted = true;
-                    })}
-                    style={{ width: "100%", height: "100%" }}
-                    contentFit="cover"
-                    allowsFullscreen={false}
-                    allowsPictureInPicture={false}
+                  <video
+                    src={post.video_url}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    muted
+                    playsInline
+                    preload="metadata"
                   />
                   <div
                     style={{
@@ -1897,7 +1899,7 @@ const CommunityProfile = () => {
                       alignItems: "center",
                     }}
                   >
-                    <IoChevronBack />
+                    <IoVideocam size={14} color="#fff" />
                     <span
                       style={{ color: "#fff", fontSize: fontSize.sm, marginLeft: spacing.xs }}
                     >
@@ -1910,20 +1912,20 @@ const CommunityProfile = () => {
               </button>
           )}
             {/* Post Stats */}
-            <div style={styles.iconRow}>
-              <button onClick={() => handleToggleLike(post.id)}>
+            <div style={{...styles.iconRow, display: "flex"}}>
+              <button onClick={() => handleToggleLike(post.id)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
                 {likedPosts.has(post.id) ? (
-                  <IoChevronBack />
+                  <IoThumbsUp size={18} color="#00bfff" />
                 ) : (
-                  <IoChevronBack />
+                  <IoThumbsUpOutline size={18} color="#666" />
                 )}
               </button>
               <span style={styles.iconText}>
                 {postLikeCounts[post.id] || 0}
               </span>
 
-              <button disabled>
-                <MdCheck />
+              <button disabled style={{ background: "none", border: "none", display: "flex", alignItems: "center" }}>
+                <MdEye size={18} color="#666" />
               </button>
               <span style={styles.iconText}>
                 {postViewCounts[post.id] || post.view_count || 0}
@@ -1934,17 +1936,18 @@ const CommunityProfile = () => {
                   setSelectedComment(post);
                   setShowCommentModal(true);
                 }}
+                style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
               >
-                <FiSearch />
+                <FiMessageCircle size={18} color="#666" />
               </button>
               <span style={styles.iconText}>{postCommentCounts[post.id] ?? post.comment_count ?? 0}</span>
 
-              <button onClick={() => setShowShareModal(true)}>
-                <FiSearch />
+              <button onClick={() => setShowShareModal(true)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
+                <FiShare2 size={18} color="#666" />
               </button>
 
               {post.is_pinned && (
-                <MdCheck />
+                <MdPushPin size={16} color="#00BFFF" />
               )}
             </div>
 
@@ -2012,7 +2015,7 @@ const CommunityProfile = () => {
               <img
                 src={
                   post.author_profile?.avatar_url
-                    ? { uri: post.author_profile.avatar_url }
+                    ? post.author_profile.avatar_url
                     : "/assets/../assets/avatar.jpg"
                 }
                 style={{...(styles.profileImage || {}), marginRight: spacing.xs}}
@@ -2029,7 +2032,6 @@ const CommunityProfile = () => {
                   <span style={{...(styles.profileName || {}), color: theme.text}}>
                     {community?.name}
                   </span>
-                  <MdCheck />
                 </div>
                 <div style={{ flexDirection: "row", alignItems: "center" }}>
                   <div style={{ flexDirection: "row", alignItems: "center" }}>
@@ -2129,7 +2131,7 @@ const CommunityProfile = () => {
                               );
                             }}
                           >
-                            <FiSearch />
+                            <MdDelete size={16} color="#FF3B30" style={{ marginRight: 6 }} />
                             <span style={{ fontSize: fontSize.base, color: "#FF3B30" }}>
                               Delete Post
                             </span>
@@ -2193,7 +2195,7 @@ const CommunityProfile = () => {
                       if (post.id) {
                         trackView(post.id, "community");
                       }
-                      router.push("/community-post");
+                      router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
                     }}
                     style={{ marginTop: spacing.base }}
                   >
@@ -2219,7 +2221,7 @@ const CommunityProfile = () => {
                     if (post.id) {
                       trackView(post.id, "community");
                     }
-                    router.push("/community-post");
+                    router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
                   }}
                   style={{ marginTop: spacing.base }}
                 >
@@ -2249,7 +2251,7 @@ const CommunityProfile = () => {
                   if (post.id) {
                     trackView(post.id, "community");
                   }
-                  router.push("/community-post");
+                  router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
                 }}
                 style={{
                   marginTop: spacing.base,
@@ -2268,15 +2270,12 @@ const CommunityProfile = () => {
                     position: "relative",
                   }}
                 >
-                  <VideoView
-                    player={useVideoPlayer(post.video_url, (player) => {
-                      player.loop = false;
-                      player.muted = true;
-                    })}
-                    style={{ width: "100%", height: "100%" }}
-                    contentFit="cover"
-                    allowsFullscreen={false}
-                    allowsPictureInPicture={false}
+                  <video
+                    src={post.video_url}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    muted
+                    playsInline
+                    preload="metadata"
                   />
                   <div
                     style={{
@@ -2293,7 +2292,7 @@ const CommunityProfile = () => {
                       alignItems: "center",
                     }}
                   >
-                    <IoChevronBack />
+                    <IoVideocam size={14} color="#fff" />
                     <span
                       style={{ color: "#fff", fontSize: fontSize.sm, marginLeft: spacing.xs }}
                     >
@@ -2306,20 +2305,20 @@ const CommunityProfile = () => {
               </button>
           )}
             {/* Post Stats */}
-            <div style={styles.iconRow}>
-              <button onClick={() => handleToggleLike(post.id)}>
+            <div style={{...styles.iconRow, display: "flex"}}>
+              <button onClick={() => handleToggleLike(post.id)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
                 {likedPosts.has(post.id) ? (
-                  <IoChevronBack />
+                  <IoThumbsUp size={18} color="#00bfff" />
                 ) : (
-                  <IoChevronBack />
+                  <IoThumbsUpOutline size={18} color="#666" />
                 )}
               </button>
               <span style={{...(styles.iconText || {}), color: theme.secondaryText}}>
                 {postLikeCounts[post.id] || 0}
               </span>
 
-              <button disabled>
-                <MdCheck />
+              <button disabled style={{ background: "none", border: "none", display: "flex", alignItems: "center" }}>
+                <MdEye size={18} color="#666" />
               </button>
               <span style={{...(styles.iconText || {}), color: theme.secondaryText}}>
                 {postViewCounts[post.id] || post.view_count || 0}
@@ -2330,19 +2329,20 @@ const CommunityProfile = () => {
                   setSelectedComment(post);
                   setShowCommentModal(true);
                 }}
+                style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
               >
-                <FiSearch />
+                <FiMessageCircle size={18} color="#666" />
               </button>
               <span style={{...(styles.iconText || {}), color: theme.secondaryText}}>
                 {postCommentCounts[post.id] ?? post.comment_count ?? 0}
               </span>
 
-              <button onClick={() => setShowShareModal(true)}>
-                <FiSearch />
+              <button onClick={() => setShowShareModal(true)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
+                <FiShare2 size={18} color="#666" />
               </button>
 
               {post.is_pinned && (
-                <MdCheck />
+                <MdPushPin size={16} color="#00BFFF" />
               )}
             </div>
 
@@ -2396,11 +2396,7 @@ const CommunityProfile = () => {
           {members.slice(0, 3).map((m, i) => (
             <img
               key={m.user_id || i}
-              src={
-                m.profiles?.avatar_url
-                  ? { uri: m.profiles.avatar_url }
-                  : "/assets/../assets/avatar.jpg"
-              }
+              src={m.profiles?.avatar_url || "/avatar.png"}
               style={i === 0 ? styles.avatarImage : styles.avatarImageTwo}
             />
           ))}
@@ -2414,13 +2410,13 @@ const CommunityProfile = () => {
         </span>
       </div>
       <div style={{ flexDirection: "row", alignItems: "center" }}>
-        <MdCheck />
+        <MdCheck size={16} color="#00BFFF" style={{ marginRight: 8 }} />
         <span style={{...(styles.aboutBoxText || {}), color: theme.secondaryText}}>
           Only community members can post
         </span>
       </div>
       <div style={{ flexDirection: "row", alignItems: "center" }}>
-        <MdCheck />
+        <MdPerson size={16} color="#00BFFF" style={{ marginRight: 8 }} />
         <span style={{...(styles.aboutBoxText || {}), color: theme.secondaryText}}>
           {community?.is_private
             ? "Invitation required to join this community"
@@ -2428,13 +2424,13 @@ const CommunityProfile = () => {
         </span>
       </div>
       <div style={{ flexDirection: "row", alignItems: "center" }}>
-        <FiSearch />
+        <FiMessageCircle size={16} color="#00BFFF" style={{ marginRight: 8 }} />
         <span style={{...(styles.aboutBoxText || {}), color: theme.secondaryText}}>
           All sorts of posts are allowed
         </span>
       </div>
       <div style={{ flexDirection: "row", alignItems: "center" }}>
-        <MdCheck />
+        <MdStar size={16} color="#00BFFF" style={{ marginRight: 8 }} />
         <span style={{...(styles.aboutBoxText || {}), color: theme.secondaryText}}>
           Created on{" "}
           {community?.created_at
@@ -2447,7 +2443,7 @@ const CommunityProfile = () => {
         </span>
       </div>
       <div style={{ flexDirection: "row", alignItems: "center" }}>
-        <FiSearch />
+        <MdPerson size={16} color="#00BFFF" style={{ marginRight: 8 }} />
         <span style={{...(styles.aboutBoxText || {}), color: theme.secondaryText}}>
           Created by{" "}
           {creatorProfile?.full_name ||
@@ -2554,7 +2550,7 @@ const CommunityProfile = () => {
                 marginBottom: spacing.base,
               }}
             >
-              <MdCheck />
+              <MdPeople size={36} color="#00BFFF" />
             </div>
         )}
           <span

@@ -188,7 +188,8 @@ export default function Auth() {
         return;
       }
 
-      const emailRedirectTo = `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`;
+      const emailRedirectTo =
+        `${typeof window !== "undefined" ? window.location.origin : "https://www.verrsa.org"}/auth/callback`;
 
       const { data, error } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
@@ -319,7 +320,8 @@ export default function Auth() {
       setLoading(true);
       setHandlingOAuth(true);
 
-      const redirectTo = `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`;
+      const redirectTo = `${typeof window !== "undefined" ? window.location.origin : "https://www.verrsa.org"}/auth/callback`;
+        
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

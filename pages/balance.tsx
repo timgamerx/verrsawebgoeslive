@@ -2,13 +2,13 @@
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from "react";
 import { spacing, radius, fontSize } from '../lib/theme';
-import { IoArrowBack, IoCheckmark, IoChevronBack, IoClose } from 'react-icons/io5';
+import { IoArrowBack, IoCheckmark, IoClose, IoAddCircle, IoInformationCircle, IoArrowDownCircle, IoArrowUpCircle } from 'react-icons/io5';
 import { supabase } from '../components/supabase';
 import { useTheme } from '../context/ThemeProvider';
 // inAppPurchases not available on web - stub for web compatibility
 const PRODUCT_IDS: any = {};
 const iapService = { initialize: async () => {}, getBalanceTopupProducts: async () => [], purchaseProduct: async () => ({ success: false }) };
-import { MdVerified } from 'react-icons/md';
+import { MdCreditCard, MdAccountBalance, MdHistory } from 'react-icons/md';
 // directPayments stub for web - use securePaymentApi instead
 const initializePaystackPayment = async (params: any) => ({ success: false, message: 'Use web payment flow' });
 const initializeFlutterwavePayment = async (params: any) => ({ success: false, message: 'Use web payment flow' });
@@ -405,9 +405,9 @@ export default function Balance() {
   return (
     <div style={{...(styles.container || {}), backgroundColor: theme.background}}>
       {/* Header */}
-      <div style={styles.header}>
-        <button onClick={() => router.back()}>
-          <IoArrowBack />
+      <div style={{...styles.header, display: "flex"}}>
+        <button onClick={() => router.back()} style={{ background: "none", border: "none", cursor: "pointer" }}>
+          <IoArrowBack size={24} color={theme.icon || "#333"} />
         </button>
         <span style={{...(styles.headerTitle || {}), color: theme.text}}>
           My Balance
@@ -421,7 +421,9 @@ export default function Balance() {
         <div style={styles.balanceCard}>
           {/* Background Wallet Icon */}
           <div style={styles.walletBackground}>
-            <MdVerified />
+            <svg width="120" height="120" viewBox="0 0 24 24" fill="rgba(255,255,255,0.15)" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 7H3C1.9 7 1 7.9 1 9v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm0 13H3V9h18v11zm-9-1c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zM4 4h16v2H4z"/>
+            </svg>
           </div>
 
           {/* Card Content — elevated above decorative background */}
@@ -429,10 +431,10 @@ export default function Balance() {
             <span style={styles.balanceLabel}>Available Balance</span>
             <span style={styles.balanceAmount}>${balance.toFixed(2)}</span>
             <button
-              style={styles.topUpButton}
+              style={{...styles.topUpButton, display: "flex"}}
               onClick={() => setShowTopUpModal(true)}
             >
-              <IoChevronBack />
+              <IoAddCircle size={20} color="#fff" />
               <span style={styles.topUpButtonText}>Top Up</span>
             </button>
           </div>
@@ -440,9 +442,9 @@ export default function Balance() {
 
         {/* Info Card */}
         <div
-          style={{...(styles.infoCard || {}), backgroundColor: theme.cardBackground}}
+          style={{...styles.infoCard, display: "flex", backgroundColor: theme.cardBackground}}
         >
-          <IoChevronBack />
+          <IoInformationCircle size={20} color="#00BFFF" />
           <span style={{...(styles.infoText || {}), color: theme.secondaryText}}>
             Use your balance to pay for ads, send gifts, sponsor, or donate to
             live streamers
@@ -455,7 +457,7 @@ export default function Balance() {
         </span>
         {transactions.length === 0 ? (
           <div style={styles.emptyState}>
-            <MdVerified />
+            <MdHistory size={60} color="#aaa" style={{ opacity: 0.3 }} />
             <span
               style={{...(styles.emptyStateText || {}), color: theme.secondaryText}}
             >
@@ -468,8 +470,10 @@ export default function Balance() {
               key={transaction.id}
               style={{...(styles.transactionItem || {}), borderBottomColor: theme.border}}
             >
-              <div style={styles.transactionIcon}>
-                <IoChevronBack />
+              <div style={{...styles.transactionIcon, display: "flex"}}>
+                {transaction.type === "credit"
+                  ? <IoArrowDownCircle size={24} color="#4CAF50" />
+                  : <IoArrowUpCircle size={24} color="#FF6B6B" />}
               </div>
               <div style={styles.transactionDetails}>
                 <span style={{...(styles.transactionTitle || {}), color: theme.text}}>
@@ -554,12 +558,12 @@ export default function Balance() {
                   style={{...(styles.paymentMethodButton || {}), ...(selectedPaymentMethod === "paystack" ? styles.paymentMethodButtonActive : {})}}
                   onClick={() => setSelectedPaymentMethod("paystack")}
                 >
-                  <div style={styles.paymentMethodInfo}>
-                    <MdVerified />
+                  <div style={{...styles.paymentMethodInfo, display: "flex"}}>
+                    <MdCreditCard size={24} color="#00C3F7" />
                     <span style={styles.paymentMethodText}>Paystack</span>
                   </div>
                   {selectedPaymentMethod === "paystack" && (
-                    <IoCheckmark />
+                    <IoCheckmark size={24} color="#00BFFF" />
                   )}
                 </button>
 
@@ -567,12 +571,12 @@ export default function Balance() {
                   style={{...(styles.paymentMethodButton || {}), ...(selectedPaymentMethod === "flutterwave" ? styles.paymentMethodButtonActive : {})}}
                   onClick={() => setSelectedPaymentMethod("flutterwave")}
                 >
-                  <div style={styles.paymentMethodInfo}>
-                    <MdVerified />
+                  <div style={{...styles.paymentMethodInfo, display: "flex"}}>
+                    <MdAccountBalance size={24} color="#F5A623" />
                     <span style={styles.paymentMethodText}>Flutterwave</span>
                   </div>
                   {selectedPaymentMethod === "flutterwave" && (
-                    <IoCheckmark />
+                    <IoCheckmark size={24} color="#00BFFF" />
                   )}
                 </button>
               </>

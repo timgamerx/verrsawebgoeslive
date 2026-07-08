@@ -743,26 +743,26 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
      
 
       <Head>
-        <title>{initialMeta?.title || 'Creator - Verrsa'}</title>
-        <meta name="description" content={initialMeta?.description || 'View this creator profile on Verrsa.'} />
+        <title>{initialMeta?.title || (profile?.full_name ? `${profile.full_name} - Verrsa` : 'Verrsa')}</title>
+        <meta name="description" content={initialMeta?.description || (profile?.full_name ? `View ${profile.full_name}'s profile on Verrsa.` : 'View this creator profile on Verrsa.')} />
         <link rel="canonical" href={initialMeta?.url || `${SITE_URL}/user/${userId || ''}`} />
         <meta property="og:type" content="profile" />
         <meta property="og:site_name" content="Verrsa" />
         <meta property="og:url" content={initialMeta?.url || `${SITE_URL}/user/${userId || ''}`} />
-        <meta property="og:title" content={initialMeta?.title || 'Creator - Verrsa'} />
-        <meta property="og:description" content={initialMeta?.description || 'View this creator profile on Verrsa.'} />
-        <meta property="og:image" content={initialMeta?.image || `${SITE_URL}/user?username=creator`} />
+        <meta property="og:title" content={initialMeta?.title || (profile?.full_name ? `${profile.full_name} - Verrsa` : 'Verrsa')} />
+        <meta property="og:description" content={initialMeta?.description || (profile?.full_name ? `View ${profile.full_name}'s profile on Verrsa.` : 'View this creator profile on Verrsa.')} />
+        <meta property="og:image" content={initialMeta?.image || profileImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content={initialMeta?.url || `${SITE_URL}/user/${userId || ''}`} />
-        <meta name="twitter:title" content={initialMeta?.title || 'Creator - Verrsa'} />
-        <meta name="twitter:description" content={initialMeta?.description || 'View this creator profile on Verrsa.'} />
-        <meta name="twitter:image" content={initialMeta?.image || `${SITE_URL}/user?username=creator`} />
+        <meta name="twitter:title" content={initialMeta?.title || (profile?.full_name ? `${profile.full_name} - Verrsa` : 'Verrsa')} />
+        <meta name="twitter:description" content={initialMeta?.description || (profile?.full_name ? `View ${profile.full_name}'s profile on Verrsa.` : 'View this creator profile on Verrsa.')} />
+        <meta name="twitter:image" content={initialMeta?.image || profileImage} />
       </Head>
       <MetaTags
-        title={initialMeta?.title || (profile?.full_name ? `${profile.full_name} (@${profileUsername || "creator"}) - Verrsa` : `@${profileUsername || "creator"} - Verrsa`)}
-        description={initialMeta?.description || profile?.bio || "View this creator profile on Verrsa."}
+        title={initialMeta?.title || (profile?.full_name ? `${profile.full_name} - Verrsa` : 'Verrsa')}
+        description={initialMeta?.description || (profile?.full_name ? `View ${profile.full_name}'s profile on Verrsa.` : profile?.bio || 'View this creator profile on Verrsa.')}
         image={initialMeta?.image || profileImage}
         url={initialMeta?.url || `${SITE_URL}/user/${userId || ''}`}
         type="website"
@@ -940,7 +940,7 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
 export async function getServerSideProps(context) {
   const uid = String(context?.params?.userId || '');
   const fallbackMeta = {
-    title: 'Creator - Verrsa',
+    title: 'Verrsa',
     description: 'View this creator profile on Verrsa.',
     image: `${SITE_URL}/user?username=creator`,
     url: `${SITE_URL}/user/${uid}`,
@@ -976,7 +976,9 @@ export async function getServerSideProps(context) {
 
     const username = data.username || 'creator';
     const fullName = data.full_name || username;
-    const bio = data.bio || 'View this creator profile on Verrsa.';
+    const bio = data.bio
+      ? (data.bio.length > 180 ? `${data.bio.slice(0, 177)}...` : data.bio)
+      : `View ${fullName}'s profile on Verrsa.`;
     
     // Use avatar_url if available, otherwise fall back to API endpoint
     const metaImage = data.avatar_url || `${SITE_URL}/api/user?username=${encodeURIComponent(username)}`;
@@ -986,8 +988,8 @@ export async function getServerSideProps(context) {
         initialProfile: data,
         isOwnProfile,
         initialMeta: {
-          title: `${fullName} (@${username}) - Verrsa`,
-          description: bio.length > 180 ? `${bio.slice(0, 177)}...` : bio,
+          title: `${fullName} - Verrsa`,
+          description: bio,
           image: metaImage,
           url: `${SITE_URL}/user/${uid}`,
         },
