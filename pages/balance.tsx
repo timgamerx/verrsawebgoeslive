@@ -14,13 +14,10 @@ import {
   IoCheckmarkCircle,
 } from "react-icons/io5";
 import { MdCreditCard, MdAccountBalance, MdHistory } from "react-icons/md";
-
-const initializePaystackPayment = async (_params: any) => {
-  throw new Error("Paystack web SDK not configured");
-};
-const initializeFlutterwavePayment = async (_params: any) => {
-  throw new Error("Flutterwave web SDK not configured");
-};
+import {
+  initializePaystackPayment,
+  initializeFlutterwavePayment,
+} from "../lib/directPayments";
 
 export default function Balance() {
   const router = useRouter();
@@ -362,7 +359,7 @@ const s: Record<string, React.CSSProperties> = {
   quickAmountButtonActive: { borderColor: "#00BFFF", backgroundColor: "#E8F8FF" },
   quickAmountText: { fontSize: fontSize.base, fontWeight: "500", color: "#666" },
   quickAmountTextActive: { color: "#00BFFF", fontWeight: "600" },
-  amountInput: { width: "100%", border: "1px solid #e0e0e0", borderRadius: radius.lg, padding: spacing.base, fontSize: fontSize.base, marginBottom: spacing.md, outline: "none", fontFamily: "'Instrument Sans', sans-serif", boxSizing: "border-box" },
+  amountInput: { color: "#000", width: "100%", border: "1px solid #e0e0e0", borderRadius: radius.lg, padding: spacing.base, fontSize: fontSize.base, marginBottom: spacing.md, outline: "none", fontFamily: "'Instrument Sans', sans-serif", boxSizing: "border-box" },
   paymentMethodButton: { display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: spacing.base, borderRadius: radius.lg, border: "1px solid #e0e0e0", marginBottom: spacing.md, backgroundColor: "#fff", cursor: "pointer", width: "100%" },
   paymentMethodButtonActive: { borderColor: "#00BFFF", backgroundColor: "#E8F8FF" },
   paymentMethodInfo: { display: "flex", flexDirection: "row", alignItems: "center", gap: spacing.md },
