@@ -310,18 +310,12 @@ const CompleteProfile = () => {
   const handleSave = async () => {
     // Validate all fields
     if (!validateForm()) {
-      window.alert(/* Alert: */ 
-        "Incomplete Information",
-        "Please fill in all required fields correctly.",
-      );
+      window.alert("Please fill in all required fields correctly.");
       return;
     }
 
     if (selectedCategories.length === 0 || !selectedCountry) {
-      window.alert(/* Alert: */ 
-        "Incomplete",
-        "Please select at least one category and a country.",
-      );
+      window.alert("Please select at least one category and a country.");
       return;
     }
 

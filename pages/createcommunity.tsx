@@ -88,10 +88,7 @@ const CreateCommunity = () => {
       profile = await fetchCurrentUserProfile();
     }
     if (!profile || !profile.id) {
-      window.alert(/* Alert: */ 
-        "User Error",
-        "Could not get your user profile. Please log in again.",
-      );
+      window.alert("Could not get your user profile. Please log in again.");
       return;
     }
     const userId = profile.id;
@@ -101,10 +98,7 @@ const CreateCommunity = () => {
       coverImageUrl = await uploadPublicFile(imageAsset);
       if (!coverImageUrl) {
         setLoading(false);
-        window.alert(/* Alert: */ 
-          "Image Upload Failed",
-          "Could not upload image. Try again.",
-        );
+        window.alert("Could not upload image. Try again.");
         return;
       }
     }
@@ -152,10 +146,7 @@ const CreateCommunity = () => {
         authUserError,
       );
       setLoading(false);
-      window.alert(/* Alert: */ 
-        "Error",
-        "Could not create community membership. Please try again.",
-      );
+      window.alert("Could not create community membership. Please try again.");
       return;
     }
 
@@ -175,10 +166,7 @@ const CreateCommunity = () => {
 
     if (memberError) {
       console.log("community_members insert error:", memberError);
-      window.alert(/* Alert: */ 
-        "Community Created",
-        "But failed to add you as a member. Contact support.",
-      );
+      window.alert("But failed to add you as a member. Contact support.");
     } else {
       // Send notification to all users about the new community
       const creatorName =
@@ -194,17 +182,7 @@ const CreateCommunity = () => {
         console.error("Failed to send new community notification:", err),
       );
 
-      window.alert(/* Alert: */ 
-        "Success",
-        "Your community has been published successfully! You are now the owner and first member.",
-        [
-          {
-            text: "OK",
-            onPress: () => router.back(),
-          },
-        ],
-        { cancelable: false },
-      );
+      window.alert("Your community has been published successfully! You are now the owner and first member."); router.back()
     }
   };
 

@@ -77,10 +77,7 @@ const CreateCommunityPost = ({ navigation, route }: Props) => {
     try {
       // Don't allow images if video is selected
       if (selectedVideo) {
-        window.alert(/* Alert: */ 
-          "Video Selected",
-          "Please remove the video first to add images. You can post either images or a video, not both.",
-        );
+        window.alert("Please remove the video first to add images. You can post either images or a video.");
         return;
       }
 
@@ -105,36 +102,20 @@ const CreateCommunityPost = ({ navigation, route }: Props) => {
     try {
       // Check if user has Basic or Premium subscription
       if (plan === "free") {
-        window.alert(/* Alert: */ 
-          "Subscription Required",
-          "Video posting is only available for Basic and Premium subscribers. Upgrade your subscription to post videos in communities.",
-          [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "Upgrade",
-              onPress: () => router.push("/verrsa-subscription"),
-            },
-          ],
-        );
+        if (window.confirm("Video posting is only available for Basic and Premium subscribers. Upgrade your subscription to post videos in communities.")) { router.push("/verrsa-subscription") }
         return;
       }
 
       // Don't allow video if images are selected
       if (selectedImages.length > 0) {
-        window.alert(/* Alert: */ 
-          "Images Selected",
-          "Please remove images first to add a video. You can post either images or a video, not both.",
-        );
+        window.alert("Please remove images first to add a video. You can post either images or a video.");
         return;
       }
 
       const permission =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permission.granted) {
-        window.alert(/* Alert: */ 
-          "Permission Required",
-          "Media library access is needed to select videos.",
-        );
+        window.alert("Media library access is needed to select videos.");
         return;
       }
 

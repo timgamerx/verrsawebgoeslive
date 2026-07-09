@@ -118,10 +118,7 @@ const CustomerSupport = () => {
 
           messageSubscriptionRef.current = subscription;
         } else {
-          window.alert(/* Alert: */ 
-            "Error",
-            ticketResult.error || "Failed to initialize support",
-          );
+          window.alert(ticketResult.error || "Failed to initialize support");
         }
       } catch (error) {
         console.error("Error initializing support:", error);

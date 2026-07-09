@@ -41,10 +41,7 @@ const SupportAgentDashboard = () => {
       if (ticketsResult.tickets) {
         setTickets(ticketsResult.tickets);
       } else {
-        window.alert(/* Alert: */ 
-          "Error",
-          ticketsResult.error || "Failed to load support tickets",
-        );
+        window.alert(ticketsResult.error || "Failed to load support tickets");
       }
     } catch (error) {
       console.error("Error loading tickets:", error);

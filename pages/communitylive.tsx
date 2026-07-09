@@ -637,22 +637,7 @@ export default function CommunityLive() {
       true
         ? window.confirm("Are you sure you want to end the live stream?")
         : await new Promise((resolve) => {
-            window.alert(/* Alert: */ 
-              "End Live Stream",
-              "Are you sure you want to end the live stream?",
-              [
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                  onPress: () => resolve(false),
-                },
-                {
-                  text: "End Live",
-                  style: "destructive",
-                  onPress: () => resolve(true),
-                },
-              ],
-            );
+            if (window.confirm("Are you sure you want to end the live stream?")) { resolve(false) }
           });
 
     if (!confirmed) return;
@@ -782,22 +767,14 @@ export default function CommunityLive() {
 
 
       if (userBalance < price) {
-        window.alert(/* Alert: */ 
-          "Insufficient Balance",
-          "You don't have enough balance to send this gift. Please top up your balance.",
-          [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "Top Up",
-              onPress: () => {
-                setShowGiftsModal(false);
+        if (window.confirm("You don't have enough balance to send this gift. Please top up your balance.")) {
+  (() => {
+    setShowGiftsModal(false);
                 setTimeout(() => {
                   router.push("/balance");
                 }, 100);
-              },
-            },
-          ],
-        );
+  })();
+}
         return;
       }
 
@@ -894,22 +871,14 @@ export default function CommunityLive() {
 
 
       if (userBalance < amount) {
-        window.alert(/* Alert: */ 
-          "Insufficient Balance",
-          "You don't have enough balance to sponsor. Please top up your balance.",
-          [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "Top Up",
-              onPress: () => {
-                setShowGiftsModal(false);
+        if (window.confirm("You don't have enough balance to sponsor. Please top up your balance.")) {
+  (() => {
+    setShowGiftsModal(false);
                 setTimeout(() => {
                   router.push("/balance");
                 }, 100);
-              },
-            },
-          ],
-        );
+  })();
+}
         return;
       }
 
@@ -981,22 +950,14 @@ export default function CommunityLive() {
 
 
       if (userBalance < amount) {
-        window.alert(/* Alert: */ 
-          "Insufficient Balance",
-          "You don't have enough balance to donate. Please top up your balance.",
-          [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "Top Up",
-              onPress: () => {
-                setShowGiftsModal(false);
+        if (window.confirm("You don't have enough balance to donate. Please top up your balance.")) {
+  (() => {
+    setShowGiftsModal(false);
                 setTimeout(() => {
                   router.push("/balance");
                 }, 100);
-              },
-            },
-          ],
-        );
+  })();
+}
         return;
       }
 

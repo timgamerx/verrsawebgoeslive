@@ -154,24 +154,16 @@ export default function VerrsaSubscription() {
     cycle: "monthly" | "yearly",
   ) => {
     if (balance <= 0 || balance < price) {
-      window.alert(/* Alert: */ 
-        "Insufficient Balance",
-        `You need $${price.toFixed(
+      if (window.confirm(`You need $${price.toFixed(
           2,
         )} to subscribe. Your current balance is $${balance.toFixed(
           2,
-        )}. Would you like to top up?`,
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Top Up",
-            onPress: () => {
-              setSelectedPlan("");
+        )}. Would you like to top up?`)) {
+  (() => {
+    setSelectedPlan("");
               router.push("/balance");
-            },
-          },
-        ],
-      );
+  })();
+}
       return;
     }
 
@@ -327,10 +319,7 @@ export default function VerrsaSubscription() {
               );
             } catch (error) {
               console.error("Error processing payment:", error);
-              window.alert(/* Alert: */ 
-                "Error",
-                "Failed to process payment. Please try again.",
-              );
+              window.alert("Failed to process payment. Please try again.");
             } finally {
               setPayingWithBalance(false);
             }
@@ -428,43 +417,22 @@ export default function VerrsaSubscription() {
     }
 
     if (targetPlan === "free") {
-      window.alert(/* Alert: */ 
-        "Downgrade to Free",
-        "Are you sure you want to downgrade to the Free plan? You will lose access to premium features.",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Downgrade",
-            style: "destructive",
-            onPress: () => {
-              // Handle downgrade logic here
-              window.alert(/* Alert: */ 
-                "Downgrade",
-                "Contact support to downgrade your plan.",
-              );
-            },
-          },
-        ],
-      );
+      if (window.confirm("Are you sure you want to downgrade to the Free plan? You will lose access to premium features.")) {
+        window.alert("Downgrade request submitted. Your plan will be downgraded at the end of your billing cycle.");
+      }
       return;
     }
 
     if (canUpgradeToPlan(currentPlan, targetPlan)) {
       setSelectedPlan(plan.name);
     } else {
-      window.alert(/* Alert: */ 
-        "Invalid Action",
-        "You cannot downgrade through this screen. Please contact support for plan changes.",
-      );
+      window.alert("You cannot downgrade through this screen. Please contact support for plan changes.");
     }
   };
 
   const handleRestorePurchases = async () => {
     if (true) {
-      window.alert(/* Alert: */ 
-        "Not Available",
-        "Restore Purchases is only available on iOS and Android.",
-      );
+      window.alert("Restore Purchases is only available on iOS and Android.");
       return;
     }
 
@@ -480,10 +448,7 @@ export default function VerrsaSubscription() {
             : "No purchases found to restore.",
         );
       } else {
-        window.alert(/* Alert: */ 
-          "Restore Failed",
-          result.error || "Failed to restore purchases. Please try again.",
-        );
+        window.alert(result.error || "Failed to restore purchases. Please try again.");
       }
     } catch (error: any) {
       console.error("Error restoring purchases:", error);
@@ -1141,11 +1106,7 @@ export default function VerrsaSubscription() {
                                       !status.functionsAvailable
                                         ?.requestPurchase
                                     ) {
-                                      window.alert(/* Alert: */ 
-                                        "Not Available",
-                                        "In-App Purchases require a development build. Please use Balance payment or build the app with 'npx expo run:ios'.",
-                                        [{ text: "OK" }],
-                                      );
+                                      window.alert("In-App Purchases require a development build. Please use Balance payment or build the app with 'npx expo run:ios'.");
                                       setPurchasing(false);
                                       return;
                                     }
@@ -1164,10 +1125,7 @@ export default function VerrsaSubscription() {
                                       // Purchase flow has started. Final activation is handled
                                       // by the IAP purchase listener after store confirmation.
                                       setSelectedPlan("");
-                                      window.alert(/* Alert: */ 
-                                        "Purchase Started",
-                                        "Complete your payment in the store prompt. Your subscription will activate automatically after confirmation.",
-                                      );
+                                      window.alert("Complete your payment in the store prompt. Your subscription will activate automatically after confirmation.");
                                     } else {
                                       // Error already shown by IAP service
                                       console.log(
@@ -1177,10 +1135,7 @@ export default function VerrsaSubscription() {
                                     }
                                   } catch (error: any) {
                                     console.error("Purchase error:", error);
-                                    window.alert(/* Alert: */ 
-                                      "Error",
-                                      error.message || "Purchase failed",
-                                    );
+                                    window.alert(error.message || "Purchase failed");
                                   } finally {
                                     setPurchasing(false);
                                   }

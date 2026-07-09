@@ -179,10 +179,7 @@ export default function AudienceDetails() {
 
       if (debitError) {
         console.error("Balance debit error:", debitError);
-        window.alert(/* Alert: */ 
-          "Payment Failed",
-          `Could not deduct from balance: ${debitError.message}. Please try again.`,
-        );
+        window.alert(`Could not deduct from balance: ${debitError.message}. Please try again.`);
         setLoading(false);
         return;
       }
@@ -249,10 +246,7 @@ export default function AudienceDetails() {
         setShowPaymentModal(false);
         window.alert("Your post is now being promoted.");
       } else {
-        window.alert(/* Alert: */ 
-          "Error",
-          "Payment was successful but campaign update failed. Please contact support.",
-        );
+        window.alert("Payment was successful but campaign update failed. Please contact support.");
       }
     } catch (error) {
       console.error("Balance payment error:", error);
@@ -517,10 +511,7 @@ export default function AudienceDetails() {
                           false ? "apple_iap" : "google_iap",
                       });
 
-                      window.alert(/* Alert: */ 
-                        "Success",
-                        "Payment successful! Your post is now being promoted.",
-                      );
+                      window.alert("Payment successful! Your post is now being promoted.");
                       router.push('/ads-boosts-5');
                     }
                   } catch (error) {

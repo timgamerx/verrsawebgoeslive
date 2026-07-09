@@ -2,7 +2,7 @@
 import { useRouter } from 'next/router';
 import React, { useState, useEffect, useRef } from "react";
 import { spacing, radius, fontSize } from '../lib/theme';
-import { IoAdd, IoArrowBack, IoBookmark, IoChatbubble, IoCheckmark, IoChevronBack, IoChevronDown, IoChevronForward, IoChevronUp, IoClose, IoCopy, IoCreate, IoEye, IoEyeOff, IoHeart, IoHeartOutline, IoHome, IoMenu, IoMic, IoNewspaper, IoNotifications, IoPeople, IoSearch, IoSettings, IoShare, IoStar, IoTrash, IoVideocam } from 'react-icons/io5';
+import { IoAdd, IoArrowBack, IoAttach, IoBookmark, IoChatbubble, IoCheckmark, IoChevronBack, IoChevronDown, IoChevronForward, IoChevronUp, IoClose, IoCopy, IoCreate, IoEye, IoEyeOff, IoHeart, IoHeartOutline, IoHome, IoLockClosed, IoMenu, IoMic, IoNewspaper, IoNotifications, IoPeople, IoSearch, IoSend, IoSettings, IoShare, IoStar, IoTrash, IoVideocam } from 'react-icons/io5';
 import { supabase } from '../components/supabase';
 import {
   getOrCreateConversation,
@@ -177,10 +177,7 @@ const IndividualChat = () => {
         await storeUserPublicKey(user.id, publicKey);
       } catch (encryptError) {
         console.error("Error initializing encryption:", encryptError);
-        window.alert(/* Alert: */ 
-          "Warning",
-          "Encryption setup failed. Messages will be sent unencrypted.",
-        );
+        window.alert("Encryption setup failed. Messages will be sent unencrypted.");
       }
 
       // Get or create conversation using helper function
@@ -429,9 +426,7 @@ const IndividualChat = () => {
 
         <div style={styles.headerContent}>
           <img
-            src={
-              userAvatar ? { uri: userAvatar } : "/assets/../assets/avatar.jpg"
-            }
+            src={userAvatar || "/avatar.png"}
             style={styles.headerAvatar}
           />
           <div style={styles.headerInfo}>
@@ -440,7 +435,7 @@ const IndividualChat = () => {
                 {userName || "Unknown User"}
               </span>
               {encryptionReady && (
-                <IoChevronBack />
+                <IoLockClosed size={14} color="#34c759" style={{ marginLeft: 4 }} />
               )}
             </div>
             <span
@@ -456,58 +451,54 @@ const IndividualChat = () => {
           onClick={() => window.alert("Voice call feature coming soon!")}
           style={styles.headerAction}
         >
-          <IoChevronBack />
+          <IoMic size={22} color="#333" />
         </button>
       </div>
 
       {/* Messages */}
       <div
         ref={flatListRef}
-        data={messages}
-        renderItem={renderMessage}
-        keyExtractor={(item) => item.id}
-        
-        
-        
-        onContentSizeChange={() =>
-          flatListRef.current?.scrollToEnd({ animated: true })
-        }
-      />
+        style={{ flex: 1, overflowY: "auto", padding: `0 ${spacing.base}px` }}
+      >
+        {messages.length === 0 ? renderEmptyList() : messages.map((item) => (
+          <div key={item.id}>{renderMessage({ item })}</div>
+        ))}
+      </div>
 
       {/* Input */}
       <div style={styles.inputContainer}>
         <button
           style={styles.attachButton}
-          onClick={() =>
-            window.alert(/* Alert: */ 
-              "Attachments",
-              "Image and file attachments coming soon!",
-            )
-          }
+          onClick={() => window.alert("Image and file attachments coming soon!")}
         >
-          <IoAdd />
+          <IoAttach size={20} color="#666" />
         </button>
 
-        <input
-          style={styles.textInput}
+        <textarea
+          style={styles.textInput as any}
           placeholder="Type a message..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          multiline
-          maxLength={1000}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSendMessage();
+            }
+          }}
+          rows={1}
         />
 
         <button
-          style={{...(styles.sendButton || {}), ...((!newMessage.trim() || sending || !conversationId || loading) ? styles.sendButtonDisabled : {})}}
-          onClick={sendMessage}
-          disabled={!newMessage.trim() || sending || !conversationId || loading}
+          style={{ ...styles.sendButton, ...(sending || !newMessage.trim() ? styles.sendButtonDisabled : {}) } as any}
+          onClick={handleSendMessage}
+          disabled={sending || !newMessage.trim()}
         >
-          <IoChevronBack />
+          <IoSend size={18} color={sending || !newMessage.trim() ? "#999" : "#fff"} />
         </button>
       </div>
     </div>
   );
-};
+}
 
 const styles: Record<string, React.CSSProperties> = {
   container: {

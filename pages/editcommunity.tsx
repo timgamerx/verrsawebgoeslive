@@ -60,11 +60,7 @@ const EditCommunity = ({ navigation, route }: Props) => {
           memberData?.role === "admin" || memberData?.role === "moderator";
 
         if (!isCreator && !isAdmin) {
-          window.alert(/* Alert: */ 
-            "Access Denied",
-            "You don't have permission to edit this community.",
-            [{ text: "OK", onPress: () => router.back() }],
-          );
+          window.alert("You don't have permission to edit this community."); router.back()
         }
       }
     } catch (error) {
@@ -191,10 +187,7 @@ const EditCommunity = ({ navigation, route }: Props) => {
           }
         } catch (uploadError) {
           console.error("Error uploading cover image:", uploadError);
-          window.alert(/* Alert: */ 
-            "Upload Error",
-            `Failed to upload cover image: ${uploadError}`,
-          );
+          window.alert(`Failed to upload cover image: ${uploadError}`);
           setSaving(false);
           return;
         }
@@ -215,10 +208,7 @@ const EditCommunity = ({ navigation, route }: Props) => {
           }
         } catch (uploadError) {
           console.error("Error uploading avatar image:", uploadError);
-          window.alert(/* Alert: */ 
-            "Upload Error",
-            `Failed to upload avatar image: ${uploadError}`,
-          );
+          window.alert(`Failed to upload avatar image: ${uploadError}`);
           setSaving(false);
           return;
         }

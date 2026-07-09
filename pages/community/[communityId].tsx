@@ -926,10 +926,7 @@ const CommunityProfile = () => {
       }
 
       if (user.id === community?.created_by) {
-        window.alert(/* Alert: */ 
-          "Owner",
-          "Community owners cannot leave. Transfer ownership or delete the community.",
-        );
+        window.alert("Community owners cannot leave. Transfer ownership or delete the community.");
         return;
       }
 
@@ -944,33 +941,22 @@ const CommunityProfile = () => {
         return;
       }
 
-      window.alert(/* Alert: */ 
-        "Leave Community",
-        "Are you sure you want to leave this community?",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Leave",
-            style: "destructive",
-            onPress: async () => {
-              try {
-                const { error } = await supabase
-                  .from("community_members")
-                  .delete()
-                  .eq("community_id", cleanCommunityId)
-                  .eq("user_id", user.id);
-                if (error) throw error;
+      if (window.confirm("Are you sure you want to leave this community?")) {
+        try {
+          const { error } = await supabase
+            .from("community_members")
+            .delete()
+            .eq("community_id", cleanCommunityId)
+            .eq("user_id", user.id);
+          if (error) throw error;
 
-                await fetchMembers();
-                window.alert("You have left the community.");
-              } catch (err) {
-                console.error("Error leaving community:", err);
-                window.alert("Could not leave. Please try again.");
-              }
-            },
-          },
-        ],
-      );
+          await fetchMembers();
+          window.alert("You have left the community.");
+        } catch (err) {
+          console.error("Error leaving community:", err);
+          window.alert("Could not leave. Please try again.");
+        }
+      }
     } catch (error) {
       console.error("Leave community error:", error);
       window.alert("Could not leave. Please try again.");
@@ -1007,45 +993,23 @@ const CommunityProfile = () => {
         .eq("blocked_by", user.id)
         .maybeSingle();
       if (existingBlock) {
-        window.alert(/* Alert: */ 
-          "Already Blocked",
-          "You have already blocked this community.",
-        );
+        window.alert("You have already blocked this community.");
         return;
       }
 
-      window.alert(/* Alert: */ 
-        "Block Community",
-        "You won't see content from this community. Continue?",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Block",
-            style: "destructive",
-            onPress: async () => {
-              try {
-                const { error } = await supabase
-                  .from("blocked_communities")
-                  .insert({ community_id: cleanCommunityId, blocked_by: user.id });
-                if (error) throw error;
-                window.alert("Community has been blocked.");
-                router.push("/Community");
-              } catch (err: any) {
-                // Handle missing table gracefully
-                if (err?.code === "PGRST205") {
-                  window.alert(/* Alert: */ 
-                    "Unavailable",
-                    "Blocking communities isn't set up yet.",
-                  );
-                } else {
-                  console.error("Error blocking community:", err);
-                  window.alert("Failed to block. Please try again.");
-                }
-              }
-            },
-          },
-        ],
-      );
+      if (window.confirm("You won't see content from this community. Continue?")) {
+        try {
+          const { error } = await supabase
+            .from("blocked_communities")
+            .insert({ community_id: cleanCommunityId, blocked_by: user.id });
+          if (error) throw error;
+          window.alert("Community blocked.");
+          router.push("/Community");
+        } catch (err) {
+          console.error("Error blocking community:", err);
+          window.alert("Failed to block. Please try again.");
+        }
+      }
     } catch (error) {
       console.error("Block community error:", error);
     }
@@ -1369,47 +1333,22 @@ const CommunityProfile = () => {
                   }}
                   onClick={() => {
                     handleGoLiveClose();
-                    window.alert(/* Alert: */ 
-                      "Delete Community",
-                      `Are you sure you want to permanently delete "${community?.name}"? This action cannot be undone and will remove all posts, members, and content associated with this community.`,
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Delete",
-                          style: "destructive",
-                          onPress: async () => {
-                            try {
-                              // Delete community from database
-                              const { error } = await supabase
-                                .from("community")
-                                .delete()
-                                .eq("id", cleanCommunityId);
-
-                              if (error) throw error;
-
-                              window.alert(/* Alert: */ 
-                                "Deleted",
-                                "Community has been permanently deleted.",
-                                [
-                                  {
-                                    text: "OK",
-                                    onPress: () => {
-                                      router.push("/Community");
-                                    },
-                                  },
-                                ],
-                              );
-                            } catch (error) {
-                              console.error("Error deleting community:", error);
-                              window.alert(/* Alert: */ 
-                                "Error",
-                                "Could not delete community. Please try again.",
-                              );
-                            }
-                          },
-                        },
-                      ],
-                    );
+                    if (window.confirm(`Are you sure you want to permanently delete "${community?.name}"? This action cannot be undone and will remove all posts, members, and content associated with this community.`)) {
+                      (async () => {
+                        try {
+                          const { error } = await supabase
+                            .from("community")
+                            .delete()
+                            .eq("id", cleanCommunityId);
+                          if (error) throw error;
+                          window.alert("Community has been permanently deleted.");
+                          router.push("/Community");
+                        } catch (error) {
+                          console.error("Error deleting community:", error);
+                          window.alert("Could not delete community. Please try again.");
+                        }
+                      })();
+                    }
                   }}
                 >
                   <MdDelete size={20} color="#e53935" style={{ marginRight: spacing.sm }} />
@@ -1717,21 +1656,7 @@ const CommunityProfile = () => {
                               }}
                               onClick={() => {
                                 setShowDeleteMenu(null);
-                                window.alert(/* Alert: */ 
-                                  "Delete Post",
-                                  "Are you sure you want to delete this post? This action cannot be undone.",
-                                  [
-                                    {
-                                      text: "Cancel",
-                                      style: "cancel",
-                                    },
-                                    {
-                                      text: "Delete",
-                                      style: "destructive",
-                                      onPress: () => handleDeletePost(post.id),
-                                    },
-                                  ],
-                                );
+                                if (window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) { handleDeletePost(post.id) }
                               }}
                             >
                               <MdDelete size={16} color="#FF3B30" style={{ marginRight: 6 }} />
@@ -2114,21 +2039,7 @@ const CommunityProfile = () => {
                             }}
                             onClick={() => {
                               setShowDeleteMenu(null);
-                              window.alert(/* Alert: */ 
-                                "Delete Post",
-                                "Are you sure you want to delete this post? This action cannot be undone.",
-                                [
-                                  {
-                                    text: "Cancel",
-                                    style: "cancel",
-                                  },
-                                  {
-                                    text: "Delete",
-                                    style: "destructive",
-                                    onPress: () => handleDeletePost(post.id),
-                                  },
-                                ],
-                              );
+                              if (window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) { handleDeletePost(post.id) }
                             }}
                           >
                             <MdDelete size={16} color="#FF3B30" style={{ marginRight: 6 }} />

@@ -227,16 +227,10 @@ export default function PaymentDashboard() {
       });
       const json = await resp.json();
       if (!resp.ok) {
-        window.alert(/* Alert: */ 
-          "Error",
-          json?.error || "Failed to create withdrawal request",
-        );
+        window.alert(json?.error || "Failed to create withdrawal request");
         return;
       }
-      window.alert(/* Alert: */ 
-        "Success",
-        "Withdrawal request created. Admin will process payouts.",
-      );
+      window.alert("Withdrawal request created. Admin will process payouts.");
       // refresh balances
       setAvailableCents(0);
       setPendingCents(0);
@@ -735,10 +729,7 @@ export default function PaymentDashboard() {
 
       if (error) {
         console.error("Error saving payment method:", error);
-        window.alert(/* Alert: */ 
-          "Error",
-          "Failed to save payment method. Please try again.",
-        );
+        window.alert("Failed to save payment method. Please try again.");
         return;
       }
 
@@ -763,33 +754,20 @@ export default function PaymentDashboard() {
 
   // Delete payment method
   const handleDeletePaymentMethod = async (methodId: string) => {
-    window.alert(/* Alert: */ 
-      "Delete Payment Method",
-      "Are you sure you want to delete this payment method?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const { error } = await supabase
-                .from("payment_methods")
-                .delete()
-                .eq("id", methodId);
-
-              if (error) throw error;
-
-              window.alert("Payment method deleted.");
-              fetchPaymentMethods();
-            } catch (error) {
-              console.error("Error deleting payment method:", error);
-              window.alert("Failed to delete payment method.");
-            }
-          },
-        },
-      ],
-    );
+    if (window.confirm("Are you sure you want to delete this payment method?")) {
+      try {
+        const { error } = await supabase
+          .from("payment_methods")
+          .delete()
+          .eq("id", methodId);
+        if (error) throw error;
+        window.alert("Payment method deleted.");
+        fetchPaymentMethods();
+      } catch (error) {
+        console.error("Error deleting payment method:", error);
+        window.alert("Failed to delete payment method.");
+      }
+    }
   };
 
   // Fetch withdrawal history
@@ -867,10 +845,7 @@ export default function PaymentDashboard() {
 
       // Check minimum withdrawal amount for live gifts
       if (availableBalance < 10) {
-        window.alert(/* Alert: */ 
-          "Minimum Not Met",
-          "Minimum withdrawal for live gifts is $10.00. Your current balance will be available once you reach the minimum.",
-        );
+        window.alert("Minimum withdrawal for live gifts is $10.00. Your current balance will be available once you reach the minimum.");
         return;
       }
 
@@ -898,10 +873,7 @@ export default function PaymentDashboard() {
 
                 if (withdrawalError) {
                   console.error("Withdrawal request error:", withdrawalError);
-                  window.alert(/* Alert: */ 
-                    "Error",
-                    "Failed to create withdrawal request. Please try again.",
-                  );
+                  window.alert("Failed to create withdrawal request. Please try again.");
                   return;
                 }
 
@@ -945,19 +917,13 @@ export default function PaymentDashboard() {
                   // Don't block withdrawal on email failure
                 }
 
-                window.alert(/* Alert: */ 
-                  "Success",
-                  "Your withdrawal request has been submitted and will be processed within 3-5 business days.",
-                );
+                window.alert("Your withdrawal request has been submitted and will be processed within 3-5 business days.");
                 setShowGiftEarningsModal(false);
                 // Refresh earnings
                 fetchGiftEarnings();
               } catch (error) {
                 console.error("Withdrawal processing error:", error);
-                window.alert(/* Alert: */ 
-                  "Error",
-                  "Failed to process withdrawal. Please try again.",
-                );
+                window.alert("Failed to process withdrawal. Please try again.");
               }
             },
           },
@@ -1583,10 +1549,7 @@ export default function PaymentDashboard() {
                       });
 
                       if (error) {
-                        window.alert(/* Alert: */ 
-                          "Invalid Password",
-                          "The password you entered is incorrect",
-                        );
+                        window.alert("The password you entered is incorrect");
                         return;
                       }
 
@@ -1697,10 +1660,7 @@ export default function PaymentDashboard() {
 
                       // Validate minimum amount
                       if (amt < 1) {
-                        window.alert(/* Alert: */ 
-                          "Minimum Payout",
-                          "The minimum payout request is $1.00",
-                        );
+                        window.alert("The minimum payout request is $1.00");
                         return;
                       }
 
@@ -1710,12 +1670,9 @@ export default function PaymentDashboard() {
                         Number(availableCents || 0) / 100,
                       );
                       if (amt > currentBalance) {
-                        window.alert(/* Alert: */ 
-                          "Insufficient Balance",
-                          `You cannot request more than your current balance of $${currentBalance.toFixed(
+                        window.alert(`You cannot request more than your current balance of $${currentBalance.toFixed(
                             2,
-                          )}`,
-                        );
+                          )}`);
                         return;
                       }
 
@@ -1744,10 +1701,7 @@ export default function PaymentDashboard() {
 
                       if (error) {
                         console.warn("Withdraw request failed", error);
-                        window.alert(/* Alert: */ 
-                          "Error",
-                          "Failed to submit payout request. Please try again.",
-                        );
+                        window.alert("Failed to submit payout request. Please try again.");
                       } else {
                         console.log("Withdraw created", data);
 
@@ -1793,20 +1747,14 @@ export default function PaymentDashboard() {
                           );
                         }
 
-                        window.alert(/* Alert: */ 
-                          "Success",
-                          "Your payout request has been submitted and will be reviewed shortly.",
-                        );
+                        window.alert("Your payout request has been submitted and will be reviewed shortly.");
                         setShowWithdrawModal(false);
                         setWithdrawAmount("");
                         setWithdrawNote("");
                       }
                     } catch (e) {
                       console.warn("Withdraw error", e);
-                      window.alert(/* Alert: */ 
-                        "Error",
-                        "An error occurred. Please try again.",
-                      );
+                      window.alert("An error occurred. Please try again.");
                     }
                   }}
                   style={{...(styles.withdrawButton || {}), marginLeft: 0}}
@@ -1880,10 +1828,7 @@ export default function PaymentDashboard() {
                       );
 
                       if (!result.success) {
-                        window.alert(/* Alert: */ 
-                          "Invalid Code",
-                          result.message || "The code you entered is incorrect",
-                        );
+                        window.alert(result.message || "The code you entered is incorrect");
                         return;
                       }
 
@@ -1903,10 +1848,7 @@ export default function PaymentDashboard() {
 
                       if (error) {
                         console.warn("Withdraw request failed", error);
-                        window.alert(/* Alert: */ 
-                          "Error",
-                          "Failed to submit payout request. Please try again.",
-                        );
+                        window.alert("Failed to submit payout request. Please try again.");
                       } else {
                         console.log("Withdraw created", data);
 
@@ -1952,10 +1894,7 @@ export default function PaymentDashboard() {
                           );
                         }
 
-                        window.alert(/* Alert: */ 
-                          "Success",
-                          "Your payout request has been submitted and will be reviewed shortly.",
-                        );
+                        window.alert("Your payout request has been submitted and will be reviewed shortly.");
                         setShow2FAModal(false);
                         setTwoFACode("");
                         setPendingWithdrawal(null);
@@ -1964,10 +1903,7 @@ export default function PaymentDashboard() {
                       }
                     } catch (e) {
                       console.warn("2FA verification error", e);
-                      window.alert(/* Alert: */ 
-                        "Error",
-                        "An error occurred. Please try again.",
-                      );
+                      window.alert("An error occurred. Please try again.");
                     }
                   }}
                   style={{...(styles.withdrawButton || {}), marginLeft: 0}}

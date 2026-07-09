@@ -115,38 +115,27 @@ const CommunityMembers = () => {
   };
 
   const handleRemoveMember = async (memberId: string, memberName: string) => {
-    window.alert(/* Alert: */ 
-      "Remove Member",
-      `Are you sure you want to remove ${memberName} from this community?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Remove",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const { error } = await supabase
-                .from("community_members")
-                .delete()
-                .eq("community_id", communityId)
-                .eq("user_id", memberId);
+    if (window.confirm(`Are you sure you want to remove ${memberName} from this community?`)) {
+      try {
+        const { error } = await supabase
+          .from("community_members")
+          .delete()
+          .eq("community_id", communityId)
+          .eq("user_id", memberId);
 
-              if (error) {
-                console.error("Error removing member:", error);
-                window.alert("Failed to remove member");
-                return;
-              }
+        if (error) {
+          console.error("Error removing member:", error);
+          window.alert("Failed to remove member");
+          return;
+        }
 
-              window.alert("Member removed successfully");
-              fetchMembers();
-            } catch (error) {
-              console.error("Error removing member:", error);
-              window.alert("Failed to remove member");
-            }
-          },
-        },
-      ],
-    );
+        window.alert("Member removed successfully");
+        fetchMembers();
+      } catch (error) {
+        console.error("Error removing member:", error);
+        window.alert("Failed to remove member");
+      }
+    }
   };
 
   const navigateToProfile = (userId: string) => {

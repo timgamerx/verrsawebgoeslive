@@ -25,10 +25,7 @@ export default function BlockedCommunities() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        window.alert(/* Alert: */ 
-          "Error",
-          "You must be logged in to view blocked communities",
-        );
+        window.alert("You must be logged in to view blocked communities");
         return;
       }
 
@@ -58,10 +55,7 @@ export default function BlockedCommunities() {
         window.alert("Blocked communities isn't set up yet.");
       } else {
         console.error("Error loading blocked communities:", err);
-        window.alert(/* Alert: */ 
-          "Error",
-          "Failed to load blocked communities. Please try again.",
-        );
+        window.alert("Failed to load blocked communities. Please try again.");
       }
     }
   };

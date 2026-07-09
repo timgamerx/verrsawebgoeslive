@@ -28,16 +28,7 @@ const SetNewPassword = () => {
       if (session) {
         setIsValidSession(true);
       } else {
-        window.alert(/* Alert: */ 
-          "Invalid Link",
-          "This password reset link is invalid or has expired. Please request a new one.",
-          [
-            {
-              text: "OK",
-              onPress: () => router.push("/auth"),
-            },
-          ]
-        );
+        window.alert("This password reset link is invalid or has expired. Please request a new one."); router.push("/auth")
       }
     } catch (error) {
       console.error("Error checking session:", error);
@@ -88,20 +79,12 @@ const SetNewPassword = () => {
       // Sign out after password update
       await signOut();
 
-      window.alert(/* Alert: */ 
-        "Success!",
-        "Your password has been updated successfully. Please login with your new password.",
-        [
-          {
-            text: "Go to Login",
-            onPress: () => {
-              setNewPassword("");
+      window.alert("Your password has been updated successfully. Please login with your new password.");
+(() => {
+  setNewPassword("");
               setConfirmPassword("");
               router.push("/auth");
-            },
-          },
-        ]
-      );
+})();
     } catch (error) {
       console.error("❌ Password update error:", error);
       const errorMessage =

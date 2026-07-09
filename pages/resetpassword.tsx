@@ -101,30 +101,9 @@ const ResetPassword = () => {
           error.message?.toLowerCase().includes("sending recovery email") ||
           error.message?.toLowerCase().includes("error sending")
         ) {
-          window.alert(/* Alert: */ 
-            "Email Service Error",
-            "We're experiencing issues with our email service. Please try again in a few minutes, or contact support if the problem persists.\n\nEmail: hello@verrsa.org",
-            [
-              {
-                text: "Try Again",
-                onPress: () => {},
-              },
-              {
-                text: "Contact Support",
-                onPress: () => {
-                  //to support or open email
-                  if (true) {
-                    window?.open("mailto:hello@verrsa.org", "_blank");
-                  }
-                },
-              },
-            ],
-          );
+          window.alert("We're experiencing issues with our email service. Please try again in a few minutes.");
         } else {
-          window.alert(/* Alert: */ 
-            "Reset Email Failed",
-            `Unable to send reset email: ${error.message || "Unknown error"}. Please try again.`,
-          );
+          window.alert(`Unable to send reset email: ${error.message || "Unknown error"}. Please try again.`);
         }
         return;
       }
@@ -145,28 +124,17 @@ const ResetPassword = () => {
         // Don't block the flow if SendGrid fails
       }
 
-      window.alert(/* Alert: */ 
-        "Check Your Email",
-        "We've sent a password reset link to your email address. Please check your inbox and follow the instructions to reset your password.",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              setEmail("");
+      window.alert("We've sent a password reset link to your email address. Please check your inbox and follow the instructions to reset your password.");
+(() => {
+  setEmail("");
               router.push("/auth");
-            },
-          },
-        ],
-      );
+})();
     } catch (error) {
       console.error("❌ Password reset error:", error);
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error occurred";
 
-      window.alert(/* Alert: */ 
-        "Error",
-        `Failed to send reset email: ${errorMessage}. Please try again.`,
-      );
+      window.alert(`Failed to send reset email: ${errorMessage}. Please try again.`);
     } finally {
       setLoading(false);
     }

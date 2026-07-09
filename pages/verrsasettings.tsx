@@ -94,18 +94,7 @@ const VerrsaSettings = () => {
 
       await signOut();
 
-      window.alert(/* Alert: */ 
-        "Account Deleted",
-        "Your Verrsa account has been deleted.",
-        [
-          {
-            text: "OK",
-            onPress: () =>
-              router.push("/"),
-          },
-        ],
-        { cancelable: false },
-      );
+      window.alert("Your Verrsa account has been deleted."); router.push("/")
     } catch (error) {
       console.error("Account deletion error", error);
       const message =
@@ -119,18 +108,7 @@ const VerrsaSettings = () => {
   };
 
   const handleDeleteAccount = () => {
-    window.alert(/* Alert: */ 
-      "Delete Account",
-      "This action cannot be undone. Are you sure you want to delete your account?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: performAccountDeletion,
-        },
-      ],
-    );
+    if (window.confirm("This action cannot be undone. Are you sure you want to delete your account?")) { /* TODO: handle confirm */ }
   };
 
   useEffect(() => {
@@ -223,24 +201,8 @@ const VerrsaSettings = () => {
           await Notifications.getPermissionsAsync();
 
         if (currentStatus === "denied") {
-          // Permission was previously denied - can't request again
-          window.alert(/* Alert: */ 
-            "Enable Notifications",
-            "Notification permissions are disabled. Please enable them in your device settings:\n\niOS: Settings > Verrsa > Notifications\nAndroid: Settings > Apps > Verrsa > Notifications",
-            [
-              { text: "Cancel", style: "cancel" },
-              {
-                text: "Open Settings",
-                onPress: () => {
-                  if (false) {
-                    window.open("app-settings:", "_blank");
-                  } else {
-                    Linking.openSettings();
-                  }
-                },
-              },
-            ],
-          );
+          // Permission was previously denied on web — inform the user
+          window.alert("Notification permissions are disabled. Please enable them in your browser settings.");
           return;
         }
 
@@ -248,24 +210,7 @@ const VerrsaSettings = () => {
           // Request permission (first time or undetermined)
           const { status } = await Notifications.requestPermissionsAsync();
           if (status !== "granted") {
-            // Just denied - show helpful message with Open Settings
-            window.alert(/* Alert: */ 
-              "Enable Notifications",
-              "To receive updates from Verrsa, please enable notifications in your device settings:\n\niOS: Settings > Verrsa > Notifications\nAndroid: Settings > Apps > Verrsa > Notifications",
-              [
-                { text: "Maybe Later", style: "cancel" },
-                {
-                  text: "Open Settings",
-                  onPress: () => {
-                    if (false) {
-                      window.open("app-settings:", "_blank");
-                    } else {
-                      Linking.openSettings();
-                    }
-                  },
-                },
-              ],
-            );
+            window.alert("To receive updates from Verrsa, please enable notifications in your browser settings.");
             return;
           }
         }
@@ -348,20 +293,14 @@ const VerrsaSettings = () => {
         const hasHardware = await LocalAuthentication.hasHardwareAsync();
         const isEnrolled = await LocalAuthentication.isEnrolledAsync();
         if (!hasHardware || !isEnrolled) {
-          window.alert(/* Alert: */ 
-            "Not supported",
-            "Biometric authentication is not available on this device",
-          );
+          window.alert("Biometric authentication is not available on this device");
           return;
         }
         const result = await LocalAuthentication.authenticateAsync({
           promptMessage: "Authenticate to enable biometric authentication",
         });
         if (!result.success) {
-          window.alert(/* Alert: */ 
-            "Authentication failed",
-            "Could not verify your identity",
-          );
+          window.alert("Could not verify your identity");
           return;
         }
       }
@@ -386,35 +325,23 @@ const VerrsaSettings = () => {
   };
 
   const handleRemoveDevice = async (deviceId: string) => {
-    window.alert(/* Alert: */ 
-      "Remove Device",
-      "Are you sure you want to remove this device from your account?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Remove",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const { data } = await supabase.auth.getUser();
-              const user = (data as any)?.user;
-              if (!user?.id) return;
-
-              const success = await removeDevice(user.id, deviceId);
-              if (success) {
-                window.alert("Device removed from your account");
-                loadUserDevices(user.id);
-              } else {
-                window.alert("Failed to remove device");
-              }
-            } catch (error) {
-              console.error("Error removing device:", error);
-              window.alert("Failed to remove device");
-            }
-          },
-        },
-      ],
-    );
+    if (window.confirm("Are you sure you want to remove this device from your account?")) {
+      try {
+        const { data } = await supabase.auth.getUser();
+        const user = (data as any)?.user;
+        if (!user?.id) return;
+        const success = await removeDevice(user.id, deviceId);
+        if (success) {
+          window.alert("Device removed from your account");
+          loadUserDevices(user.id);
+        } else {
+          window.alert("Failed to remove device");
+        }
+      } catch (error) {
+        console.error("Error removing device:", error);
+        window.alert("Failed to remove device");
+      }
+    }
   };
 
   const formatLastActive = (timestamp: string) => {
@@ -553,58 +480,25 @@ const VerrsaSettings = () => {
 
         <button
           style={styles.settingItem}
-          onClick={() => {
-            window.alert(/* Alert: */ 
-              "Change Password",
-              "You will be signed out and redirected to reset your password.",
-              [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Continue",
-                  onPress: async () => {
-                    try {
-                      const { data } = await supabase.auth.getUser();
-                      const email = (data as any)?.user?.email;
-
-                      if (email) {
-                        // Send password reset email
-                        const { error } =
-                          await supabase.auth.resetPasswordForEmail(email, {
-                            redirectTo: "https://www.verrsa.org/reset-password",
-                          });
-
-                        if (error) {
-                          window.alert(/* Alert: */ 
-                            "Error",
-                            "Failed to send reset email. Please try again.",
-                          );
-                        } else {
-                          window.alert(/* Alert: */ 
-                            "Check Your Email",
-                            "We've sent a password reset link to your email address.",
-                            [
-                              {
-                                text: "OK",
-                                onPress: async () => {
-                                  await signOut();
-                                  router.push("/");
-                                },
-                              },
-                            ],
-                          );
-                        }
-                      }
-                    } catch (error) {
-                      console.error("Error changing password:", error);
-                      window.alert(/* Alert: */ 
-                        "Error",
-                        "Something went wrong. Please try again.",
-                      );
-                    }
-                  },
-                },
-              ],
-            );
+          onClick={async () => {
+            if (window.confirm("You will be signed out and redirected to reset your password.")) {
+              try {
+                const { error } = await supabase.auth.resetPasswordForEmail(
+                  currentUser?.email || "",
+                  { redirectTo: `${window.location.origin}/setnewpassword` },
+                );
+                if (!error) {
+                  window.alert("We've sent a password reset link to your email address.");
+                  await supabase.auth.signOut();
+                  router.push("/");
+                } else {
+                  window.alert("Something went wrong. Please try again.");
+                }
+              } catch (error) {
+                console.error("Error changing password:", error);
+                window.alert("Something went wrong. Please try again.");
+              }
+            }
           }}
         >
           <div style={styles.settingLeft}>

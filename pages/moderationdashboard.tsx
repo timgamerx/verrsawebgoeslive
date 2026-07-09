@@ -110,49 +110,23 @@ export default function ModerationDashboard() {
     setRefreshing(false);
   };
 
-  const handleSendUpdateNotification = () => {
-  const router = useRouter();
-    window.alert(/* Alert: */ 
-      "Send App Update Notification",
-      "This will send a push notification to all users asking them to update the app. Continue?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Send",
-          style: "default",
-          onPress: async () => {
-            try {
-              const result = await sendBroadcastNotification(
-                "🚀 Update Available!",
-                "A new version of Verrsa is available. Please update your app for the best experience.",
-                {
-                  type: "app_update",
-                  action: "update",
-                },
-              );
-
-              if (result.success) {
-                window.alert(/* Alert: */ 
-                  "Success",
-                  `Update notification sent to ${result.sent || "all"} users!`,
-                );
-              } else {
-                window.alert(/* Alert: */ 
-                  "Error",
-                  result.error || "Failed to send notification",
-                );
-              }
-            } catch (error) {
-              console.error("Error sending broadcast:", error);
-              window.alert("Failed to send notification");
-            }
-          },
-        },
-      ],
-    );
+  const handleSendUpdateNotification = async () => {
+    if (!window.confirm("This will send a push notification to all users asking them to update the app. Continue?")) return;
+    try {
+      const result = await sendBroadcastNotification(
+        "🚀 Update Available!",
+        "A new version of Verrsa is available. Please update for the best experience.",
+        { type: "update_available", action: "view" },
+      );
+      if (result.success) {
+        window.alert(`Update notification sent to ${result.sent || "all"} users!`);
+      } else {
+        window.alert(result.error || "Failed to send notification");
+      }
+    } catch (error) {
+      console.error("Error sending broadcast:", error);
+      window.alert("Failed to send notification");
+    }
   };
 
   const searchEmails = async (query: string) => {
@@ -371,270 +345,110 @@ export default function ModerationDashboard() {
 
   // Approve handler for reported users (profiles), with optional enforcement
   const handleApproveProfile = async (report: ModerationReport) => {
-    window.alert(/* Alert: */ 
-      "Approve Reported User",
-      "Apply an optional enforcement window?",
-      [
-        {
-          text: "Approve only",
-          onPress: async () => {
-            const res = await contentModerator.approveReportedUser(
-              report.id,
-              userId,
-              {
-                action: "none",
-              },
-            );
-            if (res.success) {
-              setApprovedIds((prev) => {
-                const next = new Set(prev);
-                next.add(report.id);
-                return next;
-              });
-              window.alert("Reported user approved.");
-              await loadReports();
-            } else {
-              window.alert(res.message);
-            }
-          },
-        },
-        {
-          text: "Approve + 1w restricted",
-          onPress: async () => {
-            const enforcementMessage =
-              "Temporarily restricted due to moderation decision.";
-            const res = await contentModerator.approveReportedUser(
-              report.id,
-              userId,
-              {
-                enforcementDays: 7,
-                action: "restricted",
-                message: enforcementMessage,
-              },
-            );
-            if (res.success) {
-              const emailResult = await sendEnforcementEmail(
-                report.reported_user_id,
-                "restricted",
-                enforcementMessage,
-              );
-              setApprovedIds((prev) => {
-                const next = new Set(prev);
-                next.add(report.id);
-                return next;
-              });
-              window.alert(/* Alert: */ 
-                "Success",
-                emailResult.success
-                  ? "User approved with 1-week restriction and email notification sent."
-                  : "User approved with 1-week restriction, but email notification could not be sent.",
-              );
-              await loadReports();
-            } else {
-              window.alert(res.message);
-            }
-          },
-        },
-        {
-          text: "Approve + 1w ban",
-          style: "destructive",
-          onPress: async () => {
-            const enforcementMessage =
-              "Temporarily banned due to moderation decision.";
-            const res = await contentModerator.approveReportedUser(
-              report.id,
-              userId,
-              {
-                enforcementDays: 7,
-                action: "banned",
-                message: enforcementMessage,
-              },
-            );
-            if (res.success) {
-              const emailResult = await sendEnforcementEmail(
-                report.reported_user_id,
-                "banned",
-                enforcementMessage,
-              );
-              setApprovedIds((prev) => {
-                const next = new Set(prev);
-                next.add(report.id);
-                return next;
-              });
-              window.alert(/* Alert: */ 
-                "Success",
-                emailResult.success
-                  ? "User approved with 1-week ban and email notification sent."
-                  : "User approved with 1-week ban, but email notification could not be sent.",
-              );
-              await loadReports();
-            } else {
-              window.alert(res.message);
-            }
-          },
-        },
-        { text: "Cancel", style: "cancel" },
-      ],
+    const choice = window.prompt(
+      `Select enforcement for this user:\n0 = Approve (no action)\n1 = Approve + 1 week restricted\n2 = Approve + 1 week ban\nEnter 0, 1, or 2 (or cancel):`,
     );
+    if (choice === null) return;
+
+    const action = choice === "1" ? "restricted" : choice === "2" ? "banned" : "none";
+    const enforcementMessage =
+      action === "restricted"
+        ? "Temporarily restricted due to moderation decision."
+        : action === "banned"
+          ? "Temporarily banned due to moderation decision."
+          : "";
+
+    try {
+      const res = await contentModerator.approveReportedUser(
+        report.id,
+        userId,
+        action === "none"
+          ? { action: "none" }
+          : { enforcementDays: 7, action, message: enforcementMessage },
+      );
+      if (res.success) {
+        if (action !== "none") {
+          const emailResult = await sendEnforcementEmail(
+            report.reported_user_id,
+            action,
+            enforcementMessage,
+          );
+          window.alert(
+            emailResult.success
+              ? `User approved with 1-week ${action} and email notification sent.`
+              : `User approved with 1-week ${action}.`,
+          );
+        } else {
+          window.alert("Reported user approved.");
+        }
+        setApprovedIds((prev) => { const next = new Set(prev); next.add(report.id); return next; });
+        await loadReports();
+      } else {
+        window.alert(res.message);
+      }
+    } catch (error) {
+      console.error("Error approving profile:", error);
+      window.alert("Failed to approve report.");
+    }
   };
 
   // Approve handler for reported posts with enforcement options
   const handleApprovePost = async (report: ModerationReport) => {
-    window.alert(/* Alert: */ 
-      "Approve Reported Post",
-      "Apply an optional enforcement action?",
-      [
-        {
-          text: "Approve only",
-          onPress: async () => {
-            const res = await contentModerator.approveReportedPost(
-              report.id,
-              userId,
-              { action: "none" },
-            );
-            if (res.success) {
-              setApprovedIds((prev) => {
-                const next = new Set(prev);
-                next.add(report.id);
-                return next;
-              });
-              window.alert("Reported post approved.");
-              await loadReports();
-            } else {
-              window.alert(res.message);
-            }
-          },
-        },
-        {
-          text: "Approve + 1w review",
-          onPress: async () => {
-            const enforcementMessage =
-              "This post is currently blocked and under review, appeal if you think this is not right.";
-            const res = await contentModerator.approveReportedPost(
-              report.id,
-              userId,
-              {
-                enforcementDays: 7,
-                action: "under_review",
-                message: enforcementMessage,
-              },
-            );
-            if (res.success) {
-              const emailResult = await sendEnforcementEmail(
-                report.reported_user_id,
-                "under_review",
-                enforcementMessage,
-              );
-              setApprovedIds((prev) => {
-                const next = new Set(prev);
-                next.add(report.id);
-                return next;
-              });
-              window.alert(/* Alert: */ 
-                "Success",
-                emailResult.success
-                  ? "Post approved with 1-week under-review enforcement and email notification sent."
-                  : "Post approved with 1-week under-review enforcement, but email notification could not be sent.",
-              );
-              await loadReports();
-            } else {
-              window.alert(res.message);
-            }
-          },
-        },
-        {
-          text: "Approve + Block",
-          onPress: async () => {
-            const enforcementMessage = "This post is blocked pending review.";
-            const res = await contentModerator.approveReportedPost(
-              report.id,
-              userId,
-              {
-                action: "blocked",
-                message: enforcementMessage,
-              },
-            );
-            if (res.success) {
-              const emailResult = await sendEnforcementEmail(
-                report.reported_user_id,
-                "blocked",
-                enforcementMessage,
-              );
-              setApprovedIds((prev) => {
-                const next = new Set(prev);
-                next.add(report.id);
-                return next;
-              });
-              window.alert(/* Alert: */ 
-                "Success",
-                emailResult.success
-                  ? "Post approved and blocked with email notification sent."
-                  : "Post approved and blocked, but email notification could not be sent.",
-              );
-              await loadReports();
-            } else {
-              window.alert(res.message);
-            }
-          },
-        },
-        {
-          text: "Approve + Remove",
-          style: "destructive",
-          onPress: async () => {
-            const enforcementMessage =
-              "This post has been removed for violating our guidelines.";
-            const res = await contentModerator.approveReportedPost(
-              report.id,
-              userId,
-              {
-                action: "removed",
-                message: enforcementMessage,
-              },
-            );
-            if (res.success) {
-              const emailResult = await sendEnforcementEmail(
-                report.reported_user_id,
-                "removed",
-                enforcementMessage,
-              );
-              setApprovedIds((prev) => {
-                const next = new Set(prev);
-                next.add(report.id);
-                return next;
-              });
-              window.alert(/* Alert: */ 
-                "Success",
-                emailResult.success
-                  ? "Post approved and removed with email notification sent."
-                  : "Post approved and removed, but email notification could not be sent.",
-              );
-              await loadReports();
-            } else {
-              window.alert(res.message);
-            }
-          },
-        },
-        { text: "Cancel", style: "cancel" },
-      ],
+    const choice = window.prompt(
+      `Select enforcement for this post:\n0 = Approve (no action)\n1 = Approve + 1 week under review\n2 = Approve + Block\n3 = Approve + Remove\nEnter 0-3 (or cancel):`,
     );
+    if (choice === null) return;
+
+    const actionMap: Record<string, string> = { "1": "under_review", "2": "blocked", "3": "removed" };
+    const action = actionMap[choice] || "none";
+    const messageMap: Record<string, string> = {
+      under_review: "This post is currently blocked and under review, appeal if you think this is not right.",
+      blocked: "This post is blocked pending review.",
+      removed: "This post has been removed for violating our guidelines.",
+    };
+    const enforcementMessage = messageMap[action] || "";
+
+    try {
+      const res = await contentModerator.approveReportedPost(
+        report.id,
+        userId,
+        action === "none"
+          ? { action: "none" }
+          : { enforcementDays: action === "under_review" ? 7 : undefined, action, message: enforcementMessage },
+      );
+      if (res.success) {
+        if (action !== "none") {
+          const emailResult = await sendEnforcementEmail(
+            report.reported_user_id,
+            action,
+            enforcementMessage,
+          );
+          window.alert(
+            emailResult.success
+              ? `Post approved (${action}) and email notification sent.`
+              : `Post approved (${action}).`,
+          );
+        } else {
+          window.alert("Reported post approved.");
+        }
+        setApprovedIds((prev) => { const next = new Set(prev); next.add(report.id); return next; });
+        await loadReports();
+      } else {
+        window.alert(res.message);
+      }
+    } catch (error) {
+      console.error("Error approving post:", error);
+      window.alert("Failed to approve report.");
+    }
   };
 
   const confirmAction = (
     reportId: string,
     action: "approve" | "reject" | "delete",
   ) => {
-    window.alert(/* Alert: */ 
-      "Confirm Action",
-      `Are you sure you want to ${action} this content?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Confirm",
-          onPress: () => handleModerate(reportId, action),
-          style: action === "delete" ? "destructive" : "default",
-        },
-      ],
-    );
+    if (window.confirm(`Are you sure you want to ${action} this content?`)) {
+      handleModerate(reportId, action);
+    }
   };
 
   const getViolationColor = (type: string) => {
