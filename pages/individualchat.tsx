@@ -482,7 +482,7 @@ const IndividualChat = () => {
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              handleSendMessage();
+              sendMessage();
             }
           }}
           rows={1}
@@ -490,7 +490,7 @@ const IndividualChat = () => {
 
         <button
           style={{ ...styles.sendButton, ...(sending || !newMessage.trim() ? styles.sendButtonDisabled : {}) } as any}
-          onClick={handleSendMessage}
+          onClick={sendMessage}
           disabled={sending || !newMessage.trim()}
         >
           <IoSend size={18} color={sending || !newMessage.trim() ? "#999" : "#fff"} />

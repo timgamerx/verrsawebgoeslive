@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { spacing, radius, fontSize, fontFamily } from '../../lib/theme';
 import { TbChevronLeft, TbChevronRight, TbDots, TbDotsVertical } from 'react-icons/tb';
 import { supabase } from '../../components/supabase';
-import { MdAdd, MdArrowBack, MdArrowForward, MdBlock, MdCheck, MdClose, MdDelete, MdEdit, MdFavorite, MdHome, MdNotifications, MdPerson, MdRemove, MdReport, MdSearch, MdSettings, MdShare, MdStar, MdVerified, MdGroupAdd, MdExitToApp, MdAddBox, MdPeople, MdVideocam, MdPushPin, MdEye, MdChatBubbleOutline } from 'react-icons/md';
+import { MdAdd, MdArrowBack, MdArrowForward, MdBlock, MdCheck, MdClose, MdDelete, MdEdit, MdFavorite, MdHome, MdNotifications, MdPerson, MdRemove, MdReport, MdSearch, MdSettings, MdShare, MdStar, MdVerified, MdGroupAdd, MdExitToApp, MdAddBox, MdPeople, MdVideocam, MdPushPin, MdVisibility, MdChatBubbleOutline } from 'react-icons/md';
 import VerificationBadge from '../../components/VerificationBadge';
 import SharePostModal from '../../components/SharePostModal.web';
 import CommentModal from '../../components/CommentModal';
