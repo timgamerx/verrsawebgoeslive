@@ -8,7 +8,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 function getSupabaseClient() {
   if (!supabaseUrl || !supabaseKey) {
     throw new Error(
-      'Supabase configuration is required. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.'
+      'Configuration is required.'
     );
   }
 
@@ -49,7 +49,7 @@ export default async function handler(
     }
 
     if (existingEntry) {
-      return res.status(400).json({ error: 'Email already registered on waitlist' });
+      return res.status(400).json({ error: 'Already Subscribed. This email is already receiving Verrsa updates.' });
     }
 
     const { data: newEntry, error: insertError } = await supabase
@@ -59,12 +59,12 @@ export default async function handler(
 
     if (insertError) {
       console.error('Supabase insert error:', insertError);
-      return res.status(500).json({ error: 'Failed to add email to waitlist' });
+      return res.status(500).json({ error: 'Failed to add email' });
     }
 
     return res.status(201).json({
       success: true,
-      message: 'Successfully added to waitlist!',
+      message: 'You’re in! 🎉. You’ll be the first to receive creator tips, product updates, and exclusive Verrsa news.',
       data: newEntry,
     });
   } catch (error) {
