@@ -49,7 +49,7 @@ export default async function handler(
     }
 
     if (existingEntry) {
-      return res.status(400).json({ error: 'Already Subscribed. This email is already receiving Verrsa updates.' });
+      return res.status(400).json({ error: 'Already Subscribed! This email is already receiving Verrsa updates.' });
     }
 
     const { data: newEntry, error: insertError } = await supabase
