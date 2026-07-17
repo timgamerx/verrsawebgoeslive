@@ -681,7 +681,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Comparison Section */}
+      {/* Comparison Section 
       <div style={styles.contentSection}>
         <div style={styles.sectionBadge}>
           <span style={styles.sectionBadgeText}>COMPARISON</span>
@@ -713,10 +713,9 @@ export default function LandingPage() {
               </div>
             </div>
           ))}
-        </div>
+        </div> 
 
-        
-      </div>
+      </div> */}
 
 
  {/* Sign Up Section */}
