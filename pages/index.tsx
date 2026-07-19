@@ -913,7 +913,7 @@ const styles = {
     padding: "12px 24px",
     borderRadius: "8px",
     border: "none",
-    marginRight: "20px",
+    marginRight: "-10px",
     cursor: "pointer",
     boxShadow: "0 4px 12px rgba(14, 165, 233, 0.3)",
     transition: "all 0.2s ease",
