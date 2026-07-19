@@ -324,7 +324,7 @@ export default function LandingPage() {
       <div style={styles.heroSection}>
         <div style={styles.badge}>
           <span style={styles.badgeText}>
-            Application is now live on App Store, coming soon on Playstore
+            Application is live on App Store and Playstore
           </span>
         </div>
 
@@ -342,7 +342,7 @@ export default function LandingPage() {
           </a>
           <a
             // href="https://play.google.com/store/apps/verrsa"
-            href="https://tr.ee/DbjYXzkP-b"
+            href="https://tr.ee/8PCL6hEIvS"
             target="_blank"
             rel="noopener noreferrer"
           >
