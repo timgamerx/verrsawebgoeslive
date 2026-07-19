@@ -536,7 +536,7 @@ const styles = {
   },
   lastUpdated: {
     fontSize: "13px",
-    color: "#666",
+    color: "#444",
     textAlign: "center",
     marginTop: "16px",
     marginBottom: "20px",
@@ -581,7 +581,7 @@ const styles = {
   },
   footerText: {
     fontSize: "13px",
-    color: "#888",
+    color: "#444",
     margin: 0,
   },
 };

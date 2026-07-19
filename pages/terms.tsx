@@ -316,7 +316,7 @@ const styles = {
   },
   headerTitle: {
     fontSize: "28px",
-    fontWeight: "400",
+    fontWeight: "600",
     marginTop: "50px",
     marginBottom: "20px",
     textAlign: "center",
@@ -325,7 +325,7 @@ const styles = {
   },
   sectionTitle: {
     fontSize: "20px",
-    fontWeight: "400",
+    fontWeight: "600",
     marginTop: "24px",
     marginBottom: "12px",
     color: "#0F172A",
@@ -334,14 +334,14 @@ const styles = {
   paragraph: {
     fontSize: "15px",
     lineHeight: "28px",
-    color: "#888",
+    color: "#444",
     marginBottom: "16px",
     textAlign: "left",
     margin: "0 0 16px 0",
   },
   lastUpdated: {
     fontSize: "13px",
-    color: "#666",
+    color: "#444",
     textAlign: "center",
     marginBottom: "24px",
     fontStyle: "italic",
@@ -349,7 +349,7 @@ const styles = {
   },
   footer: {
     fontSize: "15px",
-    color: "#888",
+    color: "#444",
     textAlign: "center",
     marginTop: "48px",
     margin: "48px 0 0 0",

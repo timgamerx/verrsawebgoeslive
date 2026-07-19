@@ -375,7 +375,7 @@ const styles = {
   },
   lastUpdated: {
     fontSize: "13px",
-    color: "#666",
+    color: "#444",
     textAlign: "center",
     marginTop: "16px",
     marginBottom: "20px",
@@ -411,7 +411,7 @@ const styles = {
   bulletText: {
     fontSize: "15px",
     lineHeight: "30px",
-    color: "#555",
+    color: "#444",
     marginLeft: "12px",
     margin: "0 0 0 12px",
   },
@@ -424,7 +424,7 @@ const styles = {
   },
   footerText: {
     fontSize: "13px",
-    color: "#888",
+    color: "#444",
     margin: 0,
   },
 };
