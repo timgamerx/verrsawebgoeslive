@@ -354,7 +354,8 @@ export default function LandingPage() {
           </a>
         </div>
 
-        <h1 style={styles.heroTitle}>Create, Publish, Go Live, and Earn</h1>
+        <h1 className="max-w-[700px] p-15 hidden md:block" style={styles.heroTitle}>Create, Publish, Go Live, and Earn</h1>
+        <h1 className="max-w-[400px] p-15 block md:hidden" style={styles.heroTitle}>Create, Publish, Go Live, and Earn</h1>
         <p style={styles.heroSubtitle}>
           Verrsa is a monetization-first creator platform for emerging creators.
           Start earning from articles, podcasts, videos and live streams without
@@ -386,45 +387,51 @@ export default function LandingPage() {
         </div>
       </div>
 
-{/* Verrsa Creators */}
-      <section className="bg-white py-10 mb-4">
-        <h2 className="text-3xl font-extrabold text-center text-black">
-          Top Verrsa Creators
-        </h2>
-        <p className="text-gray-600 p-4 text-center max-w-2xl mx-auto">
-          Here are some of our top creators who are making waves on Verrsa. You
-          can be part of them with just few steps.
-        </p>
-        <div className="container mx-auto mt-8 px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {loadingCreators ? (
-              <div className="col-span-full text-center py-8 text-gray-500">
-                Loading creators...
-              </div>
-            ) : topCreators.length === 0 ? (
-              <div className="col-span-full text-center py-8 text-gray-500">
-                No creators found
-              </div>
-            ) : (
-              topCreators.map((creator) => (
-                <div key={creator.id} className="bg-blue-50 p-4 rounded-lg text-center">
-                  <Image
-                    src={creator.img}
-                    alt={creator.name}
-                    width={250}
-                    height={250}
-                    className="mx-auto mb-4 rounded-lg"
-                  />
-                  <h3 className="text-xl font-semibold text-black mb-1">
-                    {creator.name}
-                  </h3>
-                  <p className="text-gray-600">{creator.field}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
+    {/* Verrsa Creators */}
+      <section className="bg-white py-10 mb-4"> 
+      <h2 className="text-3xl font-extrabold text-center text-black"> 
+        Top Verrsa Creators 
+      </h2> 
+      
+      <p className="text-gray-600 p-4 text-center max-w-2xl mx-auto"> 
+        Here are some of our top creators who are making waves on Verrsa. You can be part of them with just few steps. 
+      </p> 
+      
+      <div className="container mx-auto mt-8 px-4 sm:px-6 lg:px-8"> 
+        {/* FIXED: Added grid-cols-2 for mobile, and grid-flow-row-dense so rows pack tightly */}
+        <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-row-dense gap-6"> 
+          {loadingCreators ? ( 
+            <div className="col-span-full text-center py-8 text-gray-500"> 
+              Loading creators... 
+            </div> 
+          ) : topCreators.length === 0 ? ( 
+            /* CLEANED UP: Removed accidental grid layout classes from the error text wrapper */
+            <div className="col-span-full text-center py-8 text-gray-500"> 
+              No creators found 
+            </div> 
+          ) : ( 
+            topCreators.map((creator) => ( 
+              /* FIXED: row-span-2 creates the double-row height on mobile, drops back to single row on desktop */
+              <div key={creator.id} className="bg-blue-50 p-0 rounded-lg text-center flex flex-col justify-center row-span-2 md:row-span-1"> 
+                <Image 
+                  src={creator.img} 
+                  alt={creator.name} 
+                  width={200} 
+                  height={210} 
+                  className="mx-auto mb-4 rounded-lg object-cover" 
+                /> 
+                <h3 className="text-xl font-semibold text-black mb-1"> 
+                  {creator.name} 
+                </h3> 
+                <p className="text-gray-600">
+                  {creator.field}
+                </p> 
+              </div> 
+            )) 
+          )} 
+        </div> 
+      </div> 
+    </section>
       
 
     
@@ -522,9 +529,20 @@ export default function LandingPage() {
             </h3>
           </div>
         </div>
-
-       
       </section>
+
+  <h1 className="hidden md:block flex justify-center items-center text-8xl font-semibold tracking-tighter text-gray-400 mb-[-108px] w-full text-center">
+  Success Stories
+</h1>
+
+ <h1 className="block md:hidden flex justify-center items-center text-5xl font-semibold tracking-tighter text-gray-400 mb-[-103px] w-full text-center">
+  Success Stories
+</h1>
+
+      {/* <div className="shadow-[0_10px_20px_rgba(0,0,0,0.15)] rounded-lg p-6 bg-white">
+      </div>*/}
+
+    <div className="h-px w-full bg-gray-300 shadow-lg box-shadow mt-24"></div>
 
       {/* Stats Section */}
       <div style={styles.statsSection}>
@@ -870,6 +888,7 @@ const styles = {
     padding: "12px 24px",
     borderRadius: "8px",
     border: "none",
+    marginRight: "20px",
     cursor: "pointer",
     boxShadow: "0 4px 12px rgba(14, 165, 233, 0.3)",
     transition: "all 0.2s ease",
@@ -919,22 +938,21 @@ const styles = {
     borderRadius: "8px",
   },
   heroTitle: {
-    fontSize: "64px",
+    fontSize: "45px",
     fontWeight: "600",
     color: "#0F172A",
-    maxWidth: "900px",
     textAlign: "center" as const,
-    marginBottom: "20px",
+    marginBottom: "7px",
     letterSpacing: "-1.5px",
-    lineHeight: "72px",
+    lineHeight: "56px",
   } as React.CSSProperties,
   heroSubtitle: {
-    fontSize: "20px",
+    fontSize: "16px",
     fontWeight: "300",
     color: "#475569",
     textAlign: "center" as const,
     maxWidth: "750px",
-    lineHeight: "32px",
+    lineHeight: "23px",
     marginBottom: "48px",
   } as React.CSSProperties,
   ctaContainer: {

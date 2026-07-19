@@ -160,7 +160,7 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
         <p
           style={{
             margin: `0 0 ${spacing.base}px`,
-            fontSize: 14,
+            fontSize: 16,
             color: theme.secondaryText,
             textAlign: "center",
             lineHeight: "1.5",
@@ -194,7 +194,7 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
               style={{
                 display: "flex",
                 alignItems: "center",
-                fontSize: 13,
+                fontSize: 16,
                 color: theme.text,
                 padding: `${spacing.xs}px 0`,
               }}
@@ -224,7 +224,7 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
             fontFamily: "'Instrument Sans', sans-serif",
           }}
         >
-          <span style={{ color: "#fff", fontWeight: "600", fontSize: 15 }}>
+          <span style={{ color: "#fff", fontWeight: "600", fontSize: 16 }}>
             {isDesktopDevice ? 'Download App' : 'Open App'}
           </span>
         </button>
@@ -238,7 +238,7 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
             cursor: "pointer",
             padding: `${spacing.sm}px`,
             color: theme.secondaryText,
-            fontSize: 13,
+            fontSize: 14,
             fontFamily: "'Instrument Sans', sans-serif",
           }}
         >
