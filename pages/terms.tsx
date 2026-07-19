@@ -9,8 +9,24 @@ export default function TermsandConditions() {
   const router = useRouter();
   
   return (
-    <div style={styles.scrollView}>
+    <div >
+
+        <div style={styles.headerInfo}>
+        <img
+          src="/verrsa-logo.png"
+          alt="Verrsa"
+          style={styles.logo}
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = "none";
+          }}
+        />
+        <button style={styles.signInButton} onClick={() => router.push('/auth')}>
+          <span style={styles.signInButtonText}>Sign In</span>
+        </button>
+      </div>
+
       <div style={styles.container}>
+
         <div style={styles.header}>
           <button
             style={styles.backButton}
@@ -256,6 +272,40 @@ const styles = {
     backgroundColor: "#fff",
     fontFamily: "'Instrument Sans', sans-serif",
   },
+  headerInfo: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backgroundColor: "#dcf6ff",
+      padding: "20px 40px",
+      borderBottom: "1px solid rgba(0, 0, 0, 0.05)",
+      position: "sticky" as const,
+      top: 0,
+      marginBottom: 0,
+      zIndex: 100,
+    } as React.CSSProperties,
+    logo: {
+      width: "100px",
+      height: "35px",
+      marginLeft: "-10px",
+      objectFit: "contain" as const,
+    } as React.CSSProperties,
+    signInButton: {
+       backgroundColor: "#00bfff",
+      padding: "12px 24px",
+      borderRadius: "8px",
+      border: "none",
+      marginRight: "-10px",
+      cursor: "pointer",
+      boxShadow: "0 4px 12px rgba(14, 165, 233, 0.3)",
+      transition: "all 0.2s ease",
+    },
+    signInButtonText: {
+      color: "#fff",
+      fontSize: "15px",
+      fontWeight: "500",
+      fontFamily: "'Instrument Sans', sans-serif",
+    },
   header: {
     display: "flex",
     alignItems: "center",
