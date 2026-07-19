@@ -155,7 +155,7 @@ export default function LandingPage() {
     {
       title: "Connect with likeminds",
       desc: "Verrsa gives you quick access to like minds and enable you communicate efficiently.",
-      img: "./connect.jpg",
+      img: "./connect2.jpg",
     },
     {
       title: "Upload your podcasts",
@@ -696,6 +696,31 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
+
+          {/* <div style={styles.stepItem}>
+            <div style={styles.stepNumber}>
+              <span style={styles.stepNumberText}>5</span>
+            </div>
+            <div style={styles.stepContent}>
+              <h3 style={styles.stepTitle}>Browse contents from creators</h3>
+              <p style={styles.stepDesc}>
+                Get to see many creative contents from various creators ranging from podcast, article and so on.
+              </p>
+            </div>
+          </div>
+
+          <div style={styles.stepItem}>
+            <div style={styles.stepNumber}>
+              <span style={styles.stepNumberText}>6</span>
+            </div>
+            <div style={styles.stepContent}>
+              <h3 style={styles.stepTitle}>Connect with other creators</h3>
+              <p style={styles.stepDesc}>
+                Connect and collaborate with other creators on Verrsa to grow your network and opportunities.
+              </p>
+            </div>
+          </div> */}
+
         </div>
       </div>
 
