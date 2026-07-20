@@ -1,25 +1,7 @@
 // @ts-nocheck
-/**
- * AuthCallback
- *
- * Web-only screen mounted at /auth/callback.
- * Supabase redirects here after a user clicks the email confirmation link.
- * The URL will contain either:
- *   - Hash fragment tokens: #access_token=...&refresh_token=...&type=signup
- *   - Query params (PKCE):  ?token_hash=...&type=signup
- *
- * The Supabase client auto-detects the hash and fires onAuthStateChange.
- * We also manually parse and set the session for reliability.
- * Once verified we create the profile (if missing) and navigate to MainTabs.
- */
-
 import React, { useEffect, useState } from "react";
-import { Ionicons } from '../../lib/reactNativeShim';
 import { useRouter } from 'next/router';
 import { supabase } from "../../components/supabase";
-import AppText from "../../components/AppText";
-import { useTheme } from "../../context/ThemeProvider";
-import { spacing, radius } from "../../lib/theme";
 import {
   getOnboardingData,
   clearOnboardingData,
@@ -29,7 +11,6 @@ type Status = "verifying" | "success" | "error";
 
 const AuthCallback = () => {
   const router = useRouter();
-  const { theme } = useTheme();
 
   const [status, setStatus] = useState<Status>("verifying");
   const [errorMessage, setErrorMessage] = useState("");
@@ -183,45 +164,37 @@ const AuthCallback = () => {
   };
 
   return (
-    <div style={{...(styles.container || {}), backgroundColor: theme.background}}>
+    <div style={styles.container}>
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+
       {status === "verifying" && (
         <>
-          <div style={{width:24,height:24,borderRadius:"50%",border:"3px solid #00bfff",borderTopColor:"transparent",animation:"spin 1s linear infinite"}} />
-          <AppText style={[styles.title, { color: theme.text }]}>
-            Verifying your email…
-          </AppText>
-          <AppText style={[styles.subtitle, { color: theme.secondaryText }]}>
-            Just a moment while we confirm your account.
-          </AppText>
+          <div style={styles.spinner} />
+          <p style={styles.title}>Verifying your email…</p>
+          <p style={styles.subtitle}>Just a moment while we confirm your account.</p>
         </>
       )}
 
       {status === "success" && (
         <>
-          <Ionicons name="checkmark-circle" size={64} color="#22c55e" />
-          <AppText style={[styles.title, { color: theme.text }]}>
-            Email confirmed!
-          </AppText>
-          <AppText style={[styles.subtitle, { color: theme.secondaryText }]}>
-            Welcome to Verrsa. Taking you in…
-          </AppText>
+          <div style={styles.icon}>✅</div>
+          <p style={styles.title}>Email confirmed!</p>
+          <p style={styles.subtitle}>Welcome to Verrsa. Taking you in…</p>
         </>
       )}
 
       {status === "error" && (
         <>
-          <Ionicons name="alert-circle" size={64} color="#ef4444" />
-          <AppText style={[styles.title, { color: theme.text }]}>
-            Verification failed
-          </AppText>
-          <AppText style={[styles.subtitle, { color: theme.secondaryText }]}>
-            {errorMessage}
-          </AppText>
-          <button
-            style={{...(styles.button || {}), backgroundColor: theme.accent}}
-            onClick={() => router.push('/home')}
-          >
-            <AppText style={styles.buttonText}>Back to Sign Up</AppText>
+          <div style={styles.icon}>❌</div>
+          <p style={styles.title}>Verification failed</p>
+          <p style={styles.subtitle}>{errorMessage}</p>
+          <button style={styles.button} onClick={() => router.push('/auth')}>
+            <span style={styles.buttonText}>Back to Sign In</span>
           </button>
         </>
       )}
@@ -231,31 +204,48 @@ const AuthCallback = () => {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
+    minHeight: "100vh",
     display: "flex",
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    paddingLeft: spacing.xl,
-    paddingRight: spacing.xl,
     gap: 16,
+    backgroundColor: "#FFFFFF",
+    padding: "0 24px",
+    fontFamily: "'Instrument Sans', sans-serif",
+  },
+  spinner: {
+    width: 40,
+    height: 40,
+    borderRadius: "50%",
+    border: "4px solid #E2E8F0",
+    borderTopColor: "#00BFFF",
+    animation: "spin 0.8s linear infinite",
+  },
+  icon: {
+    fontSize: 48,
   },
   title: {
     fontSize: 22,
     fontWeight: "700",
     textAlign: "center",
-    marginTop: 12,
+    color: "#0F172A",
+    margin: 0,
   },
   subtitle: {
     fontSize: 15,
-    lineHeight: 22,
     textAlign: "center",
+    color: "#64748B",
+    margin: 0,
+    lineHeight: "22px",
   },
   button: {
-    marginTop: spacing.md,
-    paddingTop: 14,
-    paddingBottom: 14,
-    paddingLeft: spacing.xl,
-    paddingRight: spacing.xl,
-    borderRadius: radius.md,
+    marginTop: 8,
+    padding: "14px 32px",
+    borderRadius: 12,
+    backgroundColor: "#00BFFF",
+    border: "none",
+    cursor: "pointer",
     display: "flex",
     alignItems: "center",
   },
@@ -263,7 +253,8 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#fff",
     fontWeight: "700",
     fontSize: 15,
+    fontFamily: "'Instrument Sans', sans-serif",
   },
-} as any;
+};
 
 export default AuthCallback;
