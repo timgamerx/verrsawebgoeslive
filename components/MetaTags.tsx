@@ -46,6 +46,13 @@ export default function MetaTags({
         </>
       )}
 
+      {/* iOS Smart App Banner – prompts users to open/install the app */}
+      {/* Replace YOUR_APP_STORE_ID with the numeric App Store ID from App Store Connect */}
+      <meta
+        name="apple-itunes-app"
+        content={`app-id=6756518229, app-argument=${fullUrl}`}
+      />
+
       {/* Twitter */}
       <meta property="twitter:card" content={video ? "player" : "summary_large_image"} />
       <meta property="twitter:url" content={fullUrl} />

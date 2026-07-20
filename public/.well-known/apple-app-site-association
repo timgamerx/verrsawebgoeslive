@@ -1,0 +1,21 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "69XV848WC6.com.verrsaapp.verrsa",
+        "paths": [
+          "/post/*",
+          "/community/*",
+          "/user/*"
+        ]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": ["69XV848WC6.com.verrsaapp.verrsa"]
+  },
+  "webcredentials": {
+    "apps": ["69XV848WC6.com.verrsaapp.verrsa"]
+  }
+}

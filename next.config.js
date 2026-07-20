@@ -1,6 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async headers() {
+    return [
+      {
+        // iOS Universal Links: AASF must be served as application/json
+        source: '/.well-known/apple-app-site-association',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/json',
+          },
+        ],
+      },
+    ];
+  },
   outputFileTracingRoot: __dirname,
   eslint: {
     ignoreDuringBuilds: true,

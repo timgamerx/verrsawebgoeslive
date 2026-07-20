@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.verrsaapp.verrsa",
+      "sha256_cert_fingerprints": [
+        "2D:D0:0A:C7:54:EE:2A:D6:5D:F9:78:41:B1:BE:E1:7E:BC:49:46:52:9F:6E:C0:06:E4:57:CA:21:B0:22:20:8E"
+      ]
+    }
+  }
+]
