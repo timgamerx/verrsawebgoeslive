@@ -103,6 +103,37 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
   const [showShareModal, setShowShareModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Deep link: redirect mobile users to the native app
+  useEffect(() => {
+    if (typeof window === 'undefined' || !userId) return;
+
+    const ua = navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/.test(ua);
+    const isAndroid = /Android/.test(ua);
+    if (!isIOS && !isAndroid) return;
+
+    const appUrl = `verrsa://user/${userId}`;
+    const iosStoreUrl = 'https://apps.apple.com/us/app/verrsa/id6756518229';
+    const androidStoreUrl = `https://play.google.com/store/apps/details?id=com.verrsaapp.verrsa`;
+
+    window.location.href = appUrl;
+
+    const storeTimeout = setTimeout(() => {
+      if (isIOS) window.location.href = iosStoreUrl;
+      else window.location.href = androidStoreUrl;
+    }, 1500);
+
+    const onVisibilityChange = () => {
+      if (document.hidden) clearTimeout(storeTimeout);
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      clearTimeout(storeTimeout);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [userId]);
+
   useEffect(() => {
     if (!userId) return;
     checkIfOwnProfile();

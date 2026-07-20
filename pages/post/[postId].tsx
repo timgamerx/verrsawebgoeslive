@@ -142,6 +142,40 @@ export default function PostPage({ post: initialPost, authorName: initialAuthorN
     );
   }
 
+  // Deep link: redirect mobile users to the native app
+  useEffect(() => {
+    if (typeof window === 'undefined' || !post?.id) return;
+
+    const ua = navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/.test(ua);
+    const isAndroid = /Android/.test(ua);
+    if (!isIOS && !isAndroid) return;
+
+    const appUrl = `verrsa://post/${post.id}`;
+    const iosStoreUrl = 'https://apps.apple.com/us/app/verrsa/id6756518229';
+    const androidStoreUrl = `https://play.google.com/store/apps/details?id=com.verrsaapp.verrsa`;
+
+    // Attempt to open the app
+    window.location.href = appUrl;
+
+    // If the app didn't open (not installed), send to the appropriate store
+    const storeTimeout = setTimeout(() => {
+      if (isIOS) window.location.href = iosStoreUrl;
+      else window.location.href = androidStoreUrl;
+    }, 1500);
+
+    // Cancel the store redirect if the app actually opened (page goes hidden)
+    const onVisibilityChange = () => {
+      if (document.hidden) clearTimeout(storeTimeout);
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      clearTimeout(storeTimeout);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [post?.id]);
+
   // Load user profile and comments (skip comments for videos)
   useEffect(() => {
     if (!post) return;
