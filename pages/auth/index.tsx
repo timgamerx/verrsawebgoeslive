@@ -11,7 +11,7 @@ import {
   IoEyeOffOutline,
   IoLogoGoogle,
 } from "react-icons/io5";
-import { supabase } from '../components/supabase.js';
+import { supabase } from '../../components/supabase.js';
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import {
   validatePassword,
@@ -24,8 +24,8 @@ import {
   trackDevice,
   twoFactorAuth,
   sendSignupNotifications,
-} from '../lib/authHelpers.js';
-import PasswordStrengthMeter from '../components/PasswordStrengthMeter';
+} from '../../lib/authHelpers.js';
+import PasswordStrengthMeter from '../../components/PasswordStrengthMeter';
 
 export default function Auth() {
   const router = useRouter();
