@@ -14,16 +14,16 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { Ionicons } from '../lib/reactNativeShim';
+import { Ionicons } from '../../lib/reactNativeShim';
 import { useRouter } from 'next/router';
-import { supabase } from "../components/supabase";
-import AppText from "../components/AppText";
-import { useTheme } from "../context/ThemeProvider";
-import { spacing, radius } from "../lib/theme";
+import { supabase } from "../../components/supabase";
+import AppText from "../../components/AppText";
+import { useTheme } from "../../context/ThemeProvider";
+import { spacing, radius } from "../../lib/theme";
 import {
   getOnboardingData,
   clearOnboardingData,
-} from "../lib/onboardingManager";
+} from "../../lib/onboardingManager";
 
 type Status = "verifying" | "success" | "error";
 
