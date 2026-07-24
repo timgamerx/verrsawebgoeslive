@@ -57,6 +57,7 @@ const CommunityProfile = () => {
   // ── Join prompt state ───────────────────────────────────────────────────
   const [showJoinPrompt, setShowJoinPrompt] = useState(false);
   const [joiningFromPrompt, setJoiningFromPrompt] = useState(false);
+  const [selectedSharePost, setSelectedSharePost] = useState<any>(null);
   // ───────────────────────────────────────────────────────────────────────
 
   const isMember = useMemo(
@@ -1090,7 +1091,10 @@ const CommunityProfile = () => {
   }, []);
 
   const handleShareModalToggle = useCallback(() => {
-    setShowShareModal((prev) => !prev);
+    setShowShareModal((prev) => {
+      if (prev) setSelectedSharePost(null);
+      return !prev;
+    });
   }, []);
 
   const handleGoLiveClose = useCallback(() => {
@@ -1898,7 +1902,7 @@ const CommunityProfile = () => {
               </button>
               <span style={styles.iconText}>{postCommentCounts[post.id] ?? post.comment_count ?? 0}</span>
 
-              <button onClick={() => setShowShareModal(true)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
+              <button onClick={() => { setSelectedSharePost(post); setShowShareModal(true); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
                 <FiShare2 size={18} color="#666" />
               </button>
 
@@ -2279,7 +2283,7 @@ const CommunityProfile = () => {
                 {postCommentCounts[post.id] ?? post.comment_count ?? 0}
               </span>
 
-              <button onClick={() => setShowShareModal(true)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
+              <button onClick={() => { setSelectedSharePost(post); setShowShareModal(true); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
                 <FiShare2 size={18} color="#666" />
               </button>
 
@@ -2424,15 +2428,24 @@ const CommunityProfile = () => {
       {activeTab === "media" && <Media />}
       {activeTab === "about" && <About />}
 
-      {/* Share Modal */}
+      {/* Share Modal — community-level or per-post depending on context */}
       <SharePostModal
         visible={showShareModal}
         onClose={handleShareModalToggle}
-        title={community?.name}
-        url={`https://www.verrsa.org/community/${communityId}`}
-        postId={communityId}
-        postType="community"
-        cover_image_url={community?.cover_image_url}
+        title={selectedSharePost
+          ? (selectedSharePost.title || selectedSharePost.content?.substring(0, 60) || community?.name)
+          : community?.name}
+        url={selectedSharePost
+          ? `https://www.verrsa.org/community/${communityId}/post/${selectedSharePost.id}`
+          : `https://www.verrsa.org/community/${communityId}`}
+        postId={selectedSharePost ? selectedSharePost.id : (communityId as string)}
+        postType={selectedSharePost ? "communitypost" : "community"}
+        imageUrl={selectedSharePost
+          ? (getPostImages(selectedSharePost)[0] || community?.cover_image_url || '')
+          : (community?.cover_image_url || '')}
+        description={selectedSharePost
+          ? (selectedSharePost.content?.substring(0, 120) || '')
+          : `Join ${community?.name || 'this community'} on Verrsa!`}
       />
 
       {/* Comment Modal */}

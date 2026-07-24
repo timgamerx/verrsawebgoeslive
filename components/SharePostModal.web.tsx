@@ -103,12 +103,14 @@ export default function SharePostModal({
       : postType === "video"
         ? "Watch this video on Verrsa."
         : postType === "community"
-          ? "Check out this community post on Verrsa."
-          : postType === "profile"
-            ? "View this profile on Verrsa."
-            : postType === "verse"
-              ? "Check this verse out on Verrsa."
-            : "Read this article on Verrsa.");
+          ? `Join ${title ? `"${title}"` : 'this community'} on Verrsa!`
+          : postType === "communitypost"
+            ? "Check out this community post on Verrsa."
+            : postType === "profile"
+              ? "View this profile on Verrsa."
+              : postType === "verse"
+                ? "Check this verse out on Verrsa."
+              : "Read this article on Verrsa.");
 
   // Fetch following users when modal becomes visible
   useEffect(() => {
@@ -304,6 +306,10 @@ export default function SharePostModal({
       const content =
         postType === "profile"
           ? `Check out ${title} on Verrsa!`
+          : postType === "community"
+          ? `Join ${title} on Verrsa!`
+          : postType === "communitypost"
+          ? `Check out this post in the ${title ? `"${title}"` : 'community'} on Verrsa:`
           : `Check out this ${postType}: ${title}`;
 
       const shareText = content + (shareUrl ? ` ${shareUrl}` : "");

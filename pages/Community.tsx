@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { supabase } from '../components/supabase';
 import { getActiveModerationExclusions } from '../lib/moderationExclusions';
+import SharePostModal from '../components/SharePostModal.web';
 import {
   IoPeople,
   IoNotificationsOutline,
@@ -39,6 +40,7 @@ function Community() {
   const [communities, setCommunities] = useState([]);
   const [unreadNotifications] = useState(5);
   const [userAvatar, setUserAvatar] = useState('/avatar.jpg');
+  const [shareTarget, setShareTarget] = useState<any>(null);
 
   useEffect(() => {
     const fetchUserAvatar = async () => {
@@ -100,24 +102,8 @@ function Community() {
     });
   };
 
-  const handleShare = async (community) => {
-    try {
-      const communityUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/community/${community.id}`;
-      
-      if (navigator.share) {
-        await navigator.share({
-          title: community.name,
-          text: community.description,
-          url: communityUrl,
-        });
-      } else {
-        // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(communityUrl);
-        alert("Community link copied to clipboard!");
-      }
-    } catch (error) {
-      console.error("Error sharing community:", error);
-    }
+  const handleShare = (community: any) => {
+    setShareTarget(community);
   };
 
   const formatCount = (count) => {
@@ -359,6 +345,20 @@ function Community() {
         )}
       </div>
       </div>
+
+      {/* Share Modal */}
+      {shareTarget && (
+        <SharePostModal
+          visible={!!shareTarget}
+          onClose={() => setShareTarget(null)}
+          title={shareTarget.name}
+          url={`https://www.verrsa.org/community/${shareTarget.id}`}
+          postId={shareTarget.id}
+          postType="community"
+          imageUrl={shareTarget.cover_image_url || shareTarget.avatar_url}
+          description={`Join ${shareTarget.name} on Verrsa! ${shareTarget.description ? shareTarget.description.substring(0, 100) : ''}`}
+        />
+      )}
 
       {/* Floating Action Button */}
       <button style={styles.fab}
