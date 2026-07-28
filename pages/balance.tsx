@@ -152,7 +152,7 @@ export default function Balance() {
     } finally { setProcessing(false); }
   };
 
-  const quickAmounts = [2, 5, 10, 25, 50, 100];
+  const quickAmounts = [0.5, 1, 2, 5, 10, 25, 50, 100];
 
   if (loading) {
     return (

@@ -2,4 +2,17 @@ User-Agent: *
 Allow: /
 Disallow: /private/
 
-Sitemap: https://www.verrsa.org/sitemap.xml
+# Disallow private/sensitive areas
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /settings
+Disallow: /profile/edit
+Disallow: /ambassador/dashboard
+
+# Sitemap location
+Sitemap: https://verrsa.org/sitemap.xml
+Sitemap: https://verrsa.org/sitemap-dynamic.xml
+
+# Crawl delay for polite crawling
+Crawl-delay: 1
