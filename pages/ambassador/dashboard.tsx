@@ -301,7 +301,7 @@ export default function AmbassadorDashboard() {
             <IoChevronBack size={26} color={text} />
           </button>
           <div>
-            <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: text }}>Ambassador Dashboard</h1>
+            <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: text }}>Verrsa Ambassador Dashboard</h1>
             {profile && (
               <p style={{ margin: 0, fontSize: 13, color: subtext }}>
                 {profile.full_name || profile.username || 'Ambassador'}
