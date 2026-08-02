@@ -5,8 +5,13 @@
       {
         "appID": "69XV848WC6.com.verrsaapp.verrsa",
         "paths": [
-          "/post/*",
+          "/home",
           "/community/*",
+          "/article/*",
+          "/podcast/*",
+          "/video/*",
+          "/profile/*",
+          "/post/*",
           "/user/*"
         ]
       }
