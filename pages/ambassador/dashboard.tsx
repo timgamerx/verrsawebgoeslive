@@ -298,16 +298,26 @@ export default function AmbassadorDashboard() {
             onClick={() => router.back()}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center' }}
           >
-            <IoChevronBack size={26} color={text} />
+            <IoChevronBack size={22} color={text} />
           </button>
-          <div>
+          <div style={{ flex: 1, textAlign: 'center' }}>
             <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: text }}>Verrsa Ambassador Dashboard</h1>
-            {profile && (
-              <p style={{ margin: 0, fontSize: 13, color: subtext }}>
-                {profile.full_name || profile.username || 'Ambassador'}
-              </p>
-            )}
           </div>
+          {profile?.avatar_url ? (
+            <img
+              src={profile.avatar_url}
+              alt="avatar"
+              style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+            />
+          ) : (
+            <div style={{
+              width: 34, height: 34, borderRadius: '50%', backgroundColor: `${accent}30`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 14, fontWeight: 700, color: accent, flexShrink: 0,
+            }}>
+              {(profile?.full_name || profile?.username || 'A')[0].toUpperCase()}
+            </div>
+          )}
         </div>
 
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px' }}>
@@ -318,7 +328,7 @@ export default function AmbassadorDashboard() {
             borderRadius: 16,
             padding: '24px 20px',
             marginBottom: 20,
-            background: `linear-gradient(135deg, ${accent} 0%, #8b5cf6 100%)`,
+            backgroundColor: "#00bfff",
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
               <IoWalletOutline size={20} color="rgba(255,255,255,0.8)" />
