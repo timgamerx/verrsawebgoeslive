@@ -77,6 +77,9 @@ export default function AmbassadorDashboard() {
   // Confirmation modal
   const [confirmTask, setConfirmTask] = useState<any>(null);
 
+  // History drawer
+  const [showHistoryDrawer, setShowHistoryDrawer] = useState(false);
+
   useEffect(() => {
     loadData();
   }, []);
@@ -85,8 +88,9 @@ export default function AmbassadorDashboard() {
     setLoading(true);
     try {
       const {
-        data: { user: authUser },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const authUser = session?.user ?? null;
 
       if (!authUser) {
         router.replace('/auth');
@@ -303,21 +307,26 @@ export default function AmbassadorDashboard() {
           <div style={{ flex: 1, textAlign: 'center' }}>
             <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: text }}>Verrsa Ambassador Dashboard</h1>
           </div>
-          {profile?.avatar_url ? (
-            <img
-              src={profile.avatar_url}
-              alt="avatar"
-              style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
-            />
-          ) : (
-            <div style={{
-              width: 34, height: 34, borderRadius: '50%', backgroundColor: `${accent}30`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 14, fontWeight: 700, color: accent, flexShrink: 0,
-            }}>
-              {(profile?.full_name || profile?.username || 'A')[0].toUpperCase()}
-            </div>
-          )}
+          <button
+            onClick={() => setShowHistoryDrawer(true)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
+          >
+            {profile?.avatar_url ? (
+              <img
+                src={profile.avatar_url}
+                alt="avatar"
+                style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+              />
+            ) : (
+              <div style={{
+                width: 34, height: 34, borderRadius: '50%', backgroundColor: `${accent}30`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 14, fontWeight: 700, color: accent, flexShrink: 0,
+              }}>
+                {(profile?.full_name || profile?.username || 'A')[0].toUpperCase()}
+              </div>
+            )}
+          </button>
         </div>
 
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '20px 16px' }}>
@@ -704,6 +713,93 @@ export default function AmbassadorDashboard() {
             >
               Yes, I Completed This
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* History Drawer */}
+      {showHistoryDrawer && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            zIndex: 200, display: 'flex', justifyContent: 'flex-end',
+          }}
+          onClick={() => setShowHistoryDrawer(false)}
+        >
+          <div
+            style={{
+              backgroundColor: card,
+              width: '85%',
+              maxWidth: 360,
+              height: '100%',
+              overflowY: 'auto',
+              padding: '24px 16px',
+              boxSizing: 'border-box',
+              boxShadow: '-4px 0 24px rgba(0,0,0,0.25)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: text }}>Task History</h3>
+              <button onClick={() => setShowHistoryDrawer(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                <IoCloseOutline size={24} color={subtext} />
+              </button>
+            </div>
+
+            {/* Profile summary */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, padding: '12px 14px', backgroundColor: `${accent}10`, borderRadius: 12 }}>
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="avatar" style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: 44, height: 44, borderRadius: '50%', backgroundColor: `${accent}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, color: accent }}>
+                  {(profile?.full_name || profile?.username || 'A')[0].toUpperCase()}
+                </div>
+              )}
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: text }}>{profile?.full_name || profile?.username || 'Ambassador'}</div>
+                <div style={{ fontSize: 12, color: subtext }}>Total earned: <strong style={{ color: green }}>₦{totalEarned.toLocaleString()}</strong></div>
+              </div>
+            </div>
+
+            {completions.length === 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, paddingTop: 40 }}>
+                <IoTimeOutline size={40} color={border} />
+                <p style={{ margin: 0, fontSize: 14, color: subtext, textAlign: 'center' }}>No completed tasks yet.
+Start completing tasks to see your history here.</p>
+              </div>
+            ) : (
+              completions.map((c, i) => (
+                <div
+                  key={c.id || i}
+                  style={{
+                    backgroundColor: isDarkMode ? '#222' : '#f9f9f9',
+                    border: `1px solid ${border}`,
+                    borderRadius: 12,
+                    padding: '12px 14px',
+                    marginBottom: 10,
+                  }}
+                >
+                  <div style={{ fontSize: 14, fontWeight: 700, color: text, marginBottom: 3 }}>{c.task_title}</div>
+                  <div style={{ fontSize: 11, color: subtext, marginBottom: 8 }}>
+                    {c.created_at ? new Date(c.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 5,
+                      padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                      backgroundColor: c.status === 'approved' ? `${green}18` : c.status === 'rejected' ? '#fef2f2' : `${orange}18`,
+                      color: c.status === 'approved' ? green : c.status === 'rejected' ? '#ef4444' : orange,
+                    }}>
+                      {c.status === 'approved' ? <IoCheckmarkCircle size={12} /> : <IoTimeOutline size={12} />}
+                      {c.status.charAt(0).toUpperCase() + c.status.slice(1)}
+                    </div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: c.status === 'approved' ? green : c.status === 'rejected' ? '#ef4444' : orange }}>
+                      {c.status === 'approved' ? '+' : ''}₦{(c.amount || 0).toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}

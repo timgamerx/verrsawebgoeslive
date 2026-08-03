@@ -1,25 +1,24 @@
 // @ts-nocheck
 import { useRouter } from 'next/router';
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { spacing, radius, fontSize, fontFamily } from '../../lib/theme';
-import { TbChevronLeft, TbChevronRight, TbDots, TbDotsVertical } from 'react-icons/tb';
-import { supabase } from '../../components/supabase';
-import { MdAdd, MdArrowBack, MdArrowForward, MdBlock, MdCheck, MdClose, MdDelete, MdEdit, MdFavorite, MdHome, MdNotifications, MdPerson, MdRemove, MdReport, MdSearch, MdSettings, MdShare, MdStar, MdVerified, MdGroupAdd, MdExitToApp, MdAddBox, MdPeople, MdVideocam, MdPushPin, MdVisibility, MdChatBubbleOutline } from 'react-icons/md';
-import VerificationBadge from '../../components/VerificationBadge';
-import SharePostModal from '../../components/SharePostModal.web';
-import CommentModal from '../../components/CommentModal';
-import { trackView, incrementViewCount } from '../../components/api';
+import { spacing, radius, fontSize, fontFamily } from "../../lib/theme";
+import { supabase } from "../../components/supabase";
+import { TbChevronLeft, TbDots, TbDotsVertical } from 'react-icons/tb';
+import { MdBlock, MdDelete, MdEdit, MdFavorite, MdFavoriteBorder, MdGroupAdd, MdExitToApp, MdAddBox, MdPeople, MdVideocam, MdPushPin, MdVisibility, MdGroups, MdLock, MdDateRange, MdGroup, MdAnalytics } from 'react-icons/md';
+import { FiShare2, FiMessageCircle, FiTrash2, FiFileText, FiUser } from 'react-icons/fi';
+import { IoNotificationsOutline, IoChevronForward, IoVideocam, IoPlay } from 'react-icons/io5';
+import VerificationBadge from "../../components/VerificationBadge";
+import SharePostModal from "../../components/SharePostModal.web";
+import CommentModal from "../../components/CommentModal";
+import { trackView } from "../../components/api";
 import {
   sendFollowNotification,
   sendCommunityNotification,
-} from '../../lib/pushNotifications';
-import { notifyNewCommunityMembers } from '../../lib/notificationService';
-import { renderTextWithLinks } from '../../lib/linkUtils';
-import { updateCommunityLastActive } from '../../lib/communityActivityTracker';
-import { useTheme } from '../../context/ThemeProvider';
-import { getActiveModerationExclusions } from '../../lib/moderationExclusions';
-import { IoChevronBack, IoChevronForward, IoVideocam, IoThumbsUp, IoThumbsUpOutline, IoFlagOutline } from 'react-icons/io5'
-import { FiShare2, FiMessageCircle } from 'react-icons/fi'
+} from "../../lib/pushNotifications";
+import { notifyNewCommunityMembers } from "../../lib/notificationService";
+import { renderTextWithLinks } from "../../lib/linkUtils";
+import { updateCommunityLastActive } from "../../lib/communityActivityTracker";
+import { useTheme } from "../../context/ThemeProvider";
 
 const CommunityProfile = () => {
   const router = useRouter();
@@ -53,11 +52,11 @@ const CommunityProfile = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userSubscription, setUserSubscription] = useState<string>("free");
   const [showDeleteMenu, setShowDeleteMenu] = useState<string | null>(null);
+  const [selectedSharePost, setSelectedSharePost] = useState<any>(null);
 
   // ── Join prompt state ───────────────────────────────────────────────────
   const [showJoinPrompt, setShowJoinPrompt] = useState(false);
   const [joiningFromPrompt, setJoiningFromPrompt] = useState(false);
-  const [selectedSharePost, setSelectedSharePost] = useState<any>(null);
   // ───────────────────────────────────────────────────────────────────────
 
   const isMember = useMemo(
@@ -65,7 +64,7 @@ const CommunityProfile = () => {
     [members, currentUser],
   );
 
-  // Get communityId from Next.js router query
+  // communityId is already destructured from router.query above
 
   // Clean the communityId if it contains path separators
   const cleanCommunityId = React.useMemo(() => {
@@ -96,38 +95,7 @@ const CommunityProfile = () => {
     return communityId;
   }, [communityId]);
 
-  // Deep link: redirect mobile users to the native app
-  useEffect(() => {
-    if (typeof window === 'undefined' || !cleanCommunityId) return;
-
-    const ua = navigator.userAgent;
-    const isIOS = /iPhone|iPad|iPod/.test(ua);
-    const isAndroid = /Android/.test(ua);
-    if (!isIOS && !isAndroid) return;
-
-    const appUrl = `verrsa://community/${cleanCommunityId}`;
-    const iosStoreUrl = 'https://apps.apple.com/us/app/verrsa/id6756518229';
-    const androidStoreUrl = `https://play.google.com/store/apps/details?id=com.verrsaapp.verrsa`;
-
-    window.location.href = appUrl;
-
-    const storeTimeout = setTimeout(() => {
-      if (isIOS) window.location.href = iosStoreUrl;
-      else window.location.href = androidStoreUrl;
-    }, 1500);
-
-    const onVisibilityChange = () => {
-      if (document.hidden) clearTimeout(storeTimeout);
-    };
-    document.addEventListener('visibilitychange', onVisibilityChange);
-
-    return () => {
-      clearTimeout(storeTimeout);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-    };
-  }, [cleanCommunityId]);
-
-  // Validate communityId and redirect to Community if invalid
+  // Validate communityId and redirect to CommunityFeed if invalid
   useEffect(() => {
     // Skip validation during initial mount to avoid premature redirects
     if (!cleanCommunityId) return;
@@ -155,10 +123,9 @@ const CommunityProfile = () => {
       // Use replace to avoid adding to history stack
       const timer = setTimeout(() => {
         try {
-          router.push("/Community");
+          router.replace("/Community");
         } catch (error) {
           console.error("Navigation error:", error);
-          // Fallback: try navigating to home
           try {
             router.push("/home");
           } catch (e) {
@@ -212,7 +179,7 @@ const CommunityProfile = () => {
     }
   }, [cleanCommunityId]);
 
-  // Refresh posts when returning to this screen (Next.js version)
+  // Refresh posts when returning to this page (Next.js version)
   useEffect(() => {
     const handleRouteChange = () => {
       if (cleanCommunityId) {
@@ -228,6 +195,33 @@ const CommunityProfile = () => {
     };
   }, [cleanCommunityId, router.events]);
 
+  // Subscribe to new community posts so the feed updates instantly
+  useEffect(() => {
+    if (!cleanCommunityId) return;
+
+    const newPostsChannel = supabase
+      .channel(`community-posts-new-${cleanCommunityId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "posts",
+          filter: `community_id=eq.${cleanCommunityId}`,
+        },
+        () => {
+          fetchCommunityPosts();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      try {
+        supabase.removeChannel(newPostsChannel);
+      } catch (e) {}
+    };
+  }, [cleanCommunityId]);
+
   useEffect(() => {
     console.log("Members state updated:", members);
     console.log("Members length:", members.length);
@@ -239,7 +233,7 @@ const CommunityProfile = () => {
     const STORAGE_KEY = `community_join_prompt_${cleanCommunityId}`;
     const COOLDOWN_MS = 48 * 60 * 60 * 1000; // 48 hours
     let timer: ReturnType<typeof setTimeout>;
-    const checkPrompt = async () => {
+    const checkPrompt = () => {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const last = parseInt(raw, 10);
@@ -247,7 +241,6 @@ const CommunityProfile = () => {
       }
       timer = setTimeout(() => setShowJoinPrompt(true), 4000);
     };
-    
     checkPrompt();
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -297,9 +290,8 @@ const CommunityProfile = () => {
 
   const fetchUserFollowStatuses = async (userIds: string[]) => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user || userIds.length === 0) return;
 
       // Check if follows table exists and fetch following relationships
@@ -332,7 +324,6 @@ const CommunityProfile = () => {
       setLoading(true);
     }
     try {
-      const { excludedUserIds } = await getActiveModerationExclusions();
       const { data, error } = await supabase
         .from("community")
         .select("*")
@@ -342,14 +333,6 @@ const CommunityProfile = () => {
       if (error) {
         console.error("Error fetching community:", error);
       } else {
-        if (excludedUserIds.has(String(data?.created_by || ""))) {
-          setCommunity(null);
-          setCreatorProfile(null);
-          setCommunityPosts([]);
-          setMembers([]);
-          setLoading(false);
-          return;
-        }
         console.log("Fetched community:", data);
         setCommunity(data);
 
@@ -378,8 +361,6 @@ const CommunityProfile = () => {
   const fetchCommunityPosts = async () => {
     try {
       console.log("Fetching community posts for:", cleanCommunityId);
-      const { excludedPostKeys, excludedUserIds } =
-        await getActiveModerationExclusions();
       const blockedIds = await (
         await import("../../lib/blockUtils")
       ).fetchBlockedUserIds();
@@ -417,14 +398,9 @@ const CommunityProfile = () => {
 
       if (postsData && postsData.length > 0) {
         // Exclude posts from blocked authors
-        const filteredPostsData = postsData.filter((p) => {
-          const authorId = String(p.user_id || "");
-          const postKey = `${p.id}_community_post`;
-          if (blockedIds.length && blockedIds.includes(p.user_id)) return false;
-          if (excludedUserIds.has(authorId)) return false;
-          if (excludedPostKeys.has(postKey)) return false;
-          return true;
-        });
+        const filteredPostsData = blockedIds.length
+          ? postsData.filter((p) => !blockedIds.includes(p.user_id))
+          : postsData;
         // Get user profiles for post authors
         const userIds = [
           ...new Set(filteredPostsData.map((post) => post.user_id)),
@@ -437,7 +413,7 @@ const CommunityProfile = () => {
 
         if (profilesError) {
           console.error("Error fetching post author profiles:", profilesError);
-          setCommunityPosts(filteredPostsData);
+          setCommunityPosts(postsData);
         } else {
           // Attach profile data to posts
           const postsWithProfiles = filteredPostsData.map((post) => ({
@@ -490,9 +466,8 @@ const CommunityProfile = () => {
 
   const fetchUserLikeStatuses = async (postIds: string[]) => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user || postIds.length === 0) return;
 
       const { data: likes, error } = await supabase
@@ -823,7 +798,6 @@ const CommunityProfile = () => {
   const fetchMembers = async () => {
     try {
       console.log("Fetching members for community:", cleanCommunityId);
-      const { excludedUserIds } = await getActiveModerationExclusions();
 
       // Try the simpler manual join approach first
       const { data: membersData, error: membersError } = await supabase
@@ -841,11 +815,8 @@ const CommunityProfile = () => {
       }
 
       if (membersData && membersData.length > 0) {
-        const filteredMembersData = membersData.filter(
-          (member) => !excludedUserIds.has(String(member.user_id || "")),
-        );
         // Get all user IDs
-        const userIds = filteredMembersData.map((member) => member.user_id);
+        const userIds = membersData.map((member) => member.user_id);
         console.log("User IDs to fetch profiles for:", userIds);
 
         // Fetch profiles for these users
@@ -859,10 +830,10 @@ const CommunityProfile = () => {
         if (profilesError) {
           console.error("Error fetching profiles:", profilesError);
           // Still set members without profile data
-          setMembers(filteredMembersData);
+          setMembers(membersData);
         } else {
           // Manually join the data
-          const membersWithProfiles = filteredMembersData.map((member) => ({
+          const membersWithProfiles = membersData.map((member) => ({
             ...member,
             profiles:
               profilesData?.find((profile) => profile.id === member.user_id) ||
@@ -1035,11 +1006,16 @@ const CommunityProfile = () => {
             .from("blocked_communities")
             .insert({ community_id: cleanCommunityId, blocked_by: user.id });
           if (error) throw error;
-          window.alert("Community blocked.");
-          router.push("/Community");
-        } catch (err) {
-          console.error("Error blocking community:", err);
-          window.alert("Failed to block. Please try again.");
+          window.alert("Community has been blocked.");
+          router.back();
+        } catch (err: any) {
+          // Handle missing table gracefully
+          if (err?.code === "PGRST205") {
+            window.alert("Blocking communities isn't set up yet.");
+          } else {
+            console.error("Error blocking community:", err);
+            window.alert("Failed to block. Please try again.");
+          }
         }
       }
     } catch (error) {
@@ -1091,10 +1067,7 @@ const CommunityProfile = () => {
   }, []);
 
   const handleShareModalToggle = useCallback(() => {
-    setShowShareModal((prev) => {
-      if (prev) setSelectedSharePost(null);
-      return !prev;
-    });
+    setShowShareModal((prev) => !prev);
   }, []);
 
   const handleGoLiveClose = useCallback(() => {
@@ -1106,46 +1079,39 @@ const CommunityProfile = () => {
     () => (
       <div>
         <img
-          src={
-            community?.cover_image_url
-              ? community.cover_image_url
-              : "/positivity-life2.jpg"
-          }
+          src={community?.cover_image_url ? community.cover_image_url : "/positivity-life2.jpg"}
           style={styles.coverImage}
         />
         <button
-          onClick={() => {
-            router.back();
-          }}
+          onClick={() => router.back()}
           style={{
             position: "absolute",
             top: 65,
             left: 10,
             zIndex: 1,
-            backgroundColor: isDarkMode
-              ? "rgba(0, 0, 0, 0.5)"
-              : "rgba(255, 255, 255, 0.5)",
+            backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.5)" : "rgba(255, 255, 255, 0.5)",
             borderRadius: radius.xl2,
             padding: spacing.xs,
             width: 40,
             height: 40,
+            display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            border: "none",
+            cursor: "pointer",
           }}
         >
-          <TbChevronLeft />
+          <TbChevronLeft size={32} color={theme.icon || "#333"} />
         </button>
 
-        {/* Overflow menu button (available to all users) */}
+        {/* Overflow menu button */}
         <button
           style={{
             position: "absolute",
             top: 60,
             right: 10,
             zIndex: 1,
-            backgroundColor: isDarkMode
-              ? "rgba(0, 0, 0, 0.5)"
-              : "rgba(255, 255, 255, 0.5)",
+            backgroundColor: isDarkMode ? "rgba(0, 0, 0, 0.5)" : "rgba(255, 255, 255, 0.5)",
             borderRadius: radius.xl2,
             padding: spacing.sm,
             border: "none",
@@ -1154,13 +1120,11 @@ const CommunityProfile = () => {
             alignItems: "center",
             justifyContent: "center",
           }}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleGoLiveToggle();
-          }}
+          onClick={(e) => { e.stopPropagation(); handleGoLiveToggle(); }}
         >
           <TbDotsVertical size={24} color={theme.icon || "#333"} />
         </button>
+
         {showGoLive && (
           <div
             style={{
@@ -1170,367 +1134,171 @@ const CommunityProfile = () => {
               backgroundColor: theme.cardBackground,
               padding: spacing.sm,
               borderRadius: radius.md,
-              elevation: 5,
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
               zIndex: 10,
               minWidth: 150,
             }}
           >
-            {/* Join / Leave community */}
             {!isMember ? (
               <button
-                style={{
-                  paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-                  paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                  borderBottomWidth: 1,
-                  borderBottomColor: theme.border,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-                onClick={() => {
-                  handleGoLiveClose();
-                  handleJoinCommunity();
-                }}
+                style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
+                onClick={() => { handleGoLiveClose(); handleJoinCommunity(); }}
               >
                 <MdGroupAdd size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
-                <span style={{ fontSize: fontSize.base, color: theme.text }}>
-                  Join Community
-                </span>
+                <span style={{ fontSize: fontSize.base, color: theme.text }}>Join Community</span>
               </button>
             ) : (
               currentUser?.id !== community?.created_by && (
                 <button
-                  style={{
-                    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-                    paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                    borderBottomWidth: 1,
-                    borderBottomColor: theme.border,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                  onClick={() => {
-                    handleGoLiveClose();
-                    handleLeaveCommunity();
-                  }}
+                  style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
+                  onClick={() => { handleGoLiveClose(); handleLeaveCommunity(); }}
                 >
                   <MdExitToApp size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
-                  <span style={{ fontSize: fontSize.base, color: theme.text }}>
-                    Leave Community
-                  </span>
+                  <span style={{ fontSize: fontSize.base, color: theme.text }}>Leave Community</span>
                 </button>
               )
             )}
 
-            {/* Block community - only visible to members who are not owners */}
             {isMember && currentUser?.id !== community?.created_by && (
               <button
-                style={{
-                  paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-                  paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                  borderBottomWidth: 1,
-                  borderBottomColor: theme.border,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-                onClick={() => {
-                  handleGoLiveClose();
-                  handleBlockCommunity();
-                }}
+                style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
+                onClick={() => { handleGoLiveClose(); handleBlockCommunity(); }}
               >
                 <MdBlock size={20} color="#e53935" style={{ marginRight: spacing.md }} />
-                <span style={{ fontSize: fontSize.base, color: "#e53935" }}>
-                  Block Community
-                </span>
+                <span style={{ fontSize: fontSize.base, color: "#e53935" }}>Block Community</span>
               </button>
-          )}
-            {/* Go Live Option - Only for community owner with subscription */}
+            )}
+
             {currentUser?.id === community?.created_by && (
               <button
-                style={{
-                  paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-                  paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                  borderBottomWidth: 1,
-                  borderBottomColor: theme.border,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-                onClick={() => {
-                  handleGoLiveClose();
-
-                  // Allow all community owners to go live (subscription check removed)
-                  router.push("/community-live");
-                }}
+                style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
+                onClick={() => { handleGoLiveClose(); router.push(`/community/live/${cleanCommunityId}`); }}
               >
                 <MdVideocam size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
-                <div style={{ flex: 1 }}>
-                  <span style={{ fontSize: fontSize.base, color: theme.text }}>
-                    Go Live
-                  </span>
-                </div>
-                <IoVideocam size={18} color="#00BFFF" />
+                <span style={{ fontSize: fontSize.base, color: theme.text }}>Go Live</span>
+                <IoVideocam size={18} color="#00BFFF" style={{ marginLeft: "auto" }} />
               </button>
-          )}
-            {/* Make a New Post Option - Only for community owner and members */}
+            )}
+
             {(currentUser?.id === community?.created_by || isMember) && (
               <button
-                style={{
-                  paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-                  paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                  borderBottomWidth: 1,
-                  borderBottomColor: theme.border,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-                onClick={() => {
-                  handleGoLiveClose();
-                  router.push("/create-community-post");
-                }}
+                style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
+                onClick={() => { handleGoLiveClose(); router.push(`/create-community-post?communityId=${cleanCommunityId}&communityName=${encodeURIComponent(community?.name || "Community")}`); }}
               >
                 <MdAddBox size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
-                <span style={{ fontSize: fontSize.base, color: theme.text }}>
-                  Make a New Post
-                </span>
+                <span style={{ fontSize: fontSize.base, color: theme.text }}>Make a New Post</span>
               </button>
-          )}
-            {/* Edit Community Info Option - Only for community owner */}
+            )}
+
             {currentUser?.id === community?.created_by && (
               <>
                 <button
-                  style={{
-                    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-                    paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                    borderBottomWidth: 1,
-                    borderBottomColor: theme.border,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                  onClick={() => {
-                    handleGoLiveClose();
-                    router.push("/edit-community");
-                  }}
+                  style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
+                  onClick={() => { handleGoLiveClose(); router.push(`/edit-community?communityId=${cleanCommunityId}`); }}
                 >
                   <MdEdit size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
-                  <span style={{ fontSize: fontSize.base, color: theme.text }}>
-                    Edit Community Info
-                  </span>
+                  <span style={{ fontSize: fontSize.base, color: theme.text }}>Edit Community Info</span>
                 </button>
 
-                {/* See Community Members Option - Only for community owner */}
                 <button
-                  style={{
-                    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-                    paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                    borderBottomWidth: 1,
-                    borderBottomColor: theme.border,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                  onClick={() => {
-                    handleGoLiveClose();
-                    router.push("/community-members");
-                  }}
+                  style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
+                  onClick={() => { handleGoLiveClose(); router.push(`/community-members?communityId=${cleanCommunityId}&communityName=${encodeURIComponent(community?.name || "Community")}`); }}
                 >
                   <MdPeople size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
-                  <span style={{ fontSize: fontSize.base, color: theme.text }}>
-                    See Community Members
-                  </span>
+                  <span style={{ fontSize: fontSize.base, color: theme.text }}>See Community Members</span>
                 </button>
 
-                {/* Delete Community Option - Only for community owner */}
                 <button
-                  style={{
-                    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-                    paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
+                  style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
                   onClick={() => {
                     handleGoLiveClose();
-                    if (window.confirm(`Are you sure you want to permanently delete "${community?.name}"? This action cannot be undone and will remove all posts, members, and content associated with this community.`)) {
+                    if (window.confirm(`Are you sure you want to permanently delete "${community?.name}"? This action cannot be undone and will remove all posts, members, and content.`)) {
                       (async () => {
                         try {
-                          const { error } = await supabase
-                            .from("community")
-                            .delete()
-                            .eq("id", cleanCommunityId);
+                          const { error } = await supabase.from("community").delete().eq("id", cleanCommunityId);
                           if (error) throw error;
                           window.alert("Community has been permanently deleted.");
                           router.push("/Community");
-                        } catch (error) {
-                          console.error("Error deleting community:", error);
+                        } catch (err) {
+                          console.error("Error deleting community:", err);
                           window.alert("Could not delete community. Please try again.");
                         }
                       })();
                     }
                   }}
                 >
-                  <MdDelete size={20} color="#e53935" style={{ marginRight: spacing.sm }} />
-                  <span style={{ fontSize: fontSize.base, color: "#e53935" }}>
-                    Delete Community
-                  </span>
+                  <MdDelete size={20} color="#e53935" style={{ marginRight: spacing.md }} />
+                  <span style={{ fontSize: fontSize.base, color: "#e53935" }}>Delete Community</span>
                 </button>
               </>
             )}
           </div>
-      )}
-        <div
-          style={{...(styles.headerContent || {}), backgroundColor: theme.background}}
-        >
-          <div
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <span style={{...(styles.title || {}), color: theme.text}}>
-              {community?.name || "Community"}
-            </span>
-            <div
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <button
-                style={{ marginRight: spacing.md, background: "none", border: "none", cursor: "pointer" }}
-                onClick={handleShareModalToggle}
-              >
+        )}
+
+        <div style={{ ...styles.headerContent, backgroundColor: theme.background }}>
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ ...styles.title, color: theme.text }}>{community?.name || "Community"}</span>
+            <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+              <button style={{ marginRight: spacing.md, background: "none", border: "none", cursor: "pointer" }} onClick={handleShareModalToggle}>
                 <FiShare2 size={20} color={theme.icon || "#333"} />
               </button>
-              <button
-                onClick={() => router.push("/notification")}
-                style={{ background: "none", border: "none", cursor: "pointer" }}
-              >
-                <MdNotifications size={24} color={theme.icon || "#333"} />
+              <button onClick={() => router.push("/notification")} style={{ background: "none", border: "none", cursor: "pointer" }}>
+                <IoNotificationsOutline size={21} color={theme.icon || "#333"} />
               </button>
             </div>
           </div>
-          <div
-            style={{ flexDirection: "row", alignItems: "center", marginTop: spacing.sm }}
-          >
-            {/* Show up to 3 member avatars */}
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginTop: spacing.sm }}>
             {members.slice(0, 3).map((m, i) => (
-              <img
-                key={m.user_id || i}
-                src={m.profiles?.avatar_url || "/avatar.png"}
-                style={i === 0 ? styles.avatarImage : styles.avatarImageTwo}
-              />
+              <img key={m.user_id || i} src={m.profiles?.avatar_url || "/avatar.png"} style={i === 0 ? styles.avatarImage : styles.avatarImageTwo} />
             ))}
-            <span style={{...(styles.subtitle || {}), color: theme.secondaryText}}>
-              {members.length} Members
+            <span style={{ ...styles.subtitle, color: theme.secondaryText }}>
+              {members.length} {members.length === 1 ? "Member" : "Members"}
             </span>
           </div>
-
-          <span style={{...(styles.description || {}), color: theme.secondaryText}}>
-            {community?.description}
-          </span>
+          <span style={{ ...styles.description, color: theme.secondaryText }}>{community?.description}</span>
         </div>
       </div>
     ),
-    [
-      community,
-      members.length,
-      router,
-      cleanCommunityId,
-      showGoLive,
-      currentUser?.id,
-      handleGoLiveToggle,
-      handleGoLiveClose,
-      handleShareModalToggle,
-      isLive,
-      theme,
-      isDarkMode,
-    ],
+    [community, members.length, cleanCommunityId, showGoLive, currentUser?.id, handleGoLiveToggle, handleGoLiveClose, handleShareModalToggle, isLive, theme, isDarkMode],
   );
 
-  // 🔹 Join Live Banner (shown when community is live)
+  // 🔹 Join Live Banner
   const LiveBanner = useMemo(
-    () =>
-      isLive ? (
-        <button
-          style={styles.liveBanner}
-          onClick={() => {
-            router.push("/community-live");
-          }}
-        >
-          <div style={styles.liveBannerContent}>
-            <div style={styles.liveIndicator}>
-              <div style={styles.liveDot} />
-              <span style={styles.liveText}>LIVE NOW</span>
-            </div>
-            <span style={styles.liveBannerTitle}>
-              {community?.name} is streaming live!
-            </span>
-            <span style={styles.liveBannerSubtitle}>
-              Tap to join the live stream
-            </span>
+    () => isLive ? (
+      <button
+        style={{ ...styles.liveBanner, display: "flex" } as React.CSSProperties}
+        onClick={() => router.push(`/community/live/${cleanCommunityId}`)}
+      >
+        <div style={styles.liveBannerContent}>
+          <div style={{ ...styles.liveIndicator, display: "flex" }}>
+            <div style={styles.liveDot} />
+            <span style={styles.liveText}>LIVE NOW</span>
           </div>
-          <IoChevronForward />
-        </button>
-      ) : null,
+          <span style={styles.liveBannerTitle}>{community?.name} is streaming live!</span>
+          <span style={styles.liveBannerSubtitle}>Tap to join the live stream</span>
+        </div>
+        <IoChevronForward size={24} color="#fff" />
+      </button>
+    ) : null,
     [isLive, cleanCommunityId, community?.name],
   );
 
-  // 🔹 Tabs component (separate from Header to prevent unnecessary re-renders)
+  // 🔹 Tabs
   const Tabs = useMemo(
     () => (
-      <div
-        style={{...(styles.tabRow || {}), backgroundColor: theme.background,
-            borderBottomColor: theme.border,}}
-      >
-        <button onClick={() => handleTabSwitch("recents")}>
-          <span
-            style={{...(styles.tabText || {}), color: theme.secondaryText, ...(activeTab === "recents" ? {
-                ...styles.activeTab,
-                color: "#00bfff",
-                borderColor: "#00bfff",
-              } : {})}}
-          >
+      <div style={{ ...styles.tabRow, display: "flex", backgroundColor: theme.background, borderBottom: `1px solid ${theme.border}` }}>
+        <button onClick={() => handleTabSwitch("recents")} style={{ background: "none", border: "none", cursor: "pointer" }}>
+          <span style={{ ...styles.tabText, color: activeTab === "recents" ? "#00bfff" : theme.secondaryText, ...(activeTab === "recents" ? { fontWeight: "bold", borderBottom: "2px solid #00bfff" } : {}) }}>
             Recents
           </span>
         </button>
-        <button onClick={() => handleTabSwitch("media")}>
-          <span
-            style={{...(styles.tabText || {}), color: theme.secondaryText, ...(activeTab === "media" ? {
-                ...styles.activeTab,
-                color: "#00bfff",
-                borderColor: "#00bfff",
-              } : {})}}
-          >
+        <button onClick={() => handleTabSwitch("media")} style={{ background: "none", border: "none", cursor: "pointer" }}>
+          <span style={{ ...styles.tabText, color: activeTab === "media" ? "#00bfff" : theme.secondaryText, ...(activeTab === "media" ? { fontWeight: "bold", borderBottom: "2px solid #00bfff" } : {}) }}>
             Media
           </span>
         </button>
-        <button onClick={() => handleTabSwitch("about")}>
-          <span
-            style={{...(styles.tabText || {}), color: theme.secondaryText, ...(activeTab === "about" ? {
-                ...styles.activeTab,
-                color: "#00bfff",
-                borderColor: "#00bfff",
-              } : {})}}
-          >
+        <button onClick={() => handleTabSwitch("about")} style={{ background: "none", border: "none", cursor: "pointer" }}>
+          <span style={{ ...styles.tabText, color: activeTab === "about" ? "#00bfff" : theme.secondaryText, ...(activeTab === "about" ? { fontWeight: "bold", borderBottom: "2px solid #00bfff" } : {}) }}>
             About
           </span>
         </button>
@@ -1539,871 +1307,233 @@ const CommunityProfile = () => {
     [activeTab, handleTabSwitch, theme],
   );
 
+  // Post card shared render helper
+  const renderPostCard = (post: any) => (
+    <div key={post.id} style={{ ...styles.postCard, backgroundColor: theme.background }}>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start", marginTop: spacing.base, width: "100%" }}>
+        <img
+          src={post.author_profile?.avatar_url || "/avatar.png"}
+          style={{ ...styles.profileImage, marginRight: spacing.xs }}
+        />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", flex: 1 }}>
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <span style={{ ...styles.profileName, color: theme.text }}>{community?.name}</span>
+            <MdGroups size={20} color={theme.icon || "#333"} style={{ marginLeft: spacing.xs }} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <span style={{ ...styles.profileOwnerName, color: theme.secondaryText }}>
+              {post.author_profile?.full_name || post.author_profile?.username || "Unknown User"}
+            </span>
+            {(post.author_profile?.subscription_tier === "basic" || post.author_profile?.subscription_tier === "premium") && (
+              <VerificationBadge size={14} style={{ marginLeft: spacing.xs }} />
+            )}
+            <span style={{ ...styles.feedbacksTime, color: theme.secondaryText }}>
+              • {new Date(post.created_at).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+
+        {currentUser && (currentUser.id === post.user_id || currentUser.id === community?.created_by) && (
+          <div style={{ position: "relative" }}>
+            <button onClick={() => setShowDeleteMenu(showDeleteMenu === post.id ? null : post.id)} style={{ background: "none", border: "none", cursor: "pointer" }}>
+              <TbDots size={18} color="#666" />
+            </button>
+            {showDeleteMenu === post.id && (
+              <>
+                <div style={{ position: "fixed", inset: 0, zIndex: 9 }} onClick={() => setShowDeleteMenu(null)} />
+                <div style={{ position: "absolute", top: 25, right: 0, backgroundColor: "#fff", padding: spacing.sm, borderRadius: radius.md, boxShadow: "0 2px 8px rgba(0,0,0,0.25)", zIndex: 10, minWidth: 150 }}>
+                  <button
+                    style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
+                    onClick={() => {
+                      setShowDeleteMenu(null);
+                      if (window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+                        handleDeletePost(post.id);
+                      }
+                    }}
+                  >
+                    <FiTrash2 size={20} color="#FF3B30" style={{ marginRight: spacing.md }} />
+                    <span style={{ fontSize: fontSize.base, color: "#FF3B30" }}>Delete Post</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {currentUser && currentUser.id !== community?.created_by && currentUser.id !== post.user_id && (
+          <button
+            style={{ ...styles.followBtn, ...(followedUsers.has(post.user_id) ? { backgroundColor: "#f0f0f0" } : {}), border: "none", cursor: "pointer" }}
+            onClick={() => handleToggleFollow(post.user_id)}
+          >
+            <span style={{ ...styles.followText, ...(followedUsers.has(post.user_id) ? { color: "#666" } : {}) }}>
+              {followedUsers.has(post.user_id)
+                ? `Following ${post.author_profile?.full_name?.split(" ")[0] || "User"}`
+                : `Follow ${post.author_profile?.full_name?.split(" ")[0] || "User"}`}
+            </span>
+          </button>
+        )}
+      </div>
+
+      {post.title && (
+        <span style={{ ...styles.postText, fontWeight: "bold", fontSize: fontSize.lg, color: theme.text }}>{post.title}</span>
+      )}
+
+      {renderTextWithLinks(post.content, [styles.postText, { color: theme.text }], "#00bfff")}
+
+      {/* Post Images */}
+      {(() => {
+        const images = getPostImages(post);
+        if (images.length === 0) return null;
+        if (images.length === 1) {
+          return (
+            <button onClick={() => { if (post.id) trackView(post.id, "community"); router.push(`/community/post/${post.id}?communityId=${cleanCommunityId}`); }} style={{ marginTop: spacing.base, background: "none", border: "none", cursor: "pointer", width: "100%" }}>
+              <img src={images[0]} style={{ width: "100%", aspectRatio: "1", borderRadius: radius.md, marginTop: spacing.md, marginBottom: spacing.md, objectFit: "contain" }} />
+            </button>
+          );
+        }
+        return (
+          <button onClick={() => { if (post.id) trackView(post.id, "community"); router.push(`/community/post/${post.id}?communityId=${cleanCommunityId}`); }} style={{ marginTop: spacing.base, background: "none", border: "none", cursor: "pointer", width: "100%" }}>
+            <div style={{ display: "flex", overflowX: "auto" }}>
+              {images.map((imageUrl: string, index: number) => (
+                <img key={index} src={imageUrl} style={{ width: 300, height: 300, borderRadius: radius.md, marginRight: index === images.length - 1 ? 0 : 10, objectFit: "cover", flexShrink: 0 }} />
+              ))}
+            </div>
+          </button>
+        );
+      })()}
+
+      {/* Post Video */}
+      {post.video_url && (
+        <button
+          onClick={() => { if (post.id) trackView(post.id, "community"); router.push(`/community/post/${post.id}?communityId=${cleanCommunityId}`); }}
+          style={{ marginTop: spacing.base, marginBottom: spacing.md, marginLeft: -28, marginRight: -28, background: "none", border: "none", cursor: "pointer" }}
+        >
+          <div style={{ width: "100%", height: 300, overflow: "hidden", backgroundColor: "#000", position: "relative" }}>
+            <video src={post.video_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} muted playsInline preload="metadata" />
+            <div style={{ position: "absolute", bottom: 10, right: 10, backgroundColor: "rgba(0,0,0,0.7)", padding: "4px 8px", borderRadius: radius.xs, display: "flex", alignItems: "center" }}>
+              <IoPlay size={12} color="#fff" />
+              <span style={{ color: "#fff", fontSize: fontSize.sm, marginLeft: spacing.xs }}>
+                {post.video_duration ? `${Math.ceil(post.video_duration / 60000)} min` : "Video"}
+              </span>
+            </div>
+          </div>
+        </button>
+      )}
+
+      {/* Post Stats */}
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginTop: spacing.md, gap: spacing.sm }}>
+        <button onClick={() => handleToggleLike(post.id)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
+          {likedPosts.has(post.id) ? <MdFavorite size={22} color="#FF2D78" /> : <MdFavoriteBorder size={22} color={theme.icon || "#666"} />}
+        </button>
+        <span style={{ ...styles.iconText }}>{postLikeCounts[post.id] || 0}</span>
+
+        <MdAnalytics size={18} color={theme.iconSecondary || "#999"} />
+        <span style={{ ...styles.iconText }}>{postViewCounts[post.id] || post.view_count || 0}</span>
+
+        <button onClick={() => { setSelectedComment(post); setShowCommentModal(true); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <FiMessageCircle size={18} color={theme.icon || "#666"} />
+        </button>
+        <span style={{ ...styles.iconText }}>{postCommentCounts[post.id] ?? post.comment_count ?? 0}</span>
+
+        <button onClick={() => { setSelectedSharePost(post); setShowShareModal(true); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <FiShare2 size={18} color={theme.icon || "#666"} />
+        </button>
+
+        {post.is_pinned && <MdPushPin size={16} color="#00BFFF" style={{ marginLeft: "auto" }} />}
+      </div>
+
+      <div style={{ height: 1, backgroundColor: theme.border, marginTop: spacing.base, opacity: 0.3 }} />
+    </div>
+  );
+
   // 🔹 Recents content
   const Recents = () => {
     if (communityPosts.length === 0) {
       return (
-        <div
-          style={{...(styles.postCard || {}), alignItems: "center",
-              padding: spacing.lg,
-              backgroundColor: theme.background,}}
-        >
-          <span style={{ color: theme.secondaryText, fontSize: fontSize.base }}>
-            No posts yet
-          </span>
-          <span
-            style={{
-              color: theme.secondaryText,
-              fontSize: fontSize.md,
-              marginTop: spacing.xs,
-              opacity: 0.7,
-            }}
-          >
+        <div style={{ ...styles.postCard, display: "flex", flexDirection: "column", alignItems: "center", padding: spacing.lg, backgroundColor: theme.background }}>
+          <span style={{ color: theme.secondaryText, fontSize: fontSize.base }}>No posts yet</span>
+          <span style={{ color: theme.secondaryText, fontSize: fontSize.md, marginTop: spacing.xs, opacity: 0.7 }}>
             Be the first to post in this community!
           </span>
         </div>
       );
     }
-
-    return (
-      <div>
-        {communityPosts.map((post) => (
-          <div
-            key={post.id}
-            style={{...(styles.postCard || {}), backgroundColor: theme.background}}
-          >
-            <div style={styles.postHeader}>
-              <div
-                style={{
-                  flexDirection: "row",
-                  alignSelf: "flex-start",
-                  marginTop: spacing.base,
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                <img
-                  src={
-                    post.author_profile?.avatar_url
-                      ? post.author_profile.avatar_url
-                      : "/assets/../assets/avatar.jpg"
-                  }
-                  style={{...(styles.profileImage || {}), marginRight: spacing.xs}}
-                />
-
-                <div
-                  style={{
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    flex: 1,
-                  }}
-                >
-                  <div style={{ flexDirection: "row", alignItems: "center" }}>
-                    <span style={{...(styles.profileName || {}), color: theme.text}}>
-                      {community?.name}
-                    </span>
-                    {community?.is_verified && <VerificationBadge size={14} style={{ marginLeft: spacing.xs }} />}
-                  </div>
-                  <div style={{ flexDirection: "row", alignItems: "center" }}>
-                    <div
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <span
-                        style={{...(styles.profileOwnerName || {}), color: theme.secondaryText}}
-                      >
-                        {post.author_profile?.full_name ||
-                          post.author_profile?.username ||
-                          "Unknown User"}
-                      </span>
-                      {(post.author_profile?.subscription_tier === "basic" ||
-                        post.author_profile?.subscription_tier ===
-                          "premium") && (
-                        <VerificationBadge
-                          size={14}
-                          style={{ marginLeft: spacing.xs }}
-                        />
-                      )}
-                    </div>
-                    <span
-                      style={{...(styles.feedbacksTime || {}), color: theme.secondaryText}}
-                    >
-                      • {new Date(post.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-                {/* Show delete button if user is post owner or community owner */}
-                {currentUser &&
-                  (currentUser.id === post.user_id ||
-                    currentUser.id === community?.created_by) && (
-                    <div>
-                      <button
-                        onClick={() => {
-                          setShowDeleteMenu(
-                            showDeleteMenu === post.id ? null : post.id,
-                          );
-                        }}
-                      >
-                        <TbDots />
-                      </button>
-                      {showDeleteMenu === post.id && (
-                        <>
-                          <button
-                            style={{
-                              position: "absolute",
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              zIndex: 0,
-                            }}
-                            onClick={() => {
-                              setShowDeleteMenu(null);
-                            }}
-                          />
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: 25,
-                              right: 0,
-                              backgroundColor: "#fff",
-                              padding: spacing.sm,
-                              borderRadius: radius.md,
-                              elevation: 5,
-                              shadowColor: "#000",
-                              shadowOffset: {
-                                width: 0,
-                                height: 2,
-                              },
-                              shadowOpacity: 0.25,
-                              shadowRadius: 3.84,
-                              zIndex: 10,
-                              minWidth: 150,
-                            }}
-                          >
-                            <button
-                              style={{
-                                paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-                                paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                                flexDirection: "row",
-                                alignItems: "center",
-                              }}
-                              onClick={() => {
-                                setShowDeleteMenu(null);
-                                if (window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) { handleDeletePost(post.id) }
-                              }}
-                            >
-                              <MdDelete size={16} color="#FF3B30" style={{ marginRight: 6 }} />
-                              <span style={{ fontSize: fontSize.base, color: "#FF3B30" }}>
-                                Delete Post
-                              </span>
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                )}
-                {/* Only show follow button if not the community owner, not the post owner, and not following yourself */}
-                {currentUser &&
-                  currentUser.id !== community?.created_by &&
-                  currentUser.id !== post.user_id && (
-                    <button
-                      style={{...(styles.followBtn || {}), ...(followedUsers.has(post.user_id) ? {
-                          backgroundColor: "#f0f0f0",
-                        } : {})}}
-                      onClick={() => handleToggleFollow(post.user_id)}
-                    >
-                      <span
-                        style={{...(styles.followText || {}), ...(followedUsers.has(post.user_id) ? { color: "#666" } : {})}}
-                      >
-                        {followedUsers.has(post.user_id)
-                          ? `Following ${
-                              post.author_profile?.full_name?.split(" ")[0] ||
-                              "User"
-                            }`
-                          : `Follow ${
-                              post.author_profile?.full_name?.split(" ")[0] ||
-                              "User"
-                            }`}
-                      </span>
-                    </button>
-                          )}
-              </div>
-            </div>
-
-            {/* Post Title */}
-            {post.title && (
-              <span
-                style={{...(styles.postText || {}), fontWeight: "bold", fontSize: fontSize.lg, color: theme.text}}
-              >
-                {post.title}
-              </span>
-          )}
-            {/* Post Content with clickable links */}
-            {renderTextWithLinks(
-              post.content,
-              [styles.postText, { color: theme.text }],
-              "#00bfff",
-            )}
-
-            {/* Post Images */}
-            {(() => {
-              const images = getPostImages(post);
-              if (images.length === 0) return null;
-
-              if (images.length === 1) {
-                return (
-                  <button
-                    onClick={() => {
-                      if (post.id) {
-                        trackView(post.id, "community");
-                      }
-                      router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
-                    }}
-                    style={{ marginTop: spacing.base }}
-                  >
-                    <img
-                      src={images[0] }
-                      style={{
-                        width: "100%",
-                        height: undefined,
-                        aspectRatio: 1,
-                        borderRadius: radius.md,
-                        marginTop: spacing.md,
-    marginBottom: spacing.md,
-                      }}
-                      
-                    />
-                  </button>
-                );
-              }
-
-              return (
-                <button
-                  onClick={() => {
-                    if (post.id) {
-                      trackView(post.id, "community");
-                    }
-                    router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
-                  }}
-                  style={{ marginTop: spacing.base }}
-                >
-                  <div style={{overflowY: "auto", flex: 1}}>
-                    {images.map((imageUrl, index) => (
-                      <img
-                        key={index}
-                        src={imageUrl }
-                        style={{
-                          width: 300,
-                          height: 300,
-                          borderRadius: radius.md,
-                          marginRight: index === images.length - 1 ? 0 : 10,
-                        }}
-                        
-                      />
-                    ))}
-                  </div>
-                </button>
-              );
-            })()}
-
-            {/* Post Video */}
-            {post.video_url && (
-              <button
-                onClick={() => {
-                  if (post.id) {
-                    trackView(post.id, "community");
-                  }
-                  router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
-                }}
-                style={{
-                  marginTop: spacing.base,
-                  marginBottom: spacing.md,
-                  marginLeft: -28,
-    marginRight: -28,
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                <div
-                  style={{
-                    width: "100%",
-                    height: 300,
-                    borderRadius: radius.none,
-                    overflow: "hidden",
-                    backgroundColor: "#000",
-                    position: "relative",
-                  }}
-                >
-                  <video
-                    src={post.video_url}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    muted
-                    playsInline
-                    preload="metadata"
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: 10,
-                      right: 10,
-                      backgroundColor: "rgba(0, 0, 0, 0.7)",
-                      paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                      paddingTop: spacing.xs,
-    paddingBottom: spacing.xs,
-                      borderRadius: radius.xs,
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <IoVideocam size={14} color="#fff" />
-                    <span
-                      style={{ color: "#fff", fontSize: fontSize.sm, marginLeft: spacing.xs }}
-                    >
-                      {post.video_duration
-                        ? `${Math.ceil(post.video_duration / 60000)} min`
-                        : "Video"}
-                    </span>
-                  </div>
-                </div>
-              </button>
-          )}
-            {/* Post Stats */}
-            <div style={{...styles.iconRow, display: "flex"}}>
-              <button onClick={() => handleToggleLike(post.id)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
-                {likedPosts.has(post.id) ? (
-                  <IoThumbsUp size={18} color="#00bfff" />
-                ) : (
-                  <IoThumbsUpOutline size={18} color="#666" />
-                )}
-              </button>
-              <span style={styles.iconText}>
-                {postLikeCounts[post.id] || 0}
-              </span>
-
-              <button disabled style={{ background: "none", border: "none", display: "flex", alignItems: "center" }}>
-                <MdEye size={18} color="#666" />
-              </button>
-              <span style={styles.iconText}>
-                {postViewCounts[post.id] || post.view_count || 0}
-              </span>
-
-              <button
-                onClick={() => {
-                  setSelectedComment(post);
-                  setShowCommentModal(true);
-                }}
-                style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
-              >
-                <FiMessageCircle size={18} color="#666" />
-              </button>
-              <span style={styles.iconText}>{postCommentCounts[post.id] ?? post.comment_count ?? 0}</span>
-
-              <button onClick={() => { setSelectedSharePost(post); setShowShareModal(true); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
-                <FiShare2 size={18} color="#666" />
-              </button>
-
-              {post.is_pinned && (
-                <MdPushPin size={16} color="#00BFFF" />
-              )}
-            </div>
-
-            {/* Divider */}
-            <div
-              style={{
-                height: 1,
-                backgroundColor: theme.border,
-                marginTop: spacing.base,
-                opacity: 0.3,
-              }}
-            />
-          </div>
-        ))}
-      </div>
-    );
+    return <div>{communityPosts.map(renderPostCard)}</div>;
   };
 
-  // \ud83d\udd39 Media content
+  // 🔹 Media content
   const Media = () => {
-    const mediaPostsFiltered = communityPosts.filter(
-      (post) => getPostImages(post).length > 0 || post.video_url,
-    );
-
+    const mediaPostsFiltered = communityPosts.filter((post) => getPostImages(post).length > 0 || post.video_url);
     if (mediaPostsFiltered.length === 0) {
       return (
-        <div
-          style={{...(styles.postCard || {}), alignItems: "center",
-              padding: spacing.lg,
-              backgroundColor: theme.cardBackground,}}
-        >
-          <span style={{ color: theme.secondaryText, fontSize: fontSize.base }}>
-            No media posts yet
-          </span>
-          <span
-            style={{
-              color: theme.secondaryText,
-              fontSize: fontSize.md,
-              marginTop: spacing.xs,
-              opacity: 0.7,
-            }}
-          >
+        <div style={{ ...styles.postCard, display: "flex", flexDirection: "column", alignItems: "center", padding: spacing.lg, backgroundColor: theme.cardBackground }}>
+          <span style={{ color: theme.secondaryText, fontSize: fontSize.base }}>No media posts yet</span>
+          <span style={{ color: theme.secondaryText, fontSize: fontSize.md, marginTop: spacing.xs, opacity: 0.7 }}>
             Share some photos or videos with the community!
           </span>
         </div>
       );
     }
-
-    return (
-      <div>
-        {mediaPostsFiltered.map((post) => (
-          <div
-            key={post.id}
-            style={{...(styles.postCard || {}), backgroundColor: theme.background}}
-          >
-            <div
-              style={{
-                flexDirection: "row",
-                alignSelf: "flex-start",
-                marginTop: spacing.base,
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <img
-                src={
-                  post.author_profile?.avatar_url
-                    ? post.author_profile.avatar_url
-                    : "/assets/../assets/avatar.jpg"
-                }
-                style={{...(styles.profileImage || {}), marginRight: spacing.xs}}
-              />
-
-              <div
-                style={{
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  flex: 1,
-                }}
-              >
-                <div style={{ flexDirection: "row", alignItems: "center" }}>
-                  <span style={{...(styles.profileName || {}), color: theme.text}}>
-                    {community?.name}
-                  </span>
-                </div>
-                <div style={{ flexDirection: "row", alignItems: "center" }}>
-                  <div style={{ flexDirection: "row", alignItems: "center" }}>
-                    <span
-                      style={{...(styles.profileOwnerName || {}), color: theme.secondaryText}}
-                    >
-                      {post.author_profile?.full_name ||
-                        post.author_profile?.username ||
-                        "Unknown User"}
-                    </span>
-                    {(post.author_profile?.subscription_tier === "basic" ||
-                      post.author_profile?.subscription_tier === "premium") && (
-                      <VerificationBadge size={14} style={{ marginLeft: spacing.xs }} />
-                    )}
-                  </div>
-                  <span
-                    style={{...(styles.feedbacksTime || {}), color: theme.secondaryText}}
-                  >
-                    • {new Date(post.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-              {/* Show delete button if user is post owner or community owner */}
-              {currentUser &&
-                (currentUser.id === post.user_id ||
-                  currentUser.id === community?.created_by) && (
-                  <div>
-                    <button
-                      onClick={() => {
-                        setShowDeleteMenu(
-                          showDeleteMenu === post.id ? null : post.id,
-                        );
-                      }}
-                    >
-                      <TbDots />
-                    </button>
-                    {showDeleteMenu === post.id && (
-                      <>
-                        <button
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            zIndex: 0,
-                          }}
-                          onClick={() => {
-                            setShowDeleteMenu(null);
-                          }}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: 25,
-                            right: 0,
-                            backgroundColor: "#fff",
-                            padding: spacing.sm,
-                            borderRadius: radius.md,
-                            elevation: 5,
-                            shadowColor: "#000",
-                            shadowOffset: {
-                              width: 0,
-                              height: 2,
-                            },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 3.84,
-                            zIndex: 10,
-                            minWidth: 150,
-                          }}
-                        >
-                          <button
-                            style={{
-                              paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-                              paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                              flexDirection: "row",
-                              alignItems: "center",
-                            }}
-                            onClick={() => {
-                              setShowDeleteMenu(null);
-                              if (window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) { handleDeletePost(post.id) }
-                            }}
-                          >
-                            <MdDelete size={16} color="#FF3B30" style={{ marginRight: 6 }} />
-                            <span style={{ fontSize: fontSize.base, color: "#FF3B30" }}>
-                              Delete Post
-                            </span>
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-              )}
-              {/* Only show follow button if not the community owner, not the post owner, and not following yourself */}
-              {currentUser &&
-                currentUser.id !== community?.created_by &&
-                currentUser.id !== post.user_id && (
-                  <button
-                    style={{...(styles.followBtn || {}), ...(followedUsers.has(post.user_id) ? {
-                        backgroundColor: "#f0f0f0",
-                      } : {})}}
-                    onClick={() => handleToggleFollow(post.user_id)}
-                  >
-                    <span
-                      style={{...(styles.followText || {}), ...(followedUsers.has(post.user_id) ? { color: "#666" } : {})}}
-                    >
-                      {followedUsers.has(post.user_id)
-                        ? `Following ${
-                            post.author_profile?.full_name?.split(" ")[0] ||
-                            "User"
-                          }`
-                        : `Follow ${
-                            post.author_profile?.full_name?.split(" ")[0] ||
-                            "User"
-                          }`}
-                    </span>
-                  </button>
-                        )}
-            </div>
-
-            {/* Post Title */}
-            {post.title && (
-              <span
-                style={{...(styles.postText || {}), fontWeight: "bold", fontSize: fontSize.base, color: theme.text}}
-              >
-                {post.title}
-              </span>
-          )}
-            {/* Post Content with clickable links */}
-            {renderTextWithLinks(
-              post.content,
-              [styles.postText, { color: theme.text }],
-              "#00bfff",
-            )}
-
-            {/* Post Images - Show all images for media tab */}
-            {(() => {
-              const images = getPostImages(post);
-              if (images.length === 0) return null;
-
-              if (images.length === 1) {
-                return (
-                  <button
-                    onClick={() => {
-                      if (post.id) {
-                        trackView(post.id, "community");
-                      }
-                      router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
-                    }}
-                    style={{ marginTop: spacing.base }}
-                  >
-                    <img
-                      src={images[0] }
-                      style={{
-                        width: "100%",
-                        height: undefined,
-                        aspectRatio: 1,
-                        borderRadius: radius.md,
-                        marginTop: spacing.md,
-    marginBottom: spacing.md,
-                      }}
-                      
-                    />
-                  </button>
-                );
-              }
-
-              return (
-                <button
-                  onClick={() => {
-                    if (post.id) {
-                      trackView(post.id, "community");
-                    }
-                    router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
-                  }}
-                  style={{ marginTop: spacing.base }}
-                >
-                  <div style={{overflowY: "auto", flex: 1}}>
-                    {images.map((imageUrl, index) => (
-                      <img
-                        key={index}
-                        src={imageUrl }
-                        style={{
-                          width: 300,
-                          height: 300,
-                          borderRadius: radius.md,
-                          marginRight: index === images.length - 1 ? 0 : 10,
-                        }}
-                        
-                      />
-                    ))}
-                  </div>
-                </button>
-              );
-            })()}
-
-            {/* Post Video */}
-            {post.video_url && (
-              <button
-                onClick={() => {
-                  if (post.id) {
-                    trackView(post.id, "community");
-                  }
-                  router.push(`/communitypost?postId=${post.id}&communityId=${cleanCommunityId}`);
-                }}
-                style={{
-                  marginTop: spacing.base,
-                  marginBottom: spacing.md,
-                  marginLeft: -12,
-    marginRight: -12,
-                }}
-              >
-                <div
-                  style={{
-                    width: "100%",
-                    height: 300,
-                    borderRadius: radius.none,
-                    overflow: "hidden",
-                    backgroundColor: "#000",
-                    position: "relative",
-                  }}
-                >
-                  <video
-                    src={post.video_url}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    muted
-                    playsInline
-                    preload="metadata"
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: 10,
-                      right: 10,
-                      backgroundColor: "rgba(0, 0, 0, 0.7)",
-                      paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-                      paddingTop: spacing.xs,
-    paddingBottom: spacing.xs,
-                      borderRadius: radius.xs,
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <IoVideocam size={14} color="#fff" />
-                    <span
-                      style={{ color: "#fff", fontSize: fontSize.sm, marginLeft: spacing.xs }}
-                    >
-                      {post.video_duration
-                        ? `${Math.ceil(post.video_duration / 60000)} min`
-                        : "Video"}
-                    </span>
-                  </div>
-                </div>
-              </button>
-          )}
-            {/* Post Stats */}
-            <div style={{...styles.iconRow, display: "flex"}}>
-              <button onClick={() => handleToggleLike(post.id)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
-                {likedPosts.has(post.id) ? (
-                  <IoThumbsUp size={18} color="#00bfff" />
-                ) : (
-                  <IoThumbsUpOutline size={18} color="#666" />
-                )}
-              </button>
-              <span style={{...(styles.iconText || {}), color: theme.secondaryText}}>
-                {postLikeCounts[post.id] || 0}
-              </span>
-
-              <button disabled style={{ background: "none", border: "none", display: "flex", alignItems: "center" }}>
-                <MdEye size={18} color="#666" />
-              </button>
-              <span style={{...(styles.iconText || {}), color: theme.secondaryText}}>
-                {postViewCounts[post.id] || post.view_count || 0}
-              </span>
-
-              <button
-                onClick={() => {
-                  setSelectedComment(post);
-                  setShowCommentModal(true);
-                }}
-                style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}
-              >
-                <FiMessageCircle size={18} color="#666" />
-              </button>
-              <span style={{...(styles.iconText || {}), color: theme.secondaryText}}>
-                {postCommentCounts[post.id] ?? post.comment_count ?? 0}
-              </span>
-
-              <button onClick={() => { setSelectedSharePost(post); setShowShareModal(true); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center" }}>
-                <FiShare2 size={18} color="#666" />
-              </button>
-
-              {post.is_pinned && (
-                <MdPushPin size={16} color="#00BFFF" />
-              )}
-            </div>
-
-            {/* Divider */}
-            <div
-              style={{
-                height: 1,
-                backgroundColor: theme.border,
-                marginTop: spacing.base,
-                opacity: 0.3,
-              }}
-            />
-          </div>
-        ))}
-      </div>
-    );
+    return <div>{mediaPostsFiltered.map(renderPostCard)}</div>;
   };
 
   // 🔹 About content
   const About = () => (
-    <div style={{...(styles.aboutBox || {}), backgroundColor: theme.background}}>
-      <div
-        style={{...(styles.headerContent || {}), backgroundColor: theme.background}}
-      >
-        <div
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <span style={{...(styles.title || {}), color: theme.text}}>
-            {community?.name || "Community"}
-          </span>
+    <div style={{ ...styles.aboutBox, backgroundColor: theme.background }}>
+      <div style={{ ...styles.headerContent, backgroundColor: theme.background }}>
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ ...styles.title, color: theme.text }}>{community?.name || "Community"}</span>
           {isLive && (
-            <div style={styles.liveBadge}>
+            <div style={{ ...styles.liveBadge, display: "flex" }}>
               <span style={styles.liveText}>🟢 LIVE</span>
             </div>
-        )}
-          <div
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          ></div>
+          )}
         </div>
-        <div
-          style={{ flexDirection: "row", alignItems: "center", marginTop: spacing.sm }}
-        >
-          {/* Show up to 3 member avatars */}
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginTop: spacing.sm }}>
           {members.slice(0, 3).map((m, i) => (
-            <img
-              key={m.user_id || i}
-              src={m.profiles?.avatar_url || "/avatar.png"}
-              style={i === 0 ? styles.avatarImage : styles.avatarImageTwo}
-            />
+            <img key={m.user_id || i} src={m.profiles?.avatar_url || "/avatar.png"} style={i === 0 ? styles.avatarImage : styles.avatarImageTwo} />
           ))}
-          <span style={{...(styles.subtitle || {}), color: theme.secondaryText}}>
-            {members.length} Members
+          <span style={{ ...styles.subtitle, color: theme.secondaryText }}>
+            {members.length} {members.length === 1 ? "Member" : "Members"}
           </span>
         </div>
-
-        <span style={{...(styles.description || {}), color: theme.secondaryText}}>
-          {community?.description || "No description available"}
+        <span style={{ ...styles.description, color: theme.secondaryText }}>{community?.description || "No description available"}</span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+        <MdBlock size={20} color={theme.iconSecondary || "#999"} />
+        <span style={{ ...styles.aboutBoxText, color: theme.secondaryText }}>Only community members can post</span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+        <MdGroupAdd size={20} color={theme.iconSecondary || "#999"} />
+        <span style={{ ...styles.aboutBoxText, color: theme.secondaryText }}>
+          {community?.is_private ? "Invitation required to join this community" : "Anyone can join this community"}
         </span>
       </div>
-      <div style={{ flexDirection: "row", alignItems: "center" }}>
-        <MdCheck size={16} color="#00BFFF" style={{ marginRight: 8 }} />
-        <span style={{...(styles.aboutBoxText || {}), color: theme.secondaryText}}>
-          Only community members can post
-        </span>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+        <FiFileText size={20} color={theme.iconSecondary || "#999"} />
+        <span style={{ ...styles.aboutBoxText, color: theme.secondaryText }}>All sorts of posts are allowed</span>
       </div>
-      <div style={{ flexDirection: "row", alignItems: "center" }}>
-        <MdPerson size={16} color="#00BFFF" style={{ marginRight: 8 }} />
-        <span style={{...(styles.aboutBoxText || {}), color: theme.secondaryText}}>
-          {community?.is_private
-            ? "Invitation required to join this community"
-            : "Anyone can join this community"}
-        </span>
-      </div>
-      <div style={{ flexDirection: "row", alignItems: "center" }}>
-        <FiMessageCircle size={16} color="#00BFFF" style={{ marginRight: 8 }} />
-        <span style={{...(styles.aboutBoxText || {}), color: theme.secondaryText}}>
-          All sorts of posts are allowed
-        </span>
-      </div>
-      <div style={{ flexDirection: "row", alignItems: "center" }}>
-        <MdStar size={16} color="#00BFFF" style={{ marginRight: 8 }} />
-        <span style={{...(styles.aboutBoxText || {}), color: theme.secondaryText}}>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+        <MdDateRange size={20} color={theme.iconSecondary || "#999"} />
+        <span style={{ ...styles.aboutBoxText, color: theme.secondaryText }}>
           Created on{" "}
           {community?.created_at
-            ? new Date(community.created_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
+            ? new Date(community.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
             : "Unknown date"}
         </span>
       </div>
-      <div style={{ flexDirection: "row", alignItems: "center" }}>
-        <MdPerson size={16} color="#00BFFF" style={{ marginRight: 8 }} />
-        <span style={{...(styles.aboutBoxText || {}), color: theme.secondaryText}}>
-          Created by{" "}
-          {creatorProfile?.full_name ||
-            creatorProfile?.username ||
-            "Unknown user"}
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+        <FiUser size={20} color={theme.iconSecondary || "#999"} />
+        <span style={{ ...styles.aboutBoxText, color: theme.secondaryText }}>
+          Created by {creatorProfile?.full_name || creatorProfile?.username || "Unknown user"}
         </span>
       </div>
     </div>
   );
 
-  // Handle invalid communityId
   if (!isValidCommunityId) {
     return (
-      <div style={{...(styles.container || {}), backgroundColor: theme.background, justifyContent: "center", alignItems: "center"}}>
+      <div style={{ flex: 1, backgroundColor: theme.background, display: "flex", justifyContent: "center", alignItems: "center" }}>
         <span style={{ color: theme.secondaryText }}>Redirecting...</span>
       </div>
     );
@@ -2411,16 +1541,14 @@ const CommunityProfile = () => {
 
   if (loading) {
     return (
-      <div style={{...(styles.container || {}), backgroundColor: theme.background}}>
-        <span style={{ margin: spacing.xl2, color: theme.secondaryText }}>
-          Loading community...
-        </span>
+      <div style={{ flex: 1, backgroundColor: theme.background }}>
+        <span style={{ margin: spacing.xl2, color: theme.secondaryText }}>Loading community...</span>
       </div>
     );
   }
+
   return (
-    <div style={{...(styles.container || {}), backgroundColor: theme.background, overflowY: "auto"}}
-    >
+    <div style={{ flex: 1, backgroundColor: theme.background, overflowY: "auto" }}>
       {Header}
       {LiveBanner}
       {Tabs}
@@ -2428,10 +1556,10 @@ const CommunityProfile = () => {
       {activeTab === "media" && <Media />}
       {activeTab === "about" && <About />}
 
-      {/* Share Modal — community-level or per-post depending on context */}
+      {/* Share Modal */}
       <SharePostModal
         visible={showShareModal}
-        onClose={handleShareModalToggle}
+        onClose={() => { handleShareModalToggle(); setSelectedSharePost(null); }}
         title={selectedSharePost
           ? (selectedSharePost.title || selectedSharePost.content?.substring(0, 60) || community?.name)
           : community?.name}
@@ -2440,151 +1568,91 @@ const CommunityProfile = () => {
           : `https://www.verrsa.org/community/${communityId}`}
         postId={selectedSharePost ? selectedSharePost.id : (communityId as string)}
         postType={selectedSharePost ? "communitypost" : "community"}
-        imageUrl={selectedSharePost
-          ? (getPostImages(selectedSharePost)[0] || community?.cover_image_url || '')
-          : (community?.cover_image_url || '')}
-        description={selectedSharePost
-          ? (selectedSharePost.content?.substring(0, 120) || '')
-          : `Join ${community?.name || 'this community'} on Verrsa!`}
+        cover_image_url={selectedSharePost
+          ? (getPostImages(selectedSharePost)[0] || community?.cover_image_url || "")
+          : (community?.cover_image_url || "")}
       />
 
       {/* Comment Modal */}
       {selectedComment && showCommentModal && (
         <CommentModal
           visible={showCommentModal}
-          onClose={() => {
-            setShowCommentModal(false);
-            setSelectedComment(null);
-          }}
+          onClose={() => { setShowCommentModal(false); setSelectedComment(null); }}
           contentId={selectedComment.id}
           contentType="community_post"
         />
       )}
 
-      {/* Join Community Prompt Modal */}
-      {(showJoinPrompt) && (<div style={{position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.5)"}}>
-        <button
-          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.45)" }}
-          onClick={dismissJoinPrompt}
-        />
-        <div
-          style={{
-            backgroundColor: theme.cardBackground,
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-            padding: spacing.xl,
-            paddingBottom: spacing.xl5,
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-          }}
-        >
-          {/* Community image */}
-          {community?.cover_image_url || community?.avatar_url ? (
-            <img
-              src={community.cover_image_url || community.avatar_url }
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: radius.full,
-                alignSelf: "center",
-                marginBottom: spacing.base,
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: radius.full,
-                backgroundColor: "#00BFFF22",
-                alignSelf: "center",
-                justifyContent: "center",
-                alignItems: "center",
-                marginBottom: spacing.base,
-              }}
-            >
-              <MdPeople size={36} color="#00BFFF" />
-            </div>
-        )}
-          <span
+      {/* Join Prompt Modal */}
+      {showJoinPrompt && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+          <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.45)" }} onClick={dismissJoinPrompt} />
+          <div
             style={{
-              fontSize: fontSize.xl2,
-              fontWeight: "700",
-              color: theme.text,
-              textAlign: "center",
-              marginBottom: spacing.xs,
+              backgroundColor: theme.cardBackground,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              padding: spacing.xl,
+              paddingBottom: spacing.xl5 || 48,
+              position: "relative",
+              zIndex: 1,
             }}
           >
-            Join {community?.name}
-          </span>
-
-          {community?.description ? (
-            <span
-              style={{
-                fontSize: fontSize.base,
-                color: theme.secondaryText,
-                textAlign: "center",
-                marginBottom: spacing.base,
-                lineHeight: 22,
-              }}
-              
-            >
-              {community.description}
-            </span>
-          ) : null}
-
-          <span
-            style={{
-              fontSize: fontSize.sm2,
-              color: theme.secondaryText,
-              textAlign: "center",
-              marginBottom: spacing.lg,
-            }}
-          >
-            {members.length} member{members.length !== 1 ? "s" : ""}
-          </span>
-
-          {/* Join button */}
-          <button
-            onClick={handleJoinFromPrompt}
-            disabled={joiningFromPrompt}
-            style={{
-              backgroundColor: "#00BFFF",
-              borderRadius: radius.lg,
-              paddingTop: spacing.base,
-    paddingBottom: spacing.base,
-              alignItems: "center",
-              marginBottom: spacing.sm,
-              opacity: joiningFromPrompt ? 0.7 : 1,
-            }}
-          >
-            {joiningFromPrompt ? (
-              <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}><div style={{width: 24, height: 24, borderRadius: "50%", border: "3px solid #00bfff", borderTopColor: "transparent", animation: "spin 1s linear infinite"}} /></div>
+            {community?.cover_image_url || community?.avatar_url ? (
+              <img
+                src={community.cover_image_url || community.avatar_url}
+                style={{ width: 72, height: 72, borderRadius: "50%", display: "block", margin: "0 auto", marginBottom: spacing.base, objectFit: "cover" }}
+              />
             ) : (
-              <span style={{ color: "#fff", fontWeight: "600", fontSize: fontSize.base }}>
-                Join Community
+              <div style={{ width: 72, height: 72, borderRadius: "50%", backgroundColor: "#00BFFF22", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", marginBottom: spacing.base }}>
+                <MdPeople size={36} color="#00BFFF" />
+              </div>
+            )}
+
+            <span style={{ display: "block", fontSize: fontSize.xl2 || 22, fontWeight: 700, color: theme.text, textAlign: "center", marginBottom: spacing.xs }}>
+              Join {community?.name}
+            </span>
+
+            {community?.description && (
+              <span style={{ display: "block", fontSize: fontSize.base, color: theme.secondaryText, textAlign: "center", marginBottom: spacing.base, lineHeight: "22px" }}>
+                {community.description}
               </span>
             )}
-          </button>
 
-          {/* Later button */}
-          <button
-            onClick={dismissJoinPrompt}
-              style={{
-                alignItems: "center",
-                paddingTop: spacing.sm,
-                paddingBottom: spacing.sm,
-              }}
-          >
-            <span style={{ color: theme.secondaryText, fontSize: fontSize.base }}>
-              Maybe Later
+            <span style={{ display: "block", fontSize: fontSize.sm2 || 13, color: theme.secondaryText, textAlign: "center", marginBottom: spacing.lg }}>
+              {members.length} member{members.length !== 1 ? "s" : ""}
             </span>
-          </button>
+
+            <button
+              onClick={handleJoinFromPrompt}
+              disabled={joiningFromPrompt}
+              style={{
+                display: "block",
+                width: "100%",
+                backgroundColor: "#00BFFF",
+                borderRadius: radius.lg,
+                padding: `${spacing.base}px`,
+                marginBottom: spacing.sm,
+                opacity: joiningFromPrompt ? 0.7 : 1,
+                border: "none",
+                cursor: joiningFromPrompt ? "not-allowed" : "pointer",
+                color: "#fff",
+                fontWeight: 600,
+                fontSize: fontSize.base,
+              }}
+            >
+              {joiningFromPrompt ? "Joining..." : "Join Community"}
+            </button>
+
+            <button
+              onClick={dismissJoinPrompt}
+              style={{ display: "block", width: "100%", background: "none", border: "none", cursor: "pointer", padding: `${spacing.sm}px`, color: theme.secondaryText, fontSize: fontSize.base }}
+            >
+              Maybe Later
+            </button>
+          </div>
         </div>
-      </div>
-            )}
+      )}
     </div>
   );
 };
@@ -2593,121 +1661,39 @@ export default CommunityProfile;
 
 const styles: Record<string, React.CSSProperties> = {
   container: { flex: 1 },
-  coverImage: { width: "100%", height: 180 },
+  coverImage: { width: "100%", height: 180, objectFit: "cover", display: "block" },
   headerContent: { padding: spacing.base },
-  title: { fontSize: fontSize.xl, fontWeight: "400", marginBottom: -8 },
+  title: { fontSize: fontSize.xl, fontWeight: 400, marginBottom: -8 },
   subtitle: { fontSize: fontSize.lg, marginBottom: spacing.xs, marginTop: 3 },
-  description: { fontSize: fontSize.base, marginTop: spacing.sm, lineHeight: 22 },
-
+  description: { fontSize: fontSize.base, marginTop: spacing.sm, lineHeight: "22px" },
   tabRow: {
     flexDirection: "row",
     justifyContent: "space-around",
-    borderBottomWidth: 1,
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
   },
   tabText: { fontSize: fontSize.base },
-  activeTab: {
-    fontWeight: "bold",
-    borderBottomWidth: 2,
-  },
-
-  postCard: {
-    margin: spacing.base,
-    borderRadius: radius.none,
-    padding: spacing.md,
-    elevation: 2,
-  },
-  postHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  postName: { fontWeight: "400", fontSize: fontSize.md },
-  followBtn: {
-    backgroundColor: "#00AEEF",
-    paddingLeft: spacing.md,
-    paddingRight: spacing.md,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.xs,
-    borderRadius: radius.xs,
-  },
-  postText: {
-    marginTop: spacing.sm,
-    marginBottom: spacing.sm,
-    marginTop: spacing.base,
-    marginBottom: -10,
-    fontSize: fontSize.base,
-    fontWeight: "200",
-    fontFamily: fontFamily.regular,
-  },
-  postImage: {
-    width: "100%",
-    height: undefined,
-    aspectRatio: 1,
-    borderRadius: radius.md,
-    marginTop: 25,
-    marginBottom: spacing.md,
-  },
-
-  aboutBox: {
-    margin: spacing.base,
-    borderRadius: radius.lg,
-    padding: spacing.base,
-  },
-  aboutBoxText: {
-    fontSize: fontSize.base,
-    marginBottom: spacing.sm,
-    lineHeight: 30,
-    fontFamily: fontFamily.regular,
-    marginLeft: spacing.base,
-  },
-  profileImage: { width: 40, height: 40, borderRadius: radius.xl2 },
-  profileName: { fontWeight: "400", fontSize: fontSize.lg, marginBottom: -5 },
+  activeTab: { fontWeight: "bold" },
+  postCard: { margin: spacing.base, padding: spacing.md },
+  postHeader: { display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  postName: { fontWeight: 400, fontSize: fontSize.md },
+  followBtn: { backgroundColor: "#00AEEF", paddingLeft: spacing.md, paddingRight: spacing.md, paddingTop: spacing.xs, paddingBottom: spacing.xs, borderRadius: radius.xs },
+  postText: { marginTop: spacing.base, marginBottom: -10, fontSize: fontSize.base, fontWeight: 200, fontFamily: fontFamily.regular },
+  postImage: { width: "100%", aspectRatio: "1", borderRadius: radius.md, marginTop: 25, marginBottom: spacing.md, objectFit: "contain" },
+  aboutBox: { margin: spacing.base, borderRadius: radius.lg, padding: spacing.base },
+  aboutBoxText: { fontSize: fontSize.base, marginBottom: spacing.sm, lineHeight: "30px", fontFamily: fontFamily.regular, marginLeft: spacing.base },
+  profileImage: { width: 40, height: 40, borderRadius: radius.xl2, objectFit: "cover" },
+  profileName: { fontWeight: 400, fontSize: fontSize.lg, marginBottom: -5 },
   profileOwnerName: { fontSize: fontSize.base },
   feedbacksTime: { fontSize: fontSize.sm, marginLeft: spacing.xs },
-  followText: { color: "#fff", fontWeight: "400" },
-  avatarImage: {
-    width: 25,
-    height: 25,
-    borderRadius: radius.full,
-    marginRight: spacing.sm,
-  },
-  avatarImageTwo: {
-    width: 25,
-    height: 25,
-    borderRadius: radius.full,
-    marginRight: spacing.sm,
-    marginLeft: -12,
-  },
-  iconRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: spacing.md,
-    gap: spacing.sm,
-  },
-  icon: {
-    marginLeft: spacing.xs,
-    marginRight: spacing.xs,
-  },
-  iconText: {
-    fontSize: fontSize.sm,
-    marginRight: spacing.sm,
-  },
-  liveBadge: {
-    backgroundColor: "green",
-    paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-    paddingTop: spacing.px,
-    paddingBottom: spacing.px,
-    borderRadius: radius.none,
-    marginLeft: spacing.sm,
-  },
-  liveText: {
-    color: "#fff",
-    fontSize: fontSize.sm,
-    fontWeight: "bold",
-  },
+  followText: { color: "#fff", fontWeight: 400 },
+  avatarImage: { width: 25, height: 25, borderRadius: "50%", marginRight: spacing.sm, objectFit: "cover" },
+  avatarImageTwo: { width: 25, height: 25, borderRadius: "50%", marginRight: spacing.sm, marginLeft: -12, objectFit: "cover" },
+  iconRow: { flexDirection: "row", alignItems: "center", marginTop: spacing.md, gap: spacing.sm },
+  icon: { marginLeft: spacing.xs, marginRight: spacing.xs },
+  iconText: { fontSize: fontSize.sm, marginRight: spacing.sm },
+  liveBadge: { backgroundColor: "green", paddingLeft: spacing.sm, paddingRight: spacing.sm, paddingTop: spacing.px || 1, paddingBottom: spacing.px || 1, marginLeft: spacing.sm },
+  liveText: { color: "#fff", fontSize: fontSize.sm, fontWeight: "bold" },
   liveBanner: {
     backgroundColor: "#00a419b5",
     paddingTop: spacing.base,
@@ -2722,35 +1708,12 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: spacing.md,
     marginBottom: spacing.md,
     borderRadius: radius.lg,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    cursor: "pointer",
+    border: "none",
   },
-  liveBannerContent: {
-    flex: 1,
-  },
-  liveIndicator: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: spacing.xs,
-  },
-  liveDot: {
-    width: 8,
-    height: 8,
-    borderRadius: radius.xs,
-    backgroundColor: "#fff",
-    marginRight: spacing.sm,
-  },
-  liveBannerTitle: {
-    color: "#fff",
-    fontSize: fontSize.base,
-    fontWeight: "600",
-    marginBottom: spacing.px,
-  },
-  liveBannerSubtitle: {
-    color: "rgba(255,255,255,0.9)",
-    fontSize: fontSize.sm2,
-  },
+  liveBannerContent: { flex: 1 },
+  liveIndicator: { flexDirection: "row", alignItems: "center", marginBottom: spacing.xs },
+  liveDot: { width: 8, height: 8, borderRadius: "50%", backgroundColor: "#fff", marginRight: spacing.sm },
+  liveBannerTitle: { color: "#fff", fontSize: fontSize.base, fontWeight: 600, marginBottom: spacing.px || 1 },
+  liveBannerSubtitle: { color: "rgba(255,255,255,0.9)", fontSize: fontSize.sm2 },
 };
