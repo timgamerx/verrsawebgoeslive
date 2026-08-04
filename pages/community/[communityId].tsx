@@ -267,8 +267,9 @@ const CommunityProfile = () => {
   const getCurrentUser = async () => {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
       if (user) {
         setCurrentUser(user);
 
@@ -547,8 +548,9 @@ const CommunityProfile = () => {
   const handleToggleFollow = async (userId: string) => {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
       if (!user) return;
 
       // Don't allow following yourself
@@ -608,10 +610,10 @@ const CommunityProfile = () => {
 
       // Get current user
       const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-      if (userError || !user) {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
+      if (!user) {
         window.alert("You must be logged in to delete posts");
         return;
       }
@@ -645,8 +647,9 @@ const CommunityProfile = () => {
   const handleToggleLike = async (postId: string) => {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
       if (!user) return;
 
       const isLiked = likedPosts.has(postId);
@@ -856,8 +859,9 @@ const CommunityProfile = () => {
   const handleJoinCommunity = async () => {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
       if (!user) {
         window.alert("Please sign in to join this community.");
         return;
@@ -921,8 +925,9 @@ const CommunityProfile = () => {
   const handleLeaveCommunity = async () => {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
       if (!user) {
         window.alert("Please sign in to leave.");
         return;
@@ -969,8 +974,9 @@ const CommunityProfile = () => {
   const handleBlockCommunity = async () => {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user ?? null;
       if (!user) {
         window.alert("Please sign in to block.");
         return;
@@ -1378,7 +1384,7 @@ const CommunityProfile = () => {
         <span style={{ ...styles.postText, fontWeight: "bold", fontSize: fontSize.lg, color: theme.text }}>{post.title}</span>
       )}
 
-      {renderTextWithLinks(post.content, [styles.postText, { color: theme.text }], "#00bfff")}
+      {renderTextWithLinks(post.content, undefined, { ...styles.postText, color: theme.text })}
 
       {/* Post Images */}
       {(() => {

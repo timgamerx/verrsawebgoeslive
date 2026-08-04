@@ -109,7 +109,7 @@ export default function Balance() {
 
   const handleTopUp = async () => {
     const amount = parseFloat(topUpAmount);
-    if (!amount || amount < 2) { window.alert("Please enter a valid amount (minimum $2)"); return; }
+    if (!amount || amount < 0.5) { window.alert("Please enter a valid amount (minimum $0.5)"); return; }
     if (!selectedPaymentMethod) { window.alert("Please select a payment method (Paystack or Flutterwave)"); return; }
     if (!currentUser) { window.alert("User not authenticated"); return; }
 
