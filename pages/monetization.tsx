@@ -245,7 +245,7 @@ export default function Monetization() {
           <button
             style={{...(styles.historyBtn || {}), backgroundColor: theme.cardBackground,
                 borderColor: theme.accent,}}
-            onClick={() => router.push("/payment-history")}
+            onClick={() => router.push("/paymenthistory")}
           >
             <TbCreditCard size={20} color={colors?.accent || "#00BFFF"} />
             <span style={{...(styles.historyText || {}), color: theme.accent}}>
@@ -256,7 +256,7 @@ export default function Monetization() {
           {/* Publish Now */}
           <button
             style={styles.premiumBtn}
-            onClick={() => router.push("/verrsa-subscription")}
+            onClick={() => router.push("/verrsasubscription")}
           >
             <span style={styles.premiumText}>Go Premium</span>
           </button>
