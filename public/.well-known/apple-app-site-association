@@ -7,11 +7,14 @@
         "paths": [
           "/home",
           "/community/*",
+          "/communityprofile/*",
           "/monetization/*",
-          "/article/*",
-          "/podcast/*",
-          "/video/*",
+          "/articles/*",
+          "/podcasts/*",
+          "/videos/*",
+          "/reelvideo/*",
           "/profile/*",
+          "/userprofile/*",
           "/post/*",
           "/user/*"
         ]

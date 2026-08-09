@@ -188,7 +188,7 @@ export default function LandingPage() {
   return (
     <>
       <SEO
-        title="Verrsa - Write, Post, Live, Earn | Monetization-First Creator Platform"
+        title="Verrsa - Create, Publish, Live, Earn | Monetization-First Creator Platform"
         description="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required."
         keywords="creator platform, monetization, earn money online, articles, podcasts, live streaming, content creation, emerging creators, micro-influencers, social media, Verrsa"
         url="https://verrsa.org"

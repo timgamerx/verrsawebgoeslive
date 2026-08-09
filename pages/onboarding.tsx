@@ -46,7 +46,7 @@ const Onboarding: React.FC<OnboardingProps> = () => {
       {renderImage()}
 
       <AppText style={{ ...styles.title, color: theme.text }}>
-        Write, Post, Live, Earn
+        Create, Publish, Live, Earn
       </AppText>
 
       <AppText style={{ ...styles.subtitle, color: theme.secondaryText }}>

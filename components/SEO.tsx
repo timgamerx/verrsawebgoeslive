@@ -17,7 +17,7 @@ import { Helmet } from 'react-helmet-async';
  * @param {boolean} props.noindex - Prevent indexing
  */
 export default function SEO({
-  title = 'Verrsa - Write, Post, Live, Earn',
+  title = 'Verrsa - Create, Publish, Live, Earn',
   description = 'Monetization-first creator platform for emerging creators. Write. Post. Go live. Monetize. All in one place.',
   keywords = 'Verrsa, social media, community, live stream, posts, videos, articles, podcasts, creator platform, monetization',
   image = 'https://ik.imagekit.io/te9biwxvl/verrsa-team.png',

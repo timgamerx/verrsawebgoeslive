@@ -77,7 +77,7 @@ const POLICY_SECTIONS = [
       },
       {
         label: "Minimum Withdrawal",
-        text: "Earnings accumulate until you reach the $10 minimum withdrawal threshold.",
+        text: "Earnings accumulate until you reach the $2 minimum withdrawal threshold.",
       },
     ],
   },
@@ -110,11 +110,11 @@ export default function Monetization() {
   return (
     <>
     <Head>
-        <title>Verrsa - Write, Post, Live, Earn | Monetization-First Creator Platform</title>
-        <meta name="description" content="How to earn on Verrsa." />
-        <meta property="og:title" content="Verrsa - Write, Post, Live, Earn | Monetization-First Creator Platform" />
-        <meta property="og:description" content="How to earn on Verrsa." />
-        <meta property="og:image" content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png" />
+        <title>Verrsa - Create, Publish, Live, Earn | Monetization-First Creator Platform</title>
+        <meta name="description" content="How to earn on Verrsa - Turn your content into income. Learn about our transparent payout structure and start monetizing your posts today." />
+        <meta property="og:title" content="Verrsa - Create, Publish, Live, Earn | Monetization-First Creator Platform" />
+        <meta property="og:description" content="How to earn on Verrsa - Turn your content into income. Learn about our transparent payout structure and start monetizing your posts today." />
+        <meta property="og:image" content="https://ik.imagekit.io/te9biwxvl/how-to-earn-on-verrsa2.jpg" />
       </Head>
 
  <div

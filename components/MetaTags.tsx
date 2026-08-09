@@ -13,7 +13,7 @@ interface MetaTagsProps {
 }
 
 export default function MetaTags({
-  title = 'Verrsa - Write, Post, Live, Earn',
+  title = 'Verrsa - Create, Publish, Live, Earn',
   description = 'Monetization-first creator platform for emerging creators. Write. Post. Go live. Monetize. All in one place.',
   image = 'https://ik.imagekit.io/te9biwxvl/verrsa-team.png',
   url = 'https://verrsa.org',
