@@ -15,12 +15,73 @@ import {
   DeviceInfo,
   trackDevice,
 } from '../lib/deviceTracking';
+import { webStorage as AsyncStorage } from '../lib/webStorage';
 import { TbChevronLeft, TbDots } from 'react-icons/tb'
 import { MdCheck, MdVerified } from 'react-icons/md'
 import {
   getUserNotificationPreferences,
   saveUserNotificationPreferences,
 } from '../lib/notificationService';
+
+const Notifications = {
+  getPermissionsAsync: async () => {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      return { status: 'default' as const };
+    }
+    const status = Notification.permission;
+    return {
+      status:
+        status === 'granted'
+          ? 'granted'
+          : status === 'denied'
+          ? 'denied'
+          : 'default',
+    };
+  },
+  requestPermissionsAsync: async () => {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      return { status: 'denied' as const };
+    }
+    const status = await Notification.requestPermission();
+    return {
+      status:
+        status === 'granted'
+          ? 'granted'
+          : status === 'denied'
+          ? 'denied'
+          : 'default',
+    };
+  },
+};
+
+const Location = {
+  requestForegroundPermissionsAsync: async () => {
+    if (typeof navigator === 'undefined' || !('permissions' in navigator)) {
+      return { status: 'granted' as const };
+    }
+    try {
+      const permissionStatus = await (navigator as any).permissions.query({
+        name: 'geolocation',
+      });
+      return {
+        status:
+          permissionStatus.state === 'granted'
+            ? 'granted'
+            : permissionStatus.state === 'denied'
+            ? 'denied'
+            : 'prompt',
+      };
+    } catch {
+      return { status: 'granted' as const };
+    }
+  },
+};
+
+const LocalAuthentication = {
+  hasHardwareAsync: async () => false,
+  isEnrolledAsync: async () => false,
+  authenticateAsync: async () => ({ success: false }),
+};
 
 type NotificationPreferences = {
   likes: boolean;
@@ -99,11 +160,9 @@ export default function ProfileSetting() {
   const API_BASE_URL = "https://www.verrsa.org/api";
 
   // Load user profile data when screen focuses
-  useEffect(
-    (() => {
-      loadUserProfile();
-    }, []),
-  );
+  useEffect(() => {
+    loadUserProfile();
+  }, []);
 
   const loadUserProfile = async () => {
     try {
@@ -572,13 +631,13 @@ export default function ProfileSetting() {
       <div style={{...(styles.settingsContainer), overflowY: "auto"}}
       >
         <button
-          onClick={() => router.push("/edit-profile-information")}
+          onClick={() => router.push("/editprofileinformation")}
         >
           <img
             src={
               userProfile.avatar
                 ? { uri: userProfile.avatar }
-                : "/assets/../assets/avatar.jpg"
+                : "/avatar.jpg"
             }
             style={{
               width: 85,
@@ -795,7 +854,7 @@ export default function ProfileSetting() {
               if (window.confirm("You will be signed out and redirected to reset your password.")) {
                 try {
                   const { error } = await supabase.auth.resetPasswordForEmail(
-                    currentUser?.email || "",
+                    userProfile.email || "",
                     { redirectTo: `${window.location.origin}/setnewpassword` },
                   );
                   if (!error) {
@@ -841,21 +900,24 @@ export default function ProfileSetting() {
                 <span style={{...(styles.settingText || {}), color: theme.text}}>
                   Nearby content
                 </span>
-                <input type="checkbox" checked={locationOptions.nearbyContent} onChange={(e) => () => toggleLocationOption("nearbyContent")(e.target.checked)} style={{cursor:"pointer"}} />
+                <input type="checkbox" checked={locationOptions.nearbyContent} onChange={(e) => toggleLocationOption("nearbyContent")}
+                  style={{cursor:"pointer"}} />
               </div>
 
               <div style={styles.optionRow}>
                 <span style={{...(styles.settingText || {}), color: theme.text}}>
                   Tag location in posts
                 </span>
-                <input type="checkbox" checked={locationOptions.tagLocation} onChange={(e) => () => toggleLocationOption("tagLocation")(e.target.checked)} style={{cursor:"pointer"}} />
+                <input type="checkbox" checked={locationOptions.tagLocation} onChange={(e) => toggleLocationOption("tagLocation")}
+                  style={{cursor:"pointer"}} />
               </div>
 
               <div style={styles.optionRow}>
                 <span style={{...(styles.settingText || {}), color: theme.text}}>
                   Location-based recommendations
                 </span>
-                <input type="checkbox" checked={locationOptions.recommendations} onChange={(e) => () => toggleLocationOption("recommendations")(e.target.checked)} style={{cursor:"pointer"}} />
+                <input type="checkbox" checked={locationOptions.recommendations} onChange={(e) => toggleLocationOption("recommendations")}
+                  style={{cursor:"pointer"}} />
               </div>
 
               <div style={styles.modalButtons}>
@@ -1159,7 +1221,7 @@ export default function ProfileSetting() {
 
         <button
           style={styles.menuItem}
-          onClick={() => router.push("/customer-support")}
+          onClick={() => router.push("/customersupport")}
         >
           <div style={{ flexDirection: "row", alignItems: "center" }}>
             <MdVerified />

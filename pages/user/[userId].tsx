@@ -911,7 +911,7 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
           )}
           {isOwnProfile && (
             <>
-              <button style={styles.editButton} onClick={() => router.push("/editprofileinformation")}>
+              <button style={styles.editButton} onClick={() => router.push("/profilesetting")}>
                 Edit Profile
               </button>
               <button style={styles.iconButtonCircle} onClick={() => router.push("/balance")}>

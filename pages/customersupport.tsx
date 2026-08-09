@@ -164,7 +164,7 @@ const CustomerSupport = () => {
         </div>
         <div style={{overflowY: "auto", flex: 1}}>
           <img
-            src={"/assets/../assets/customer-service.png"}
+            src={"/customer-service.png"}
             style={{
               width: 100,
               height: 100,
