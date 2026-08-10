@@ -342,7 +342,7 @@ export default function LandingPage() {
           </a>
           <a
             // href="https://play.google.com/store/apps/verrsa"
-            href="https://tr.ee/8PCL6hEIvS"
+            href="https://play.google.com/store/apps/details?id=com.verrsaapp.verrsa"
             target="_blank"
             rel="noopener noreferrer"
           >
