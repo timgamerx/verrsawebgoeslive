@@ -354,7 +354,7 @@ export default function LandingPage() {
           </a>
         </div>
 
-        <h1 className="max-w-[700px] p-15 hidden md:block" style={styles.heroTitle}>Create, Publish, Go Live, and Earn</h1>
+        <h1 className="max-w-[1000px] p-15 hidden md:block" style={styles.heroDesktopTitle}>Create, Publish, Go Live, and Earn</h1>
         <h1 className="max-w-[400px] p-15 block md:hidden" style={styles.heroTitle}>Create, Publish, Go Live, and Earn</h1>
         <p style={styles.heroSubtitle}>
           Verrsa is a monetization-first creator platform for emerging creators.
@@ -961,7 +961,16 @@ const styles = {
     width: "153px",
     height: "50px",
     borderRadius: "8px",
-  },
+    },
+  heroDesktopTitle: {
+    fontSize: "65px",
+    fontWeight: "600",
+    color: "#0F172A",
+    textAlign: "center" as const,
+    marginBottom: "14px",
+    letterSpacing: "-1.5px",
+    lineHeight: "56px",
+  } as React.CSSProperties,
   heroTitle: {
     fontSize: "45px",
     fontWeight: "600",
@@ -969,15 +978,15 @@ const styles = {
     textAlign: "center" as const,
     marginBottom: "7px",
     letterSpacing: "-1.5px",
-    lineHeight: "56px",
+    lineHeight: "50px",
   } as React.CSSProperties,
   heroSubtitle: {
-    fontSize: "16px",
+    fontSize: "18px",
     fontWeight: "300",
     color: "#475569",
     textAlign: "center" as const,
     maxWidth: "750px",
-    lineHeight: "23px",
+    lineHeight: "26px",
     marginBottom: "48px",
   } as React.CSSProperties,
   ctaContainer: {
