@@ -76,9 +76,9 @@ const ResetPassword = () => {
       const redirectUrl =
         true
           ? typeof window !== "undefined" && window.location?.origin
-            ? `${typeof window !== "undefined" ? window.location.origin : ""}/set-new-password`
-            : "https://www.verrsa.org/set-new-password"
-          : "verrsa://set-new-password";
+            ? `${typeof window !== "undefined" ? window.location.origin : ""}/setnewpassword`
+            : "https://www.verrsa.org/setnewpassword"
+          : "verrsa://setnewpassword";
 
       const { error } = await supabase.auth.resetPasswordForEmail(userEmail, {
         redirectTo: redirectUrl,
@@ -125,10 +125,10 @@ const ResetPassword = () => {
       }
 
       window.alert("We've sent a password reset link to your email address. Please check your inbox and follow the instructions to reset your password.");
-(() => {
-  setEmail("");
-              router.push("/auth");
-})();
+      (() => {
+        setEmail("");
+           router.push("/auth");
+      })();
     } catch (error) {
       console.error("❌ Password reset error:", error);
       const errorMessage =
@@ -149,27 +149,27 @@ const ResetPassword = () => {
       <div style={{overflowY: "auto", flex: 1}}>
         <div style={styles.logoContainer}>
           <img
-            src={"/assets/../assets/verrsa-logo.png"}
+            src={"/Verrsalogo1.png"}
             style={styles.logo}
             
           />
-          <span style={{...(styles.tagline || {}), color: theme.text}}>
+          <p style={styles.title}>
             Reset Password
-          </span>
-          <span style={{...(styles.subtitle || {}), color: theme.secondaryText}}>
+          </p>
+
+          <p style={styles.subtitle}>
             Enter your email address and we'll send you a link to reset your
             password
-          </span>
+          </p>
         </div>
 
         <div style={styles.formContainer}>
           <div
-            style={{...(styles.inputContainer || {}), backgroundColor: theme.cardBackground,
-                borderColor: theme.border,}}
+            style={styles.inputContainer}
           >
             <IoChevronBack />
             <input
-              style={{...(styles.input || {}), color: theme.text}}
+              style={styles.input}
               placeholder="Email"
               placeholderTextColor={theme.secondaryText}
               value={email}
@@ -187,7 +187,7 @@ const ResetPassword = () => {
             {loading ? (
               <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}><div style={{width: 24, height: 24, borderRadius: "50%", border: "3px solid #00bfff", borderTopColor: "transparent", animation: "spin 1s linear infinite"}} /></div>
             ) : (
-              <span style={styles.buttonText}>Send Reset Link</span>
+              <p style={styles.buttonText}>Send Reset Link</p>
             )}
           </button>
 
@@ -217,45 +217,43 @@ const styles: Record<string, React.CSSProperties> = {
   },
   logo: {
     width: 120,
-    height: 120,
+    height: 40,
+    marginTop: 30,
+    marginLeft: 30,
     marginBottom: spacing.md,
   },
-  tagline: {
+  title: {
     fontSize: fontSize.xl3,
     fontWeight: "600",
     color: "#333",
-    textAlign: "center",
+    marginLeft: 30,
     marginBottom: spacing.sm,
+    marginTop: 50,
   },
   subtitle: {
     fontSize: fontSize.lg,
     color: "#666",
-    textAlign: "center",
-    paddingLeft: spacing.lg,
-    paddingRight: spacing.lg,
     fontWeight: "300",
+    marginLeft: 30,
+    width: 400,
   },
   formContainer: {
     width: "100%",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: radius.lg,
-    paddingLeft: spacing.base,
-    paddingRight: spacing.base,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-    marginBottom: spacing.base,
-    backgroundColor: "#f9f9f9",
   },
   input: {
     flex: 1,
     marginLeft: spacing.md,
     fontSize: fontSize.base,
     color: "#333",
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: radius.lg,
+    padding: 20,
+    marginBottom: spacing.base,
+    marginLeft: 30,
+    width: 400,
   },
   eyeIcon: {
     padding: spacing.xs,
@@ -267,9 +265,12 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: radius.lg,
     alignItems: "center",
     marginBottom: spacing.base,
+    marginLeft: 30,
   },
   buttonDisabled: {
     opacity: 0.7,
+    color: "#fff",
+    backgroundColor: "#c0bfbf"
   },
   buttonText: {
     color: "#fff",

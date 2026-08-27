@@ -541,7 +541,7 @@ export default function Auth() {
                 style={styles.forgotPasswordText}
                 onClick={(e) => {
                   e.preventDefault();
-                  router.push('/reset-password', { state: { email: email.trim() } });
+                  router.push('/resetpassword', { state: { email: email.trim() } });
                 }}
               >
                 Forgot Password?

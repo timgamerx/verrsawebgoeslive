@@ -16,7 +16,10 @@
           "/profile/*",
           "/userprofile/*",
           "/post/*",
-          "/user/*"
+          "/posts/*",
+          "/user/*",
+          "/reels/*",
+          "/reel/*"
         ]
       }
     ]
