@@ -80,11 +80,11 @@ const SetNewPassword = () => {
       await signOut();
 
       window.alert("Your password has been updated successfully. Please login with your new password.");
-(() => {
-  setNewPassword("");
-              setConfirmPassword("");
-              router.push("/auth");
-})();
+      (() => {
+        setNewPassword("");
+          setConfirmPassword("");
+          router.push("/auth");
+      })();
     } catch (error) {
       console.error("❌ Password update error:", error);
       const errorMessage =
@@ -95,13 +95,17 @@ const SetNewPassword = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }; 
 
   if (!isValidSession) {
     return (
       <div style={{...(styles.container || {}), ...(styles.centered || {})}}>
-        <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}><div style={{width: 24, height: 24, borderRadius: "50%", border: "3px solid #00bfff", borderTopColor: "transparent", animation: "spin 1s linear infinite"}} /></div>
-        <span style={styles.loadingText}>Verifying reset link...</span>
+        <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+          <div style={{width: 24, height: 24, borderRadius: "50%", border: "3px solid #00bfff", 
+            borderTopColor: "transparent", animation: "spin 1s linear infinite"}}>
+          </div>
+        </div>
+          <p style={styles.loadingText}>Verifying reset link...</p>
       </div>
     );
   }
@@ -111,9 +115,8 @@ const SetNewPassword = () => {
       <div style={{overflowY: "auto", flex: 1}}>
         <div style={styles.logoContainer}>
           <img
-            src={"/assets/../assets/verrsa-logo.png"}
+            src={"/Verrsalogo1.png"}
             style={styles.logo}
-            
           />
           <span style={styles.tagline}>Set New Password</span>
           <span style={styles.subtitle}>
@@ -195,6 +198,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: spacing.md,
     fontSize: fontSize.base,
     color: "#666",
+    marginLeft: 30,
   },
   scrollContent: {
     flexGrow: 1,
@@ -207,7 +211,9 @@ const styles: Record<string, React.CSSProperties> = {
   },
   logo: {
     width: 120,
-    height: 120,
+    height: 40,
+    marginTop: 30,
+    marginLeft: 30,
     marginBottom: spacing.md,
   },
   tagline: {

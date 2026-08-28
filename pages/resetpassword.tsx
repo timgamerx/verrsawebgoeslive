@@ -127,7 +127,7 @@ const ResetPassword = () => {
       window.alert("We've sent a password reset link to your email address. Please check your inbox and follow the instructions to reset your password.");
       (() => {
         setEmail("");
-           router.push("/auth");
+          router.push("/auth");
       })();
     } catch (error) {
       console.error("❌ Password reset error:", error);
@@ -270,7 +270,7 @@ const styles: Record<string, React.CSSProperties> = {
   buttonDisabled: {
     opacity: 0.7,
     color: "#fff",
-    backgroundColor: "#c0bfbf"
+    backgroundColor: "#d6d6d6"
   },
   buttonText: {
     color: "#fff",
