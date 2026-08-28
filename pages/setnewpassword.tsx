@@ -246,8 +246,6 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: "#ffffff",
     borderRadius: "20px",
     padding: "40px",
-    boxShadow: "0 10px 40px rgba(16, 24, 40, 0.08)",
-    boxSizing: "border-box",
   },
 
   logoContainer: {
