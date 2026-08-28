@@ -192,7 +192,7 @@ const ResetPassword = () => {
           </button>
 
           <button onClick={goBackToLogin} style={styles.backToLogin}>
-            <span style={{...(styles.backToLoginText || {}), color: theme.accent}}>
+            <span style={styles.backToLoginText}>
               Back to Login
             </span>
           </button>
@@ -291,6 +291,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     paddingTop: spacing.base,
     paddingBottom: spacing.base,
+    marginLeft: 15,
   },
   backToLoginText: {
     color: "#666",
