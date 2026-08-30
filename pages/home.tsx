@@ -475,9 +475,9 @@ function Home() {
     <>
 
 <Head>
-        <title>Verrsa - Create, Publish, Live, Earn | Monetization-First Creator Platform</title>
+        <title>Verrsa - Create, Publish, Live, Earn</title>
         <meta name="description" content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required." />
-        <meta property="og:title" content="Verrsa - Create, Publish, Live, Earn | Monetization-First Creator Platform" />
+        <meta property="og:title" content="Verrsa - Create, Publish, Live, Earn" />
         <meta property="og:description" content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required." />
         <meta property="og:image" content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png" />
       </Head>
