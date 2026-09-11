@@ -128,6 +128,7 @@ const DUMMY_POSTS = [
 ];
 
 const CATEGORIES = ["All", "Technology", "Health", "Business", "Lifestyle", "Education"];
+const HOME_POSTS_CACHE_KEY = 'verrsa-home-posts-cache-v1';
 
 function Home() {
   const [posts, setPosts] = useState([]);
@@ -204,15 +205,41 @@ function Home() {
   };
 
   const [loading, setLoading] = useState(true);
-  const hasLoadedPosts = useRef(false);
 
-  // Fetch all posts from Supabase on mount, but only once
   useEffect(() => {
-    if (!hasLoadedPosts.current) {
-      fetchAllPosts();
-      hasLoadedPosts.current = true;
+    if (typeof window === 'undefined') return;
+
+    try {
+      const cached = sessionStorage.getItem(HOME_POSTS_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed.posts)) {
+          setPosts(parsed.posts);
+          setLikedPosts(new Set(parsed.likedPosts || []));
+          setBookmarkedPosts(new Set(parsed.bookmarkedPosts || []));
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to restore cached home posts:', error);
     }
+
+    fetchAllPosts();
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (loading) return;
+
+    const cacheData = {
+      posts,
+      likedPosts: Array.from(likedPosts),
+      bookmarkedPosts: Array.from(bookmarkedPosts),
+    };
+
+    sessionStorage.setItem(HOME_POSTS_CACHE_KEY, JSON.stringify(cacheData));
+  }, [posts, likedPosts, bookmarkedPosts, loading]);
 
   const fetchAllPosts = async () => {
     try {

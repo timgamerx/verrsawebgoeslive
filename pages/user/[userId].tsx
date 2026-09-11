@@ -18,7 +18,7 @@ import {
   IoWalletOutline,
 } from "react-icons/io5";
 import { FaRegHeart, FaHeart } from "react-icons/fa6";
-import { MdAnalytics, MdMoreVert, MdBlock } from "react-icons/md";
+import { MdAnalytics, MdMoreVert, MdBlock, MdMoney } from "react-icons/md";
 import {
   FiMessageCircle,
   FiShare2,
@@ -471,7 +471,18 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
   const shareProfile = () => setShowShareModal(true);
 
   // ── Message ───────────────────────────────────────────────────────────────
-  const handleMessage = () => router.push(`/chat/${userId}`);
+  const handleMessage = () => {
+    // `pages/individualchat.tsx` expects query params (userId, userName, userAvatar)
+    // Push to the existing route with query to avoid 404 at /individualchat/<id>
+    router.push({
+      pathname: '/individualchat',
+      query: {
+        userId: String(userId || ""),
+        userName: profile?.full_name || profile?.username || "",
+        userAvatar: profile?.avatar_url || "",
+      },
+    });
+  };
 
   // ── Refresh ───────────────────────────────────────────────────────────────
   const onRefresh = async () => {
@@ -860,198 +871,377 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
         }
       `}</style>
 
-     
-
       <Head>
-        <title>{initialMeta?.title || (profile?.full_name ? `${profile.full_name} - Verrsa` : 'Verrsa')}</title>
-        <meta name="description" content={initialMeta?.description || (profile?.full_name ? `View ${profile.full_name}'s profile on Verrsa.` : 'View this creator profile on Verrsa.')} />
-        <link rel="canonical" href={initialMeta?.url || `${SITE_URL}/user/${userId || ''}`} />
+        <title>
+          {initialMeta?.title ||
+            (profile?.full_name ? `${profile.full_name} - Verrsa` : "Verrsa")}
+        </title>
+        <meta
+          name="description"
+          content={
+            initialMeta?.description ||
+            (profile?.full_name
+              ? `View ${profile.full_name}'s profile on Verrsa.`
+              : "View this creator profile on Verrsa.")
+          }
+        />
+        <link
+          rel="canonical"
+          href={initialMeta?.url || `${SITE_URL}/user/${userId || ""}`}
+        />
         <meta property="og:type" content="profile" />
         <meta property="og:site_name" content="Verrsa" />
-        <meta property="og:url" content={initialMeta?.url || `${SITE_URL}/user/${userId || ''}`} />
-        <meta property="og:title" content={initialMeta?.title || (profile?.full_name ? `${profile.full_name} - Verrsa` : 'Verrsa')} />
-        <meta property="og:description" content={initialMeta?.description || (profile?.full_name ? `View ${profile.full_name}'s profile on Verrsa.` : 'View this creator profile on Verrsa.')} />
-        <meta property="og:image" content={initialMeta?.image || profileImage} />
+        <meta
+          property="og:url"
+          content={initialMeta?.url || `${SITE_URL}/user/${userId || ""}`}
+        />
+        <meta
+          property="og:title"
+          content={
+            initialMeta?.title ||
+            (profile?.full_name ? `${profile.full_name} - Verrsa` : "Verrsa")
+          }
+        />
+        <meta
+          property="og:description"
+          content={
+            initialMeta?.description ||
+            (profile?.full_name
+              ? `View ${profile.full_name}'s profile on Verrsa.`
+              : "View this creator profile on Verrsa.")
+          }
+        />
+        <meta
+          property="og:image"
+          content={initialMeta?.image || profileImage}
+        />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content={initialMeta?.url || `${SITE_URL}/user/${userId || ''}`} />
-        <meta name="twitter:title" content={initialMeta?.title || (profile?.full_name ? `${profile.full_name} - Verrsa` : 'Verrsa')} />
-        <meta name="twitter:description" content={initialMeta?.description || (profile?.full_name ? `View ${profile.full_name}'s profile on Verrsa.` : 'View this creator profile on Verrsa.')} />
-        <meta name="twitter:image" content={initialMeta?.image || profileImage} />
+        <meta
+          name="twitter:url"
+          content={initialMeta?.url || `${SITE_URL}/user/${userId || ""}`}
+        />
+        <meta
+          name="twitter:title"
+          content={
+            initialMeta?.title ||
+            (profile?.full_name ? `${profile.full_name} - Verrsa` : "Verrsa")
+          }
+        />
+        <meta
+          name="twitter:description"
+          content={
+            initialMeta?.description ||
+            (profile?.full_name
+              ? `View ${profile.full_name}'s profile on Verrsa.`
+              : "View this creator profile on Verrsa.")
+          }
+        />
+        <meta
+          name="twitter:image"
+          content={initialMeta?.image || profileImage}
+        />
       </Head>
       <MetaTags
-        title={initialMeta?.title || (profile?.full_name ? `${profile.full_name} - Verrsa` : 'Verrsa')}
-        description={initialMeta?.description || (profile?.full_name ? `View ${profile.full_name}'s profile on Verrsa.` : profile?.bio || 'View this creator profile on Verrsa.')}
+        title={
+          initialMeta?.title ||
+          (profile?.full_name ? `${profile.full_name} - Verrsa` : "Verrsa")
+        }
+        description={
+          initialMeta?.description ||
+          (profile?.full_name
+            ? `View ${profile.full_name}'s profile on Verrsa.`
+            : profile?.bio || "View this creator profile on Verrsa.")
+        }
         image={initialMeta?.image || profileImage}
-        url={initialMeta?.url || `${SITE_URL}/user/${userId || ''}`}
+        url={initialMeta?.url || `${SITE_URL}/user/${userId || ""}`}
         type="website"
       />
       <div style={styles.container}>
-      {/* Fixed Header */}
-      <div style={styles.fixedHeader}>
-        <button style={styles.backButton} onClick={() => router.back()}>
-          <IoChevronBack size={24} color="#111" />
-        </button>
-
-        <h1 style={styles.headerTitle}>
-          {profile?.username || profile?.email?.split("@")[0] || "Profile"}
-        </h1>
-
-        {/* Header icons */}
-        <div style={styles.headerIcons}>
-          <button style={styles.iconButton} onClick={shareProfile}>
-            <FiShare2 size={19} color="#666" />
+        {/* Fixed Header */}
+        <div style={styles.fixedHeader}>
+          <button style={styles.backButton} onClick={() => router.back()}>
+            <IoChevronBack size={24} color="#111" />
           </button>
-          <div style={{ position: "relative" }}>
-            <button
-              style={styles.iconButton}
-              onClick={() => setShowHeaderMenu((p) => !p)}
-            >
-              <MdMoreVert size={21} color="#666" />
+
+          <h1 style={styles.headerTitle}>
+            {profile?.username || profile?.email?.split("@")[0] || "Profile"}
+          </h1>
+
+          {/* Header icons */}
+          <div style={styles.headerIcons}>
+            <button style={styles.iconButton} onClick={shareProfile}>
+              <FiShare2 size={19} color="#666" />
             </button>
-            {showHeaderMenu && (
+            <div style={{ position: "relative" }}>
+              <button
+                style={styles.iconButton}
+                onClick={() => setShowHeaderMenu((p) => !p)}
+              >
+                <MdMoreVert size={21} color="#666" />
+              </button>
+              {showHeaderMenu && (
+                <>
+                  <div
+                    style={styles.menuOverlay}
+                    onClick={() => setShowHeaderMenu(false)}
+                  />
+                  <div
+                    style={{
+                      ...styles.dropdownMenu,
+                      top: "36px",
+                      right: 0,
+                      minWidth: "180px",
+                    }}
+                  >
+                    <button
+                      style={styles.dropdownItem}
+                      onClick={() => {
+                        setShowHeaderMenu(false);
+                        shareProfile();
+                      }}
+                    >
+                      <FiShare2 size={18} color="#333" />
+                      <span style={{ marginLeft: "10px", color: "#333" }}>
+                        Share Profile
+                      </span>
+                    </button>
+                    {!isOwnProfile && (
+                      <>
+                        <div style={styles.menuDivider} />
+                        <button
+                          style={styles.dropdownItem}
+                          onClick={() => {
+                            setShowHeaderMenu(false);
+                            handleMessage();
+                          }}
+                        >
+                          <IoMailOutline size={18} color="#333" />
+                          <span style={{ marginLeft: "10px", color: "#333" }}>
+                            Message
+                          </span>
+                        </button>
+                        <div style={styles.menuDivider} />
+                        <button
+                          style={styles.dropdownItem}
+                          onClick={() => {
+                            setShowHeaderMenu(false);
+                            handleFollowToggle(userId);
+                          }}
+                        >
+                          {isFollowing ? (
+                            <IoCheckmark size={18} color="#00BFFF" />
+                          ) : (
+                            <IoPersonAddOutline size={18} color="#333" />
+                          )}
+                          <span
+                            style={{
+                              marginLeft: "10px",
+                              color: isFollowing ? "#00BFFF" : "#333",
+                            }}
+                          >
+                            {isFollowing ? "Unfollow" : "Follow"}
+                          </span>
+                        </button>
+                        <div style={styles.menuDivider} />
+                        <button
+                          style={styles.dropdownItem}
+                          onClick={() => {
+                            setShowHeaderMenu(false);
+                            handleReportUser();
+                          }}
+                        >
+                          <FiFlag size={18} color="#FF3B30" />
+                          <span
+                            style={{ marginLeft: "10px", color: "#FF3B30" }}
+                          >
+                            Report User
+                          </span>
+                        </button>
+                        <div style={styles.menuDivider} />
+                        <button
+                          style={styles.dropdownItem}
+                          onClick={() => {
+                            setShowHeaderMenu(false);
+                            handleBlockUser();
+                          }}
+                        >
+                          <MdBlock size={18} color="#D32F2F" />
+                          <span
+                            style={{ marginLeft: "10px", color: "#D32F2F" }}
+                          >
+                            Block User
+                          </span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Scrollable content */}
+        <div style={styles.scrollContent}>
+          {/* Profile section */}
+          <div style={styles.profileSection}>
+            <img
+              src={profile?.avatar_url || "/avatar.jpg"}
+              alt="Profile"
+              style={styles.avatar}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/avatar.jpg";
+              }}
+            />
+            <div style={styles.profileInfo}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <h2 style={styles.name}>{profile?.full_name || "Creator"}</h2>
+                {profile?.is_verified && <VerificationBadge size={20} />}
+              </div>
+              <p style={styles.usernameText}>
+                @{profile?.username || "username"}
+              </p>
+              <p style={styles.follow}>
+                {stats.postsCount} {stats.postsCount === 1 ? "Post" : "Posts"} •{" "}
+                {stats.followersCount}{" "}
+                {stats.followersCount === 1 ? "Follower" : "Followers"} •{" "}
+                {stats.followingCount} Following
+              </p>
+            </div>
+          </div>
+
+          {/* Bio */}
+          {profile?.bio && <p style={styles.bioText}>{profile.bio}</p>}
+
+          {/* Action row */}
+          <div style={styles.actionRow}>
+            {!isOwnProfile && (
+              <button
+                style={
+                  isFollowing ? styles.followingButton : styles.followButton
+                }
+                onClick={() => handleFollowToggle(userId)}
+                disabled={followLoading}
+              >
+                {followLoading ? "..." : isFollowing ? "Following" : "Follow"}
+              </button>
+            )}
+            {!isOwnProfile && (
               <>
-                <div style={styles.menuOverlay} onClick={() => setShowHeaderMenu(false)} />
-                <div style={{ ...styles.dropdownMenu, top: "36px", right: 0, minWidth: "180px" }}>
-                  <button style={styles.dropdownItem} onClick={() => { setShowHeaderMenu(false); shareProfile(); }}>
-                    <FiShare2 size={18} color="#333" />
-                    <span style={{ marginLeft: "10px", color: "#333" }}>Share Profile</span>
-                  </button>
-                  {!isOwnProfile && (
-                    <>
-                      <div style={styles.menuDivider} />
-                      <button style={styles.dropdownItem} onClick={() => { setShowHeaderMenu(false); handleMessage(); }}>
-                        <IoMailOutline size={18} color="#333" />
-                        <span style={{ marginLeft: "10px", color: "#333" }}>Message</span>
-                      </button>
-                      <div style={styles.menuDivider} />
-                      <button style={styles.dropdownItem} onClick={() => { setShowHeaderMenu(false); handleFollowToggle(userId); }}>
-                        {isFollowing ? (
-                          <IoCheckmark size={18} color="#00BFFF" />
-                        ) : (
-                          <IoPersonAddOutline size={18} color="#333" />
-                        )}
-                        <span style={{ marginLeft: "10px", color: isFollowing ? "#00BFFF" : "#333" }}>
-                          {isFollowing ? "Unfollow" : "Follow"}
-                        </span>
-                      </button>
-                      <div style={styles.menuDivider} />
-                      <button style={styles.dropdownItem} onClick={() => { setShowHeaderMenu(false); handleReportUser(); }}>
-                        <FiFlag size={18} color="#FF3B30" />
-                        <span style={{ marginLeft: "10px", color: "#FF3B30" }}>Report User</span>
-                      </button>
-                      <div style={styles.menuDivider} />
-                      <button style={styles.dropdownItem} onClick={() => { setShowHeaderMenu(false); handleBlockUser(); }}>
-                        <MdBlock size={18} color="#D32F2F" />
-                        <span style={{ marginLeft: "10px", color: "#D32F2F" }}>Block User</span>
-                      </button>
-                    </>
-                  )}
-                </div>
+                <button
+                  style={styles.messageButton}
+                  onClick={() => {
+                    alert(
+                      "Tips are coming soon.\nWe're launching Tips shortly, stay tuned for updates.",
+                    );
+                  }}
+                >
+                  <MdMoney size={24} color="#00BFFF" />
+                </button>
+
+                <button style={styles.messageButton} onClick={handleMessage}>
+                  <IoMailOutline size={24} color="#00BFFF" />
+                </button>
+              </>
+            )}
+            {isOwnProfile && (
+              <>
+                <button
+                  style={styles.editButton}
+                  onClick={() => router.push("/profilesetting")}
+                >
+                  Edit Profile
+                </button>
+                <button
+                  style={styles.iconButtonCircle}
+                  onClick={() => router.push("/balance")}
+                >
+                  <IoWalletOutline size={22} color="#333" />
+                </button>
+
+                <button
+                  style={styles.messageButton}
+                  onClick={() => {
+                    alert(
+                      "Tips are coming soon.\nWe're launching Tips shortly, stay tuned for updates.",
+                    );
+                  }}
+                >
+                  <MdMoney size={24} color="#00BFFF" />
+                </button>
+
+                <button
+                  style={styles.iconButtonCirclePrimary}
+                  onClick={() => router.push("/verrsachat")}
+                >
+                  <IoMailOutline size={22} color="#fff" />
+                </button>
               </>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* Scrollable content */}
-      <div style={styles.scrollContent}>
-        {/* Profile section */}
-        <div style={styles.profileSection}>
-          <img
-            src={profile?.avatar_url || "/avatar.jpg"}
-            alt="Profile"
-            style={styles.avatar}
-            onError={(e) => { (e.target as HTMLImageElement).src = "/avatar.jpg"; }}
-          />
-          <div style={styles.profileInfo}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <h2 style={styles.name}>{profile?.full_name || "Creator"}</h2>
-              {profile?.is_verified && <VerificationBadge size={20} />}
+          {/* Tabs */}
+          <div style={styles.tabRow}>
+            {["Posts", "About", "Followers", "Following"].map((tab) => (
+              <button
+                key={tab}
+                style={styles.tabItem}
+                onClick={() => setActiveTab(tab)}
+              >
+                <span
+                  style={
+                    activeTab === tab ? styles.activeTabText : styles.tabText
+                  }
+                >
+                  {tab}
+                </span>
+                {activeTab === tab && <div style={styles.tabIndicator} />}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab content */}
+          <div>{renderTabContent()}</div>
+        </div>
+
+        {/* Share modal */}
+        {showShareModal && (
+          <div
+            style={styles.modalOverlay}
+            onClick={() => setShowShareModal(false)}
+          >
+            <div
+              style={styles.modalContent}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                style={styles.closeButton}
+                onClick={() => setShowShareModal(false)}
+              >
+                <IoClose size={24} color="#333" />
+              </button>
+              <h2 style={styles.modalTitle}>Share Profile</h2>
+              <p style={styles.modalSubText}>
+                Share {profile?.full_name || "this user"}'s profile
+              </p>
+              <button
+                style={styles.copyButton}
+                onClick={() => {
+                  navigator.clipboard?.writeText(
+                    `https://www.verrsa.org/user/${userId}`,
+                  );
+                  alert("Profile link copied!");
+                }}
+              >
+                Copy Link
+              </button>
             </div>
-            <p style={styles.usernameText}>@{profile?.username || "username"}</p>
-            <p style={styles.follow}>
-              {stats.postsCount} {stats.postsCount === 1 ? "Post" : "Posts"} •{" "}
-              {stats.followersCount} {stats.followersCount === 1 ? "Follower" : "Followers"} •{" "}
-              {stats.followingCount} Following
-            </p>
           </div>
-        </div>
-
-        {/* Bio */}
-        {profile?.bio && <p style={styles.bioText}>{profile.bio}</p>}
-
-        {/* Action row */}
-        <div style={styles.actionRow}>
-          {!isOwnProfile && (
-            <button
-              style={isFollowing ? styles.followingButton : styles.followButton}
-              onClick={() => handleFollowToggle(userId)}
-              disabled={followLoading}
-            >
-              {followLoading ? "..." : isFollowing ? "Following" : "Follow"}
-            </button>
-          )}
-          {!isOwnProfile && (
-            <button style={styles.messageButton} onClick={handleMessage}>
-              <IoMailOutline size={22} color="#00BFFF" />
-            </button>
-          )}
-          {isOwnProfile && (
-            <>
-              <button style={styles.editButton} onClick={() => router.push("/profilesetting")}>
-                Edit Profile
-              </button>
-              <button style={styles.iconButtonCircle} onClick={() => router.push("/balance")}>
-                <IoWalletOutline size={22} color="#333" />
-              </button>
-              <button style={styles.iconButtonCirclePrimary} onClick={() => router.push("/verrsachat")}>
-                <IoMailOutline size={22} color="#fff" />
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Tabs */}
-        <div style={styles.tabRow}>
-          {["Posts", "About", "Followers", "Following"].map((tab) => (
-            <button key={tab} style={styles.tabItem} onClick={() => setActiveTab(tab)}>
-              <span style={activeTab === tab ? styles.activeTabText : styles.tabText}>{tab}</span>
-              {activeTab === tab && <div style={styles.tabIndicator} />}
-            </button>
-          ))}
-        </div>
-
-        {/* Tab content */}
-        <div>{renderTabContent()}</div>
-      </div>
-
-      {/* Share modal */}
-      {showShareModal && (
-        <div style={styles.modalOverlay} onClick={() => setShowShareModal(false)}>
-          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button style={styles.closeButton} onClick={() => setShowShareModal(false)}>
-              <IoClose size={24} color="#333" />
-            </button>
-            <h2 style={styles.modalTitle}>Share Profile</h2>
-            <p style={styles.modalSubText}>
-              Share {profile?.full_name || "this user"}'s profile
-            </p>
-            <button
-              style={styles.copyButton}
-              onClick={() => {
-                navigator.clipboard?.writeText(
-                  `https://www.verrsa.org/user/${userId}`
-                );
-                alert("Profile link copied!");
-              }}
-            >
-              Copy Link
-            </button>
-          </div>
-        </div>
-      )}
+        )}
       </div>
     </>
   );
@@ -1239,14 +1429,17 @@ const styles: Record<string, React.CSSProperties> = {
   messageButton: {
     width: "44px",
     height: "44px",
-    borderRadius: "50%",
-    border: "1px solid #00BFFF",
-    backgroundColor: "transparent",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    padding: 0,
+    borderRadius: "50%",
+    border: "1px solid #00BFFF",
+    backgroundColor: "transparent",
     cursor: "pointer",
-    flexShrink: 0,
+    outline: "none",
+    boxShadow: "none",
+    lineHeight: 0,
   },
   editButton: {
     flex: 1,

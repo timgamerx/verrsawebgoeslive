@@ -49,6 +49,17 @@ const IndividualChat = () => {
 
   const flatListRef = useRef<HTMLDivElement>(null);
 
+  const scrollToBottom = (smooth = true) => {
+    const el = flatListRef.current as HTMLElement | null;
+    if (!el) return;
+    try {
+      el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+    } catch (e) {
+      // Fallback for older browsers
+      el.scrollTop = el.scrollHeight;
+    }
+  };
+
   useEffect(() => {
     initializeChat();
   }, []);
@@ -232,7 +243,7 @@ const IndividualChat = () => {
 
       // Scroll to bottom
       setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
+        scrollToBottom(true);
       }, 100);
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -275,7 +286,7 @@ const IndividualChat = () => {
 
         // Scroll to bottom when new message arrives
         setTimeout(() => {
-          flatListRef.current?.scrollToEnd({ animated: true });
+          scrollToBottom(true);
         }, 100);
 
         // Mark as read if not sent by current user
@@ -290,7 +301,13 @@ const IndividualChat = () => {
     );
 
     return () => {
-      subscription?.unsubscribe();
+      // `subscribeToMessages` may return an unsubscribe function or an object with `unsubscribe()`.
+      try {
+        if (typeof subscription === "function") subscription();
+        else if (subscription && typeof subscription.unsubscribe === "function") subscription.unsubscribe();
+      } catch (e) {
+        console.warn("Failed to unsubscribe from messages subscription", e);
+      }
     };
   };
 
@@ -321,7 +338,7 @@ const IndividualChat = () => {
 
     // Scroll to bottom immediately
     setTimeout(() => {
-      flatListRef.current?.scrollToEnd({ animated: true });
+      scrollToBottom(true);
     }, 50);
 
     try {
@@ -510,8 +527,10 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
   },
   header: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingLeft: spacing.base,
     paddingRight: spacing.base,
     paddingTop: spacing.xl5,
@@ -521,10 +540,14 @@ const styles: Record<string, React.CSSProperties> = {
     borderBottomColor: "#f0f0f0",
   },
   backButton: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     padding: spacing.xs,
     marginRight: spacing.md,
   },
   headerContent: {
+    display: "flex",
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
@@ -536,9 +559,12 @@ const styles: Record<string, React.CSSProperties> = {
     marginRight: spacing.md,
   },
   headerInfo: {
+    display: "flex",
+    flexDirection: "column",
     flex: 1,
   },
   headerNameRow: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -561,6 +587,9 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#8e8e93", // iOS gray
   },
   headerAction: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     padding: spacing.xs,
   },
   messagesContainer: {

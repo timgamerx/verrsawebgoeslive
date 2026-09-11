@@ -652,6 +652,7 @@ const styles = {
     backgroundColor: "#000",
     fontFamily: "'Instrument Sans', sans-serif",
     paddingBottom: "120px",
+    marginBottom: 50
   },
   fullscreenContainer: {
     height: "100vh",
