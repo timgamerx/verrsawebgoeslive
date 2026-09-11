@@ -21,7 +21,7 @@ function getPostTypeVariants(type?: string): string[] {
 }
 
 export async function getActiveModerationExclusions(): Promise<ModerationExclusions> {
-  const [reportedPostsResult, reportedUsersResult, userEnforcementResult, moderationExclusionsResult] = await Promise.all([
+  const [reportedPostsResult, reportedUsersResult, postEnforcementResult, userEnforcementResult] = await Promise.all([
     supabase
       .from("reported_posts")
       .select("post_id, post_type, status, enforcement_action, enforcement_until")
@@ -31,23 +31,53 @@ export async function getActiveModerationExclusions(): Promise<ModerationExclusi
       .select("reported_user_id, status, enforcement_action, enforcement_until")
       .neq("status", "rejected"),
     supabase
+      .from("post_enforcement_view")
+      .select("post_id, post_type, user_id, enforcement_action, enforcement_until"),
+    supabase
       .from("user_enforcement_view")
       .select("user_id, enforcement_action, enforcement_until"),
-    supabase
-      .from("moderation_exclusions")
-      .select("post_id, post_type, user_id, is_active")
-      .eq("is_active", true),
   ]);
 
   const excludedPostKeys = new Set<string>();
   const excludedUserIds = new Set<string>();
   const nowTs = Date.now();
 
+  const shouldHidePost = (row: any) => {
+    if (!row?.post_id || !row?.post_type) return false;
+
+    const action = String(row?.enforcement_action || "").toLowerCase();
+    const status = String(row?.status || "").toLowerCase();
+    const hasNoRemovalDate = !row?.enforcement_until;
+    const hasFutureRemovalDate = !!row?.enforcement_until && new Date(row.enforcement_until).getTime() > nowTs;
+    const removedAndApproved = action === "removed" && (status === "approved" || status === "active");
+    const explicitRestrictedAction = ["removed", "restricted", "banned", "suspended"].includes(action);
+
+    return removedAndApproved || explicitRestrictedAction || hasNoRemovalDate || hasFutureRemovalDate;
+  };
+
+  const shouldHideUser = (row: any) => {
+    if (!row?.reported_user_id && !row?.user_id) return false;
+
+    const action = String(row?.enforcement_action || "").toLowerCase();
+    const status = String(row?.status || "").toLowerCase();
+    const hasNoRemovalDate = !row?.enforcement_until;
+    const hasFutureRemovalDate = !!row?.enforcement_until && new Date(row.enforcement_until).getTime() > nowTs;
+    const removedAndApproved = action === "removed" && (status === "approved" || status === "active");
+    const explicitRestrictedAction = ["removed", "restricted", "banned", "suspended"].includes(action);
+
+    return removedAndApproved || explicitRestrictedAction || hasNoRemovalDate || hasFutureRemovalDate;
+  };
+
   (reportedPostsResult.data || []).forEach((row: any) => {
-    const isActive =
-      !row.enforcement_until ||
-      new Date(row.enforcement_until).getTime() > nowTs;
-    if (isActive && row.post_id && row.post_type) {
+    if (shouldHidePost(row)) {
+      getPostTypeVariants(row.post_type).forEach((type) => {
+        excludedPostKeys.add(`${row.post_id}_${type}`);
+      });
+    }
+  });
+
+  (postEnforcementResult.data || []).forEach((row: any) => {
+    if (shouldHidePost(row)) {
       getPostTypeVariants(row.post_type).forEach((type) => {
         excludedPostKeys.add(`${row.post_id}_${type}`);
       });
@@ -55,36 +85,16 @@ export async function getActiveModerationExclusions(): Promise<ModerationExclusi
   });
 
   (reportedUsersResult.data || []).forEach((row: any) => {
-    const isActive =
-      !row.enforcement_until ||
-      new Date(row.enforcement_until).getTime() > nowTs;
-    if (isActive && row.reported_user_id) {
-      excludedUserIds.add(row.reported_user_id);
+    const userId = String(row.reported_user_id || "");
+    if (userId && shouldHideUser(row)) {
+      excludedUserIds.add(userId);
     }
   });
 
-  // Explicitly exclude users with active account-level restrictions/bans.
   (userEnforcementResult.data || []).forEach((row: any) => {
-    const action = String(row.enforcement_action || "").toLowerCase();
-    const isRestricted = action === "restricted" || action === "banned";
-    const isActive =
-      !row.enforcement_until ||
-      new Date(row.enforcement_until).getTime() > nowTs;
-
-    if (isRestricted && isActive && row.user_id) {
-      excludedUserIds.add(row.user_id);
-    }
-  });
-
-  // Include precomputed exclusions table if present.
-  (moderationExclusionsResult.data || []).forEach((row: any) => {
-    if (row.user_id) {
-      excludedUserIds.add(String(row.user_id));
-    }
-    if (row.post_id && row.post_type) {
-      getPostTypeVariants(row.post_type).forEach((type) => {
-        excludedPostKeys.add(`${row.post_id}_${type}`);
-      });
+    const userId = String(row.user_id || "");
+    if (userId && shouldHideUser(row)) {
+      excludedUserIds.add(userId);
     }
   });
 

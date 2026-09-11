@@ -606,12 +606,14 @@ function Home() {
         url={typeof window !== "undefined" ? window.location.href : ""}
         type="website"
       />
+
       <div style={styles.container}>
       <div style={styles.stickyHeader}>
         <div style={styles.headerRow}>
           <img src="/verrsa-logo.png" alt="Verrsa" style={styles.headerLogo} />
           <div style={styles.headerActions}>
-            <button type="button" style={styles.headerIconButton} aria-label="Notifications">
+            <button type="button" style={styles.headerIconButton} aria-label="Notifications"
+            onClick={(() => {router.push('/notification')})}>
               <IoMdNotificationsOutline size={22} color="#111" />
             </button>
             {isMobile && (

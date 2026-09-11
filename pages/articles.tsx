@@ -363,120 +363,151 @@ function Articles() {
         type="website"
       />
       <div style={styles.container}>
-      <div style={styles.stickyHeader}>
-        <div style={styles.headerRow}>
-          <img src="/verrsa-logo.png" alt="Verrsa" style={styles.headerLogo} />
-          <div style={styles.headerActions}>
-            <button type="button" style={styles.headerIconButton} aria-label="Notifications">
-              <IoMdNotificationsOutline size={22} color="#111" />
-            </button>
-            {isMobile && (
-              <button type="button" style={styles.headerAvatarButton} aria-label="Open menu" onClick={navigateToMenu}>
-                <img src={userAvatar} alt="Menu" style={styles.avatarSmall} onError={(e) => { e.currentTarget.src = '/avatar.jpg'; }} />
+        <div style={styles.stickyHeader}>
+          <div style={styles.headerRow}>
+            <img
+              src="/verrsa-logo.png"
+              alt="Verrsa"
+              style={styles.headerLogo}
+            />
+            <div style={styles.headerActions}>
+              <button
+                type="button"
+                style={styles.headerIconButton}
+                aria-label="Notifications"
+                onClick={() => {
+                  router.push("/notification");
+                }}
+              >
+                <IoMdNotificationsOutline size={22} color="#111" />
               </button>
-            )}
+              {isMobile && (
+                <button
+                  type="button"
+                  style={styles.headerAvatarButton}
+                  aria-label="Open menu"
+                  onClick={navigateToMenu}
+                >
+                  <img
+                    src={userAvatar}
+                    alt="Menu"
+                    style={styles.avatarSmall}
+                    onError={(e) => {
+                      e.currentTarget.src = "/avatar.jpg";
+                    }}
+                  />
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div style={styles.scrollContent}>
-        {/* Search Section */}
-        <div style={styles.searchContainer}>
-          <IoSearchOutline size={17} color="#888" style={{ marginRight: "8px" }} />
-          <input
-            type="text"
-            placeholder="Search Article/Creator"
-            style={styles.searchInput}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+        {/* Main Content */}
+        <div style={styles.scrollContent}>
+          {/* Search Section */}
+          <div style={styles.searchContainer}>
+            <IoSearchOutline
+              size={17}
+              color="#888"
+              style={{ marginRight: "8px" }}
+            />
+            <input
+              type="text"
+              placeholder="Search Article/Creator"
+              style={styles.searchInput}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {/* Category Section */}
+          <div style={styles.categoryContainer}>
+            {CATEGORIES.map((category) => (
+              <div
+                key={category}
+                style={
+                  selectedCategory === category
+                    ? styles.categoryActive
+                    : styles.category
+                }
+                onClick={() => setSelectedCategory(category)}
+              >
+                <span
+                  style={
+                    selectedCategory === category
+                      ? styles.categoryTextActive
+                      : styles.categoryText
+                  }
+                >
+                  {category}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/*Articles */}
+          {loading ? (
+            <div style={styles.loadingContainer}>
+              <div style={styles.spinner}></div>
+              <p style={styles.loadingText}>Loading articles...</p>
+            </div>
+          ) : articles.length > 0 ? (
+            articles.map((article) => renderArticle(article))
+          ) : (
+            <div style={styles.emptyContainer}>
+              <p style={styles.emptyText}>No articles found</p>
+            </div>
+          )}
+        </div>
+
+        {/* FAB Button */}
+        <div style={styles.fab}>
+          <IoPencilOutline
+            size={24}
+            color="#fff"
+            onClick={navigateToWriteArticle}
           />
         </div>
 
-        {/* Category Section */}
-        <div style={styles.categoryContainer}>
-          {CATEGORIES.map((category) => (
-            <div
-              key={category}
-              style={
-                selectedCategory === category
-                  ? styles.categoryActive
-                  : styles.category
-              }
-              onClick={() => setSelectedCategory(category)}
-            >
-              <span
-                style={
-                  selectedCategory === category
-                    ? styles.categoryTextActive
-                    : styles.categoryText
-                }
-              >
-                {category}
-              </span>
-            </div>
-          ))}
-        </div>
+        {/* Comment Modal */}
+        {selectedArticle && (
+          <CommentModal
+            visible={commentModalVisible}
+            onClose={() => {
+              setCommentModalVisible(false);
+              setSelectedArticle(null);
+            }}
+            contentId={selectedArticle.id}
+            contentType="article"
+            onCommentAdded={() => {
+              setArticles(
+                articles.map((a) =>
+                  a.id === selectedArticle.id
+                    ? { ...a, comment_count: (a.comment_count || 0) + 1 }
+                    : a,
+                ),
+              );
+            }}
+          />
+        )}
 
-        {/*Articles */}
-        {loading ? (
-          <div style={styles.loadingContainer}>
-            <div style={styles.spinner}></div>
-            <p style={styles.loadingText}>Loading articles...</p>
-          </div>
-        ) : articles.length > 0 ? (
-          articles.map((article) => renderArticle(article))
-        ) : (
-          <div style={styles.emptyContainer}>
-            <p style={styles.emptyText}>No articles found</p>
-          </div>
+        {/* Share Modal */}
+        {selectedArticle && (
+          <SharePostModal
+            visible={shareModalVisible}
+            onClose={() => {
+              setShareModalVisible(false);
+              setSelectedArticle(null);
+            }}
+            postId={selectedArticle.id}
+            postType="article"
+            title={selectedArticle.title}
+            description={selectedArticle.content}
+            imageUrl={selectedArticle.cover_image_url}
+            postUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/post/${selectedArticle.id}`}
+          />
         )}
       </div>
-
-      {/* FAB Button */}
-      <div style={styles.fab}>
-        <IoPencilOutline size={24} color="#fff" 
-         onClick={navigateToWriteArticle}
-        />
-      </div>
-
-      {/* Comment Modal */}
-      {selectedArticle && (
-        <CommentModal
-          visible={commentModalVisible}
-          onClose={() => {
-            setCommentModalVisible(false);
-            setSelectedArticle(null);
-          }}
-          contentId={selectedArticle.id}
-          contentType="article"
-          onCommentAdded={() => {
-            setArticles(articles.map(a => 
-              a.id === selectedArticle.id 
-                ? { ...a, comment_count: (a.comment_count || 0) + 1 }
-                : a
-            ));
-          }}
-        />
-      )}
-
-      {/* Share Modal */}
-      {selectedArticle && (
-        <SharePostModal
-          visible={shareModalVisible}
-          onClose={() => {
-            setShareModalVisible(false);
-            setSelectedArticle(null);
-          }}
-          postId={selectedArticle.id}
-          postType="article"
-          title={selectedArticle.title}
-          description={selectedArticle.content}
-          imageUrl={selectedArticle.cover_image_url}
-          postUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/post/${selectedArticle.id}`}
-        />
-      )}
-    </div>
     </>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import SEO from '../components/SEO';
 import Image from 'next/image'; 
 import Head from 'next/head';
+import { getActiveModerationExclusions } from '../lib/moderationExclusions';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -25,40 +26,52 @@ export default function LandingPage() {
       try {
         setLoadingCreators(true);
         const { supabase } = await import('../components/supabase');
-        // Get top 8 creators by post count
+        const { excludedPostKeys, excludedUserIds } = await getActiveModerationExclusions();
+
+        // Get top 8 creators by visible post count
         const { data, error } = await supabase
           .from('posts')
-          .select('user_id')
-          .not('user_id', 'is', null);
+          .select('id, post_type, user_id')
+          .not('user_id', 'is', null)
+          .eq('published', true);
         if (error) throw error;
-        // Count posts per user
+
         const creatorMap = new Map<string, number>();
         data?.forEach((post: any) => {
-          creatorMap.set(post.user_id, (creatorMap.get(post.user_id) || 0) + 1);
+          const userId = String(post.user_id || '');
+          if (!userId || excludedUserIds.has(userId)) return;
+
+          const postKey = `${post.id}_${post.post_type || 'article'}`;
+          if (excludedPostKeys.has(postKey)) return;
+
+          creatorMap.set(userId, (creatorMap.get(userId) || 0) + 1);
         });
-        // Sort by count and get top 8 user IDs
+
         const topUserIds = Array.from(creatorMap.entries())
           .sort((a, b) => b[1] - a[1])
           .slice(0, 8)
           .map(([userId]) => userId);
+
         if (topUserIds.length === 0) {
           setTopCreators([]);
           setLoadingCreators(false);
           return;
         }
-        // Fetch profile data for top creators
+
         const { data: profiles, error: profileError } = await supabase
           .from('profiles')
           .select('id, full_name, avatar_url, username')
           .in('id', topUserIds);
         if (profileError) throw profileError;
-        // Map profiles with post count
-        const creatorsWithCount = profiles?.map((profile: any) => ({
+
+        const visibleProfiles = (profiles || []).filter((profile: any) => !excludedUserIds.has(String(profile.id || '')));
+        const creatorsWithCount = visibleProfiles.map((profile: any) => ({
           id: profile.id,
           name: profile.full_name || profile.username || 'Creator',
           img: profile.avatar_url || '/avatar.jpg',
-          field: `${creatorMap.get(profile.id)} posts`,
+          field: `${creatorMap.get(profile.id) || 0} posts`,
         })) || [];
+
         setTopCreators(creatorsWithCount);
       } catch (err) {
         console.error('Error fetching top creators:', err);

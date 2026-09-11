@@ -383,6 +383,9 @@ const Podcasts = () => {
                   justifyContent: "center",
                   cursor: "pointer",
                 }}
+                onClick={() => {
+                  router.push("/notification");
+                }}
               >
                 <IoNotificationsOutline size={22} color="#111" />
               </button>
@@ -727,9 +730,9 @@ const Podcasts = () => {
                       }}
                     >
                       {likedPodcasts.has(podcast.id) ? (
-                         <FaHeart size={18} color="#FF2D78" />
-                            ) : (
-                         <FaRegHeart size={18} color="#888" />
+                        <FaHeart size={18} color="#FF2D78" />
+                      ) : (
+                        <FaRegHeart size={18} color="#888" />
                       )}
                     </button>
                     <span style={{ fontSize: "16px", color: "#000" }}>

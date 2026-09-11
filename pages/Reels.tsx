@@ -22,6 +22,7 @@ import SharePostModal from '../components/SharePostModal.web';
 import MetaTags from '../components/MetaTags';
 import VerificationBadge from '../components/VerificationBadge';
 import { getVideos, getVideoById, toggleLike as apiToggleLike, getUserLikeStatusBatch, trackShare } from '../components/api';
+import { getActiveModerationExclusions } from '../lib/moderationExclusions';
 
 // Dummy video data
 const dummyVideos = [
@@ -185,9 +186,31 @@ function Reels() {
     return () => container.removeEventListener('scroll', handleScroll);
   }, [id, currentIndex, videos, loading]);
 
+  const isRestrictedVideo = (video, excludedPostKeys, excludedUserIds) => {
+    if (!video || typeof video !== 'object') return false;
+
+    const userId = String(video.user_id || video.user?.id || video.profiles?.id || '');
+    if (userId && excludedUserIds.has(userId)) return true;
+
+    const id = String(video.id || '');
+    if (!id) return false;
+
+    const rawType = String(video.post_type || 'video').toLowerCase();
+    const variants = new Set([
+      rawType,
+      'video',
+      'reel',
+      'reels',
+      'reelvideo',
+    ].filter(Boolean));
+
+    return Array.from(variants).some((variant) => excludedPostKeys.has(`${id}_${variant}`));
+  };
+
   const fetchSingleVideo = async () => {
     try {
       setLoading(true);
+      const { excludedPostKeys, excludedUserIds } = await getActiveModerationExclusions();
       let mainVideo = null;
       
       // Try to get from location state first
@@ -197,14 +220,24 @@ function Reels() {
         // Fetch from API
         mainVideo = await getVideoById(id);
       }
+
+      if (mainVideo && isRestrictedVideo(mainVideo, excludedPostKeys, excludedUserIds)) {
+        setCurrentVideo(null);
+        setVideos([]);
+        setLoading(false);
+        return;
+      }
       
       setCurrentVideo(mainVideo);
       
       // Load more videos for swiping
       const moreVideos = await getVideos(20);
+      const filteredMoreVideos = moreVideos.filter((video) => !isRestrictedVideo(video, excludedPostKeys, excludedUserIds));
       
       // Combine: put the current video first, then filter it out from others
-      const allVideos = [mainVideo, ...moreVideos.filter(v => v.id !== mainVideo.id)];
+      const allVideos = mainVideo
+        ? [mainVideo, ...filteredMoreVideos.filter(v => v.id !== mainVideo.id)]
+        : filteredMoreVideos;
       setVideos(allVideos);
       
       // Check like status
@@ -220,12 +253,14 @@ function Reels() {
 
   const loadMoreVideos = async () => {
     try {
+      const { excludedPostKeys, excludedUserIds } = await getActiveModerationExclusions();
       const moreVideos = await getVideos(10, videos.length);
-      if (moreVideos.length > 0) {
-        setVideos(prev => [...prev, ...moreVideos]);
+      const filteredMoreVideos = moreVideos.filter((video) => !isRestrictedVideo(video, excludedPostKeys, excludedUserIds));
+      if (filteredMoreVideos.length > 0) {
+        setVideos(prev => [...prev, ...filteredMoreVideos]);
         
         // Check like status for new videos
-        const items = moreVideos.map((v) => ({ id: v.id, type: 'video' }));
+        const items = filteredMoreVideos.map((v) => ({ id: v.id, type: 'video' }));
         const likeStatuses = await getUserLikeStatusBatch(items);
         setLikedVideos(prev => {
           const updated = new Set(prev);
@@ -241,10 +276,12 @@ function Reels() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      const { excludedPostKeys, excludedUserIds } = await getActiveModerationExclusions();
       const data = await getVideos(30);
-      setVideos(data);
-      if (data.length > 0) {
-        const items = data.map((v) => ({ id: v.id, type: 'video' }));
+      const filteredData = data.filter((video) => !isRestrictedVideo(video, excludedPostKeys, excludedUserIds));
+      setVideos(filteredData);
+      if (filteredData.length > 0) {
+        const items = filteredData.map((v) => ({ id: v.id, type: 'video' }));
         const likeStatuses = await getUserLikeStatusBatch(items);
         setLikedVideos(new Set(Object.entries(likeStatuses).filter(([, v]) => v).map(([k]) => k.split('_')[0])));
       }
