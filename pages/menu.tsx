@@ -28,6 +28,7 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
   const safeOnClose = typeof onClose === "function" ? onClose : () => {};
   const [switchModalVisible, setSwitchModalVisible] = useState(false);
   const [signOutModalVisible, setSignOutModalVisible] = useState(false);
+  const [verrsaCoinModalVisible, setVerrsaCoinModalVisible] = useState(false);
   const [userName, setUserName] = useState("Your Name");
   const [userAvatar, setUserAvatar] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
@@ -324,11 +325,7 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
 
             <button
               style={styles.menuItem}
-              onClick={() => {
-                window.alert(
-                  "VerrsaCoin\n\nVerrsaCoin is Verrsa's creator reward system. Earn coins by posting content, getting likes, comments, and shares. Redeem your coins for cash withdrawals, premium features, and exclusive boosts. Coming soon!",
-                );
-              }}
+              onClick={() => setVerrsaCoinModalVisible(true)}
             >
               <FaCoins size={22} color={"#00bfff"} />
               <span style={{ ...styles.menuText, color: theme.text }}>
@@ -443,6 +440,39 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
           </div>
         </div>
       </div>
+
+      {/* VerrsaCoin Modal */}
+      {verrsaCoinModalVisible && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.verrsaCoinModalContent}>
+            <button
+              onClick={() => setVerrsaCoinModalVisible(false)}
+              style={styles.closeButton}
+            >
+              <IoClose size={20} color="#333" />
+            </button>
+
+            <div style={styles.coinIconContainer}>
+              <FaCoins size={28} color="#00BFFF" />
+            </div>
+
+            <h2 style={styles.verrsaCoinTitle}>VerrsaCoin</h2>
+            <p style={styles.verrsaCoinMessage}>
+              VerrsaCoin is Verrsa&apos;s creator reward system. Earn coins by
+              posting content, getting likes, comments, and shares. Redeem your
+              coins for cash withdrawals, premium features, and exclusive boosts.
+              Coming soon!
+            </p>
+
+            <button
+              style={styles.verrsaCoinButton}
+              onClick={() => setVerrsaCoinModalVisible(false)}
+            >
+              <span style={styles.verrsaCoinButtonText}>Got it</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Switch Account Modal */}
       {switchModalVisible && (
@@ -703,6 +733,58 @@ const styles = {
     position: "relative",
     fontFamily: "'Instrument Sans', sans-serif",
   },
+  verrsaCoinModalContent: {
+    backgroundColor: "#fff",
+    borderRadius: "20px",
+    padding: "28px 20px 20px",
+    width: "92%",
+    maxWidth: "420px",
+    position: "relative",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
+    fontFamily: "'Instrument Sans', sans-serif",
+  },
+  coinIconContainer: {
+    width: "64px",
+    height: "64px",
+    borderRadius: "50%",
+    backgroundColor: "#eafaff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "8px auto 18px",
+  },
+  verrsaCoinTitle: {
+    fontSize: "26px",
+    fontWeight: "700",
+    textAlign: "center",
+    color: "#111",
+    margin: "0 0 12px",
+    fontFamily: "'Instrument Sans', sans-serif",
+  },
+  verrsaCoinMessage: {
+    fontSize: "15px",
+    color: "#333",
+    lineHeight: "24px",
+    textAlign: "center",
+    margin: "0 0 20px",
+    fontFamily: "'Instrument Sans', sans-serif",
+  },
+  verrsaCoinButton: {
+    width: "100%",
+    backgroundColor: "#00BFFF",
+    border: "none",
+    borderRadius: "12px",
+    padding: "14px",
+    cursor: "pointer",
+    fontFamily: "'Instrument Sans', sans-serif",
+    marginBottom: "70px",
+  },
+  verrsaCoinButtonText: {
+    color: "#fff",
+    fontSize: "16px",
+    fontWeight: "600",
+    fontFamily: "'Instrument Sans', sans-serif",
+  },
   closeButton: {
     position: "absolute",
     top: "20px",
@@ -718,6 +800,8 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1,
+    outline: "none",
+    boxShadow: "none",
   },
   modalTitle: {
     fontSize: "24px",

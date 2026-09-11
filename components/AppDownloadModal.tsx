@@ -121,6 +121,8 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
             padding: `${spacing.xs}px`,
             display: "flex",
             alignItems: "center",
+            outline: "none",
+            boxShadow: "none",
           }}
           aria-label="Close"
         >
@@ -168,9 +170,8 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
           }}
         >
           {isDesktopDevice
-            ? 'Download the Verrsa mobile app for the best experience. Enjoy exclusive features, faster performance, and seamless content creation on the go.'
-            : `Experience the best of Verrsa on your ${getDeviceName()}. Enjoy a faster, smoother experience with exclusive mobile features.`
-          }
+            ? "Download the Verrsa mobile app for the best experience. Enjoy exclusive features, faster performance, and seamless content creation on the go."
+            : `Experience the best of Verrsa on your ${getDeviceName()}. Enjoy a faster, smoother experience with exclusive mobile features.`}
         </p>
 
         {/* Features List */}
@@ -225,7 +226,7 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
           }}
         >
           <span style={{ color: "#fff", fontWeight: "600", fontSize: 16 }}>
-            {isDesktopDevice ? 'Download App' : 'Open App'}
+            {isDesktopDevice ? "Download App" : "Open App"}
           </span>
         </button>
 
@@ -256,9 +257,8 @@ export const AppDownloadModal: React.FC<AppDownloadModalProps> = ({
           }}
         >
           {isDesktopDevice
-            ? 'Available on iOS and Android'
-            : `Opens ${getStoreName()} if app is not installed`
-          }
+            ? "Available on iOS and Android"
+            : `Opens ${getStoreName()} if app is not installed`}
         </p>
       </div>
     </div>
