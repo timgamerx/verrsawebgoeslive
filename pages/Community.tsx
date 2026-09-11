@@ -301,7 +301,7 @@ function Community() {
                     style={{
                       ...styles.engagementText,
                       color: likedCommunities.has(community.id)
-                        ? "#00BFFF"
+                        ? "#999"
                         : "#999",
                     }}
                   >
@@ -656,6 +656,8 @@ const styles = {
     alignItems: "center",
     gap: "6px",
     transition: "all 0.2s ease",
+    outline: "none",
+    boxShadow: "none",
   },
   engagementText: {
     fontSize: "14px",
