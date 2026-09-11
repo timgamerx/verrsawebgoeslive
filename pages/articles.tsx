@@ -11,6 +11,7 @@ import {
   IoSearchOutline,
   IoPencilOutline,
 } from "react-icons/io5";
+import { FaRegHeart, FaHeart } from "react-icons/fa6";
 import { MdAnalytics, MdArrowForwardIos } from "react-icons/md";
 import { HiDotsHorizontal } from "react-icons/hi";
 import CommentModal from '../components/CommentModal';
@@ -295,9 +296,9 @@ function Articles() {
             onClick={() => handleToggleLike(item.id)}
           >
             {likedArticles.has(item.id) ? (
-              <IoThumbsUp size={18} color="#00BFFF" />
-            ) : (
-              <IoThumbsUpOutline size={18} color="#888" />
+              <FaHeart size={18} color="#FF2D78" />
+                ) : (
+              <FaRegHeart size={18} color="#888" />
             )}
             <span style={styles.iconText}>{item.like_count || 0}</span>
           </div>

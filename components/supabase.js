@@ -20,34 +20,54 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 	},
 });
 
-// Cache for user session to prevent concurrent auth.getUser() calls
+// Cache for user session and prevent duplicate concurrent auth.getUser() calls
 let userCache = null;
 let userCacheTime = 0;
+let userRequest = null;
 const CACHE_DURATION = 5000; // 5 seconds
 
 export const getCachedUser = async () => {
 	const now = Date.now();
-	
-	// Return cached user if still valid
+
 	if (userCache && (now - userCacheTime) < CACHE_DURATION) {
 		return userCache;
 	}
-	
-	// Fetch fresh user data
-	const { data: { user }, error } = await supabase.auth.getUser();
-	
-	if (!error && user) {
-		userCache = user;
-		userCacheTime = now;
+
+	if (userRequest) {
+		return userRequest;
 	}
-	
-	return user;
+
+	userRequest = (async () => {
+		try {
+			const { data: { user }, error } = await supabase.auth.getUser();
+
+			if (!error && user) {
+				userCache = user;
+				userCacheTime = now;
+				return user;
+			}
+
+			if (error) {
+				console.warn('Supabase auth.getUser failed in cached lookup:', error.message || error);
+			}
+
+			return user || null;
+		} catch (err) {
+			console.warn('Supabase cached user lookup failed:', err?.message || err);
+			return null;
+		} finally {
+			userRequest = null;
+		}
+	})();
+
+	return userRequest;
 };
 
 // Clear cache when user signs out
 export const clearUserCache = () => {
 	userCache = null;
 	userCacheTime = 0;
+	userRequest = null;
 };
 
 // Wrapper for signOut that clears the cache

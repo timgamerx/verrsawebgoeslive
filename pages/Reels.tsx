@@ -12,7 +12,9 @@ import {
   IoShareOutline,
   IoEllipsisHorizontal,
   IoArrowBack,
+  IoShareSocialOutline,
 } from "react-icons/io5";
+import { FaRegHeart, FaHeart } from "react-icons/fa6";
 import { MdAnalytics } from "react-icons/md";
 import { useRouter } from 'next/router';
 import CommentModal from '../components/CommentModal';
@@ -140,6 +142,7 @@ function Reels() {
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const videoRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -269,6 +272,26 @@ function Reels() {
     setCommentModalVisible(true);
   };
 
+  const handleOpenUserProfile = (video) => {
+    const userId = video?.user_id || video?.user?.id || video?.profiles?.id;
+    if (userId) {
+      router.push(`/user/${userId}`);
+    }
+  };
+
+  const getDisplayTitle = (video) => {
+    const text = video?.title || video?.description || video?.content || "";
+    if (!text) return { text: "", isLong: false };
+
+    const trimmed = text.trim();
+    if (trimmed.length <= 150) return { text: trimmed, isLong: false };
+
+    return {
+      text: `${trimmed.slice(0, 150).trim()}...`,
+      isLong: true,
+    };
+  };
+
   const formatCount = (count) => {
     if (count >= 1000000) {
       return (count / 1000000).toFixed(1) + "M";
@@ -299,214 +322,289 @@ function Reels() {
       `}</style>
       <MetaTags
         title={currentVideo?.title || "Reels - Verrsa"}
-        description={currentVideo?.description || "Watch short videos and reels from creators on Verrsa. Discover entertaining and educational video content."}
-        image={currentVideo?.id ? `https://www.verrsa.org/post/post?id=${encodeURIComponent(currentVideo.id)}` : currentVideo?.thumbnail_url}
+        description={
+          currentVideo?.description ||
+          "Watch short videos and reels from creators on Verrsa. Discover entertaining and educational video content."
+        }
+        image={
+          currentVideo?.id
+            ? `https://www.verrsa.org/post/post?id=${encodeURIComponent(currentVideo.id)}`
+            : currentVideo?.thumbnail_url
+        }
         url={typeof window !== "undefined" ? window.location.href : ""}
         type="video.other"
         video={currentVideo?.video_url}
       />
-      <div 
-      ref={containerRef}
-      style={{
-        ...styles.container,
-        ...styles.fullscreenContainer,
-      }}
-    >
-      {/* Fixed Header - only show in single video mode */}
-      {id && (
-        <div style={styles.fixedHeader}>
-          <button style={styles.backButton} onClick={() => router.back()}>
-            <IoArrowBack size={24} color="#fff" />
-          </button>
-          <h2 style={styles.headerTitle}>Video</h2>
-          <div style={{ width: 24 }} />
-        </div>
-      )}
-
-      {/* Videos Grid */}
-      <div style={{
-        ...styles.content,
-        ...styles.fullscreenContent,
-        paddingTop: "0",
-      }}>
-        {loading ? (
-          <div style={styles.loadingContainer}>
-            <div style={styles.spinner}></div>
-            <p style={styles.loadingText}>Loading videos...</p>
-          </div>
-        ) : videos.length > 0 ? (
-          videos.map((video, index) => (
-          <div 
-            key={video.id} 
-            style={{
-              ...styles.videoCard,
-              ...styles.fullscreenVideoCard,
-            }}
-          >
-            {/* Video Header */}
-            <div style={styles.videoHeader}>
-              <div style={styles.userInfo}>
-                <img
-                  src={video.profiles?.avatar_url || video.user?.avatar_url || '/avatar.jpg'}
-                  alt={video.profiles?.full_name || video.user?.full_name || 'User'}
-                  style={styles.avatar}
-                />
-                <div>
-                  <div style={styles.usernameRow}>
-                    <span style={styles.username}>{video.profiles?.full_name || video.user?.full_name || 'Unknown'}</span>
-                    {(video.profiles?.is_verified || video.user?.is_verified) && (
-                      <VerificationBadge size={16} />
-                    )}
-                  </div>
-                  <span style={styles.time}>{getTimeAgo(video.created_at)}</span>
-                </div>
-              </div>
-              <button
-                style={styles.menuButton}
-                onClick={() =>
-                  setShowMenu(showMenu === video.id ? null : video.id)
-                }
-              >
-                <IoEllipsisHorizontal size={20} color="#555" />
-              </button>
-              {showMenu === video.id && (
-                <div style={styles.menuDropdown}>
-                  <button style={styles.menuItem}>Report</button>
-                  <button style={styles.menuItem}>Block User</button>
-                </div>
-              )}
-            </div>
-
-            {/* Video Title */}
-            <h3 style={styles.videoTitle}>{video.title}</h3>
-
-            {/* Video Player */}
-            <div style={{
-              ...styles.thumbnailContainer,
-              ...styles.fullscreenThumbnailContainer,
-            }}>
-              {video.video_url ? (
-                <video
-                  src={video.video_url}
-                  poster={video.thumbnail_url || undefined}
-                  style={styles.thumbnail}
-                  controls
-                  playsInline
-                  preload="metadata"
-                  autoPlay={id && index === currentIndex}
-                  muted={id}
-                  loop={id}
-                />
-              ) : video.thumbnail_url ? (
-                <img
-                  src={video.thumbnail_url}
-                  alt={video.title}
-                  style={styles.thumbnail}
-                />
-              ) : (
-                <div style={{ ...styles.thumbnail, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#1a1a1a" }}>
-                  <IoVideocam size={48} color="#444" />
-                </div>
-              )}
-            </div>
-
-            {/* Video Description */}
-            <p style={styles.description}>{video.description}</p>
-
-            {/* Engagement Row */}
-            <div style={styles.engagementRow}>
-              <button
-                style={styles.engagementButton}
-                onClick={() => toggleLike(video.id)}
-              >
-                {likedVideos.has(video.id) ? (
-                  <IoThumbsUp size={18} color="#00BFFF" />
-                ) : (
-                  <IoThumbsUpOutline size={18} color="#555" />
-                )}
-                <span
-                  style={{
-                    ...styles.engagementText,
-                    color: likedVideos.has(video.id) ? "#00BFFF" : "#555",
-                  }}
-                >
-                  {formatCount(video.like_count || 0)}
-                </span>
-              </button>
-
-              <button style={styles.engagementButton}>
-                <MdAnalytics size={18} color="#555" />
-                <span style={styles.engagementText}>
-                  {formatCount(video.view_count)}
-                </span>
-              </button>
-
-              <button style={styles.engagementButton}
-                onClick={() => handleComment(video)}>
-                <IoChatbubbleOutline size={18} color="#555" />
-                <span style={styles.engagementText}>
-                  {formatCount(video.comment_count)}
-                </span>
-              </button>
-
-              <button style={styles.engagementButton} onClick={() => handleShare(video)}>
-                <IoShareOutline size={18} color="#555" />
-              </button>
-            </div>
-
-            {/* Separator */}
-            <div style={styles.separator} />
-          </div>
-        ))
-        ) : (
-          <div style={styles.loadingContainer}>
-            <p style={styles.loadingText}>No videos found</p>
+      <div
+        ref={containerRef}
+        style={{
+          ...styles.container,
+          ...styles.fullscreenContainer,
+        }}
+      >
+        {/* Fixed Header - only show in single video mode */}
+        {id && (
+          <div style={styles.fixedHeader}>
+            <button style={styles.backButton} onClick={() => router.back()}>
+              <IoArrowBack size={24} color="#fff" />
+            </button>
+            <h2 style={styles.headerTitle}>Video</h2>
+            <div style={{ width: 24 }} />
           </div>
         )}
-      </div>
 
-      {/* Floating Action Button 
+        {/* Videos Grid */}
+        <div
+          style={{
+            ...styles.content,
+            ...styles.fullscreenContent,
+            paddingTop: "0",
+          }}
+        >
+          {loading ? (
+            <div style={styles.loadingContainer}>
+              <div style={styles.spinner}></div>
+              <p style={styles.loadingText}>Loading videos...</p>
+            </div>
+          ) : videos.length > 0 ? (
+            videos.map((video, index) => (
+              <div
+                key={video.id}
+                style={{
+                  ...styles.videoCard,
+                  ...styles.fullscreenVideoCard,
+                }}
+              >
+                {/* Video Header */}
+                <div style={styles.videoHeader}>
+                  <div style={styles.userInfo}>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenUserProfile(video)}
+                      style={styles.avatarButton}
+                      aria-label="Open user profile"
+                    >
+                      <img
+                        src={
+                          video.profiles?.avatar_url ||
+                          video.user?.avatar_url ||
+                          "/avatar.jpg"
+                        }
+                        alt={
+                          video.profiles?.full_name ||
+                          video.user?.full_name ||
+                          "User"
+                        }
+                        style={styles.avatar}
+                      />
+                    </button>
+                    <div>
+                      <div
+                        style={styles.usernameRow}
+                        onClick={() => handleOpenUserProfile(video)}
+                      >
+                        <span style={styles.username}>
+                          {video.profiles?.full_name ||
+                            video.user?.full_name ||
+                            "Unknown"}
+                        </span>
+                        {(video.profiles?.is_verified ||
+                          video.user?.is_verified) && (
+                          <VerificationBadge size={16} />
+                        )}
+                      </div>
+                      <span style={styles.time}>
+                        {getTimeAgo(video.created_at)}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    style={styles.menuButton}
+                    onClick={() =>
+                      setShowMenu(showMenu === video.id ? null : video.id)
+                    }
+                  >
+                    <IoEllipsisHorizontal size={20} color="#555" />
+                  </button>
+                  {showMenu === video.id && (
+                    <div style={styles.menuDropdown}>
+                      <button style={styles.menuItem}>Report</button>
+                      <button style={styles.menuItem}>Block User</button>
+                    </div>
+                  )}
+                </div>
+
+                {(() => {
+                  const titleMeta = getDisplayTitle(video);
+                  const isExpanded = !!expandedDescriptions[video.id];
+                  const displayText = isExpanded ? (video.title || video.description || video.content || "").trim() : titleMeta.text;
+
+                  if (!displayText) return null;
+
+                  return (
+                    <div style={styles.descriptionWrap}>
+                      <p style={styles.description}>{displayText}</p>
+                      {titleMeta.isLong && (
+                        <button
+                          type="button"
+                          style={styles.descriptionToggle}
+                          onClick={() =>
+                            setExpandedDescriptions((prev) => ({
+                              ...prev,
+                              [video.id]: !isExpanded,
+                            }))
+                          }
+                        >
+                          {isExpanded ? "see less" : "see more"}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* Video Player */}
+                <div
+                  style={{
+                    ...styles.thumbnailContainer,
+                    ...styles.fullscreenThumbnailContainer,
+                  }}
+                >
+                  {video.video_url && video.video_url.trim() ? (
+                    <video
+                      src={video.video_url}
+                      poster={video.thumbnail_url || undefined}
+                      style={styles.thumbnail}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      autoPlay={Boolean(id) && index === currentIndex}
+                      muted={Boolean(id)}
+                      loop={Boolean(id)}
+                    />
+                  ) : video.thumbnail_url ? (
+                    <img
+                      src={video.thumbnail_url}
+                      alt={video.title}
+                      style={styles.thumbnail}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        ...styles.thumbnail,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#1a1a1a",
+                      }}
+                    >
+                      <IoVideocam size={48} color="#444" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Engagement Row */}
+                <div style={styles.engagementRow}>
+                  <button
+                    style={styles.engagementButton}
+                    onClick={() => toggleLike(video.id)}
+                  >
+                    {likedVideos.has(video.id) ? (
+                      <FaHeart size={18} color="#FF2D78" />
+                    ) : (
+                      <FaRegHeart size={18} color="#9f9f9f" />
+                    )}
+                    <span
+                      style={{
+                        ...styles.engagementText,
+                        color: likedVideos.has(video.id)
+                          ? "#9f9f9f"
+                          : "#9f9f9f",
+                      }}
+                    >
+                      {formatCount(video.like_count || 0)}
+                    </span>
+                  </button>
+
+                  <button style={styles.engagementButton}>
+                    <MdAnalytics size={18} color="#9f9f9f" />
+                    <span style={styles.engagementText}>
+                      {formatCount(video.view_count)}
+                    </span>
+                  </button>
+
+                  <button
+                    style={styles.engagementButton}
+                    onClick={() => handleComment(video)}
+                  >
+                    <IoChatbubbleOutline size={18} color="#9f9f9f" />
+                    <span style={styles.engagementText}>
+                      {formatCount(video.comment_count)}
+                    </span>
+                  </button>
+
+                  <button
+                    style={styles.engagementButton}
+                    onClick={() => handleShare(video)}
+                  >
+                    <IoShareSocialOutline size={18} color="#9f9f9f" />
+                  </button>
+                </div>
+
+                {/* Separator */}
+                <div style={styles.separator} />
+              </div>
+            ))
+          ) : (
+            <div style={styles.loadingContainer}>
+              <p style={styles.loadingText}>No videos found</p>
+            </div>
+          )}
+        </div>
+
+        {/* Floating Action Button 
       <button style={styles.fab}>
         <span style={styles.fabText}>+</span>
       </button> */}
 
-      {/* Comment Modal */}
-      {selectedVideo && (
-        <CommentModal
-          visible={commentModalVisible}
-          onClose={() => {
-            setCommentModalVisible(false);
-            setSelectedVideo(null);
-          }}
-          contentId={selectedVideo.id}
-          contentType="video"
-          onCommentAdded={() => {
-            setVideos(videos.map(v => 
-              v.id === selectedVideo.id 
-                ? { ...v, comment_count: (v.comment_count || 0) + 1 }
-                : v
-            ));
-          }}
-        />
-      )}
+        {/* Comment Modal */}
+        {selectedVideo && (
+          <CommentModal
+            visible={commentModalVisible}
+            onClose={() => {
+              setCommentModalVisible(false);
+              setSelectedVideo(null);
+            }}
+            contentId={selectedVideo.id}
+            contentType="video"
+            onCommentAdded={() => {
+              setVideos(
+                videos.map((v) =>
+                  v.id === selectedVideo.id
+                    ? { ...v, comment_count: (v.comment_count || 0) + 1 }
+                    : v,
+                ),
+              );
+            }}
+          />
+        )}
 
-      {/* Share Modal */}
-      {selectedVideo && (
-        <SharePostModal
-          visible={shareModalVisible}
-          onClose={() => {
-            setShareModalVisible(false);
-            setSelectedVideo(null);
-          }}
-          postId={selectedVideo.id}
-          postType="video"
-          title={selectedVideo.title}
-          description={selectedVideo.description}
-          imageUrl={selectedVideo.thumbnail_url}
-          postUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/post/${selectedVideo.id}`}
-        />
-      )}
-    </div>
+        {/* Share Modal */}
+        {selectedVideo && (
+          <SharePostModal
+            visible={shareModalVisible}
+            onClose={() => {
+              setShareModalVisible(false);
+              setSelectedVideo(null);
+            }}
+            postId={selectedVideo.id}
+            postType="video"
+            title={selectedVideo.title}
+            description={selectedVideo.description}
+            imageUrl={selectedVideo.thumbnail_url}
+            postUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/post/${selectedVideo.id}`}
+          />
+        )}
+      </div>
     </>
   );
 }
@@ -682,11 +780,11 @@ const styles = {
   },
   fullscreenVideoCard: {
     minHeight: "100vh",
-    height: "100vh",
+    height: "auto",
     marginBottom: 0,
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     padding: "20px 20px 20px",
     maxWidth: "600px",
     margin: "0 auto",
@@ -703,16 +801,30 @@ const styles = {
     alignItems: "center",
     gap: "12px",
   },
+  avatarButton: {
+    background: "none",
+    border: "none",
+    padding: 0,
+    margin: 0,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    outline: "none",
+    boxShadow: "none",
+  },
   avatar: {
     width: "40px",
     height: "40px",
     borderRadius: "50%",
     objectFit: "cover",
+    display: "block",
   },
   usernameRow: {
     display: "flex",
     alignItems: "center",
     gap: "6px",
+    cursor: "pointer",
   },
   username: {
     fontWeight: "500",
@@ -731,6 +843,8 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    outline: "none",
+    boxShadow: "none",
   },
   menuDropdown: {
     position: "absolute",
@@ -803,11 +917,32 @@ const styles = {
     justifyContent: "center",
     transition: "all 0.2s ease",
   },
+  descriptionWrap: {
+    marginBottom: "16px",
+    width: "100%",
+  },
   description: {
     fontSize: "15px",
     color: "#ccc",
-    lineHeight: "1.5",
-    marginBottom: "16px",
+    lineHeight: "1.7",
+    margin: 0,
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    overflowWrap: "anywhere",
+  },
+  descriptionToggle: {
+    marginTop: "8px",
+    background: "none",
+    border: "none",
+    color: "#00BFFF",
+    padding: 0,
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    fontFamily: "'Instrument Sans', sans-serif",
+    textAlign: "left",
+    outline: "none",
+    boxShadow: "none",
   },
   engagementRow: {
     display: "flex",

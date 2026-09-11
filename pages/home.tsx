@@ -2,9 +2,9 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import { 
-  IoThumbsUpOutline, 
-  IoThumbsUp, 
+import {
+  IoThumbsUpOutline,
+  IoThumbsUp,
   IoShareSocialOutline,
   IoBookmarkOutline,
   IoSearchOutline,
@@ -14,8 +14,9 @@ import {
   IoMicOutline,
   IoVideocamOutline,
   IoPencilOutline,
-  IoEyeOutline
+  IoEyeOutline,
 } from "react-icons/io5";
+import { FaRegHeart, FaHeart } from "react-icons/fa6";
 import { MdAnalytics, MdArrowForwardIos } from "react-icons/md";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { useRouter } from 'next/router';
@@ -23,7 +24,7 @@ import CommentModal from '../components/CommentModal';
 import SharePostModal from '../components/SharePostModal.web';
 import MetaTags from '../components/MetaTags';
 import VerificationBadge from '../components/VerificationBadge';
-import { getAllPosts, toggleLike as apiToggleLike, getUserLikeStatusBatch, toggleBookmark as apiToggleBookmark, getUserBookmarkStatusBatch, trackShare } from '../components/api';
+import { getAllPosts, toggleLike as apiToggleLike, getUserLikeStatusBatch, getLikeCount, toggleBookmark as apiToggleBookmark, getUserBookmarkStatusBatch, trackShare } from '../components/api';
 import { supabase } from '../components/supabase';
 import PodcastPost from "./podcastpost";
 import { stat } from "fs";
@@ -141,6 +142,7 @@ function Home() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [userAvatar, setUserAvatar] = useState('/avatar.jpg');
+  const [expandedVideoTitles, setExpandedVideoTitles] = useState({});
   const router = useRouter();
 
   useEffect(() => {
@@ -217,9 +219,21 @@ function Home() {
       setLoading(true);
 
       const rawPosts = await getAllPosts(80);
+      const items = (rawPosts || []).map((p) => ({ id: p.id, type: p.type }));
 
+      const [likeStatuses, likeCounts, bookmarkStatuses] = await Promise.all([
+        getUserLikeStatusBatch(items),
+        items.length > 0 ? Promise.all(items.map(async (item) => [
+          `${item.id}_${item.type}`,
+          await getLikeCount(item.id, item.type),
+        ])) : Promise.resolve([]),
+        getUserBookmarkStatusBatch(items),
+      ]);
+
+      const countsByKey = Object.fromEntries(likeCounts || []);
       const allPosts = (rawPosts || []).map((item) => ({
         ...item,
+        like_count: countsByKey[`${item.id}_${item.type}`] ?? Number(item.like_count || 0),
         time: new Date(item.created_at).toLocaleTimeString('en-US', {
           hour: 'numeric', minute: '2-digit', hour12: true,
         }),
@@ -228,11 +242,6 @@ function Home() {
       setPosts(allPosts);
 
       if (allPosts.length > 0) {
-        const items = allPosts.map((p) => ({ id: p.id, type: p.type }));
-        const [likeStatuses, bookmarkStatuses] = await Promise.all([
-          getUserLikeStatusBatch(items),
-          getUserBookmarkStatusBatch(items),
-        ]);
         const liked = new Set(
           Object.entries(likeStatuses).filter(([, v]) => v).map(([k]) => k.split('_')[0])
         );
@@ -250,10 +259,35 @@ function Home() {
   };
 
   const handleToggleLike = async (postId, postType) => {
-    const nowLiked = !likedPosts.has(postId);
-    setLikedPosts((prev) => { const s = new Set(prev); nowLiked ? s.add(postId) : s.delete(postId); return s; });
-    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, like_count: (p.like_count || 0) + (nowLiked ? 1 : -1) } : p));
-    await apiToggleLike(postId, postType || 'article').catch(console.error);
+    const isCurrentlyLiked = likedPosts.has(postId);
+    const nextLiked = !isCurrentlyLiked;
+
+    setLikedPosts((prev) => {
+      const s = new Set(prev);
+      if (nextLiked) s.add(postId);
+      else s.delete(postId);
+      return s;
+    });
+
+    setPosts((prev) => prev.map((p) => {
+      if (p.id !== postId) return p;
+      const currentCount = Number(p.like_count || 0);
+      return {
+        ...p,
+        like_count: Math.max(currentCount + (nextLiked ? 1 : -1), 0),
+      };
+    }));
+
+    const wasToggled = await apiToggleLike(postId, postType || 'article').catch(console.error);
+    const latestCount = await getLikeCount(postId, postType || 'article');
+
+    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, like_count: latestCount } : p));
+    setLikedPosts((prev) => {
+      const s = new Set(prev);
+      if (wasToggled) s.add(postId);
+      else s.delete(postId);
+      return s;
+    });
   };
 
   const handleToggleBookmark = async (postId, postType) => {
@@ -272,6 +306,17 @@ function Home() {
     setCommentModalVisible(true);
   };
 
+  const getVideoTitlePreview = (titleText) => {
+    const text = String(titleText || "").trim();
+    if (!text) return { text: "", isLong: false };
+    if (text.length <= 150) return { text, isLong: false };
+
+    return {
+      text: `${text.slice(0, 150).trim()}...`,
+      isLong: true,
+    };
+  };
+
   const renderPost = (item) => {
     const userName = item.profiles?.full_name || item.user;
     const userAvatar = item.profiles?.avatar_url || "/avatar.jpg";
@@ -280,6 +325,10 @@ function Home() {
     const videoUrl = item.video_url || item.video;
     const videoThumbnail = item.thumbnail_url;
     const postContent = item.content || item.description || "";
+    const videoTitleText = item.title || item.description || item.content || "";
+    const videoTitleMeta = getVideoTitlePreview(videoTitleText);
+    const isVideoTitleExpanded = !!expandedVideoTitles[item.id];
+    const displayVideoTitle = isVideoTitleExpanded ? videoTitleText : videoTitleMeta.text;
 
     const getTruncatedContent = (text, maxWords) => {
       const words = text.trim().split(/\s+/).filter((word) => word.length > 0);
@@ -304,15 +353,16 @@ function Home() {
       <div key={item.id} style={styles.postContainer}>
         {/* Post Header */}
         <div style={styles.postHeader}>
-          <img src={userAvatar} alt="Avatar" style={{ ...styles.avatar, cursor: "pointer" }}
-          onClick={() => navigateToUserProfile(item.user_id)}
+          <img
+            src={userAvatar}
+            alt="Avatar"
+            style={{ ...styles.avatar, cursor: "pointer" }}
+            onClick={() => navigateToUserProfile(item.user_id)}
           />
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={styles.username}>{userName}</span>
-              {item.profiles?.is_verified && (
-                <VerificationBadge size={14} />
-              )}
+              {item.profiles?.is_verified && <VerificationBadge size={14} />}
             </div>
             <span style={styles.time}>{postTime}</span>
           </div>
@@ -321,71 +371,105 @@ function Home() {
               size={16}
               color="#888"
               style={{ cursor: "pointer" }}
-              onClick={() => setShowReportMenu(showReportMenu === item.id ? null : item.id)}
+              onClick={() =>
+                setShowReportMenu(showReportMenu === item.id ? null : item.id)
+              }
             />
           </div>
         </div>
 
-        {/* Post Title (for article/podcast) */}
-        {item.type !== "verse" && (
-          <h3 style={styles.postTitle}>{item.title}</h3>
-        )}
-
         {/* Article Content */}
         {item.type === "article" && (
-
-            <div style={{ cursor: "pointer" }} 
-             onClick={ () => router.push(`/post/${item.id}`) }
-        
-             >
-              <div style={styles.rowContent}>
-                <p style={styles.postText}>{displayContent}</p>
-                {postImage && (
-                  <img src={postImage} alt="Post" style={styles.thumbnail} />
-                )}
-              </div>
+          <div
+            style={{ cursor: "pointer" }}
+            onClick={() => router.push(`/post/${item.id}`)}
+          >
+            <div style={styles.rowContent}>
+              <p style={styles.postText}>{displayContent}</p>
+              {postImage && (
+                <img src={postImage} alt="Post" style={styles.thumbnail} />
+              )}
             </div>
-       
+          </div>
         )}
 
         {/* Video Content */}
         {item.type === "video" && (
           <div style={styles.fullWidthVideoWrapper}>
             <div style={{ cursor: "pointer", position: "relative" }}>
-              <div style={styles.videoWrapper}
-               onClick={ () => router.push(`/post/${item.id}`) }
+              {displayVideoTitle && (
+                <div style={styles.videoDescription}>
+                  <p
+                    style={{
+                      ...styles.videoDescriptionText,
+                      lineHeight: item.line_height || "1.7",
+                      letterSpacing: item.letter_spacing || "0.2px",
+                    }}
+                  >
+                    {displayVideoTitle}
+                  </p>
+                  {videoTitleMeta.isLong && (
+                    <button
+                      type="button"
+                      style={styles.videoTitleToggle}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedVideoTitles((prev) => ({
+                          ...prev,
+                          [item.id]: !isVideoTitleExpanded,
+                        }));
+                      }}
+                    >
+                      {isVideoTitleExpanded ? "see less" : "see more"}
+                    </button>
+                  )}
+                </div>
+              )}
+              <div
+                style={styles.videoWrapper}
+                onClick={() => router.push(`/post/${item.id}`)}
               >
                 {videoThumbnail && (
-                  <img src={videoThumbnail} alt="Video" style={styles.videoPlayer} 
-                 
+                  <img
+                    src={videoThumbnail}
+                    alt="Video"
+                    style={styles.videoPlayer}
                   />
                 )}
                 <div style={styles.videoOverlay}>
                   <IoPlayCircle size={50} color="rgba(255, 255, 255, 0.9)" />
                 </div>
                 <div style={styles.muteIndicator}>
-                  <IoVolumeMuteOutline size={16} color="rgba(255, 255, 255, 0.8)" />
+                  <IoVolumeMuteOutline
+                    size={16}
+                    color="rgba(255, 255, 255, 0.8)"
+                  />
                 </div>
               </div>
-              {displayContent && (
-                <div style={styles.videoDescription}>
-                  <p style={styles.videoDescriptionText}>{displayContent}</p>
-                </div>
-              )}
             </div>
           </div>
         )}
 
         {/* Podcast Content */}
-        {item.type === "podcast" && ( 
+        {item.type === "podcast" && (
           <div>
-            <p style={{ ...styles.postText, marginTop: "12px", marginLeft: 0, marginBottom: "12px" }}>
+            <p
+              style={{
+                ...styles.postText,
+                marginTop: "12px",
+                marginLeft: 0,
+                marginBottom: "12px",
+              }}
+            >
               {displayContent}
             </p>
             <div style={{ cursor: "pointer" }}>
               {postImage && (
-                <img src={postImage} alt="Podcast" style={styles.thumbnail} 
-                onClick={ () => router.push(`/post/${item.id}`) }
+                <img
+                  src={postImage}
+                  alt="Podcast"
+                  style={styles.thumbnail}
+                  onClick={() => router.push(`/post/${item.id}`)}
                 />
               )}
             </div>
@@ -394,7 +478,10 @@ function Home() {
 
         {/* Verse Content */}
         {item.type === "verse" && (
-          <div style={{ ...styles.verseContainer, cursor: "pointer" }} onClick={() => router.push(`/post/${item.id}`)}>
+          <div
+            style={{ ...styles.verseContainer, cursor: "pointer" }}
+            onClick={() => router.push(`/post/${item.id}`)}
+          >
             <p style={styles.verseText}>{item.content}</p>
             {item.image_url && (
               <img src={item.image_url} alt="Verse" style={styles.verseImage} />
@@ -405,13 +492,18 @@ function Home() {
         {/* Icon Row */}
         <div style={styles.iconRow}>
           <div
-            style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              cursor: "pointer",
+            }}
             onClick={() => handleToggleLike(item.id, item.type)}
           >
             {likedPosts.has(item.id) ? (
-              <IoThumbsUp size={18} color="#00BFFF" />
+              <FaHeart size={18} color="#FF2D78" />
             ) : (
-              <IoThumbsUpOutline size={18} color="#888" />
+              <FaRegHeart size={18} color="#888" />
             )}
             <span style={styles.iconText}>{item.like_count || 0}</span>
           </div>
@@ -421,14 +513,27 @@ function Home() {
             <span style={styles.iconText}>{item.view_count || 0}</span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}
-            onClick={() => handleComment(item)}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              cursor: "pointer",
+            }}
+            onClick={() => handleComment(item)}
+          >
             <IoChatbubbleOutline size={18} color="#888" />
             <span style={styles.iconText}>{item.comment_count || 0}</span>
           </div>
 
-          <div style={{ cursor: "pointer" }} onClick={() => handleToggleBookmark(item.id, item.type)}>
-            <IoBookmarkOutline size={18} color={bookmarkedPosts.has(item.id) ? "#00BFFF" : "#888"} />
+          <div
+            style={{ cursor: "pointer" }}
+            onClick={() => handleToggleBookmark(item.id, item.type)}
+          >
+            <IoBookmarkOutline
+              size={18}
+              color={bookmarkedPosts.has(item.id) ? "#00BFFF" : "#888"}
+            />
           </div>
 
           <div style={{ cursor: "pointer" }} onClick={() => handleShare(item)}>
@@ -446,18 +551,24 @@ function Home() {
 
           {/* Action Button */}
           {item.type === "article" && (
-            <div style={styles.readMoreCircle} onClick={() => router.push(`/post/${item.id}`)}>
+            <div
+              style={styles.readMoreCircle}
+              onClick={() => router.push(`/post/${item.id}`)}
+            >
               <MdArrowForwardIos size={14} color="#00BFFF" />
             </div>
           )}
           {item.type === "video" && (
-            <div style={{ ...styles.readMoreCircle, borderColor: "#FF6347" }}
-              onClick={() => router.push(`/Reels?id=${item.id}`)}>
+            <div
+              style={{ ...styles.readMoreCircle, borderColor: "#FF6347" }}
+              onClick={() => router.push(`/Reels?id=${item.id}`)}
+            >
               <IoPlayCircle size={14} color="#FF6347" />
             </div>
           )}
           {item.type === "podcast" && (
-            <div style={{ ...styles.readMoreCircle, borderColor: "#32CD32" }}
+            <div
+              style={{ ...styles.readMoreCircle, borderColor: "#32CD32" }}
               onClick={() => router.push(`/podcastpost?id=${item.id}`)}
             >
               <IoMicOutline size={14} color="#32CD32" />
@@ -865,11 +976,31 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: "12px",
     paddingLeft: "20px",
     paddingRight: "20px",
+    width: "100%",
   },
   videoDescriptionText: {
     fontSize: "15px",
     color: "#555",
     fontFamily: "'Instrument Sans', sans-serif",
+    margin: 0,
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    overflowWrap: "anywhere",
+  },
+  videoTitleToggle: {
+    marginTop: "8px",
+    background: "none",
+    border: "none",
+    color: "#00BFFF",
+    padding: 0,
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    fontFamily: "'Instrument Sans', sans-serif",
+    textAlign: "left",
+    outline: "none",
+    boxShadow: "none",
+    WebkitTapHighlightColor: "transparent",
   },
   rowContent: {
     display: "flex",

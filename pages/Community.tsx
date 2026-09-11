@@ -16,8 +16,8 @@ import {
   IoShareOutline,
   IoAddOutline,
 } from "react-icons/io5";
+import { FaRegHeart, FaHeart } from "react-icons/fa6";
 import { MdAnalytics } from "react-icons/md";
-
 
 
 const categories = [
@@ -293,9 +293,9 @@ function Community() {
                   onClick={() => toggleLike(community.id)}
                 >
                   {likedCommunities.has(community.id) ? (
-                    <IoThumbsUp size={18} color="#00BFFF" />
-                  ) : (
-                    <IoThumbsUpOutline size={18} color="#999" />
+                     <FaHeart size={18} color="#FF2D78" />
+                        ) : (
+                     <FaRegHeart size={18} color="#888" />
                   )}
                   <span
                     style={{

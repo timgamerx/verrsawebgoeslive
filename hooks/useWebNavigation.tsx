@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
 
 import { Platform } from '../lib/reactNativeShim';
 interface UseWebRefreshOptions {
@@ -127,6 +127,97 @@ export const useWebRefreshShortcuts = (onRefresh: () => void) => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [onRefresh]);
+};
+
+export const useTabPageRefresh = ({
+  onRefresh,
+  onBackgroundRefresh,
+  scrollRef,
+  refreshThreshold = 72,
+}: {
+  onRefresh?: () => Promise<void> | void;
+  onBackgroundRefresh?: () => Promise<void> | void;
+  scrollRef?: React.RefObject<HTMLElement | null>;
+  refreshThreshold?: number;
+}) => {
+  const isRefreshingRef = useRef(false);
+
+  const triggerRefresh = useCallback(
+    async (background = false) => {
+      if (isRefreshingRef.current) return;
+      isRefreshingRef.current = true;
+      try {
+        if (background) {
+          await onBackgroundRefresh?.();
+        } else {
+          await onRefresh?.();
+        }
+      } finally {
+        isRefreshingRef.current = false;
+      }
+    },
+    [onBackgroundRefresh, onRefresh],
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        triggerRefresh(true);
+      }
+    };
+
+    const handleWindowFocus = () => {
+      triggerRefresh(true);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleWindowFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, [triggerRefresh]);
+
+  useEffect(() => {
+    if (!scrollRef?.current || typeof window === "undefined") return;
+
+    const element = scrollRef.current;
+    let startY: number | null = null;
+
+    const handleTouchStart = (event: TouchEvent) => {
+      if (element.scrollTop <= 0) {
+        startY = event.touches[0]?.clientY ?? null;
+      }
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (startY === null || element.scrollTop > 0) return;
+      const deltaY = (event.touches[0]?.clientY ?? 0) - startY;
+      if (deltaY > refreshThreshold) {
+        triggerRefresh(false);
+        startY = null;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      startY = null;
+    };
+
+    element.addEventListener("touchstart", handleTouchStart, { passive: true });
+    element.addEventListener("touchmove", handleTouchMove, { passive: true });
+    element.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    return () => {
+      element.removeEventListener("touchstart", handleTouchStart);
+      element.removeEventListener("touchmove", handleTouchMove);
+      element.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [refreshThreshold, scrollRef, triggerRefresh]);
+
+  return { refresh: triggerRefresh };
 };
 
 /**

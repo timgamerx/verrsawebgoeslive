@@ -17,6 +17,7 @@ import {
   IoCheckmark,
   IoWalletOutline,
 } from "react-icons/io5";
+import { FaRegHeart, FaHeart } from "react-icons/fa6";
 import { MdAnalytics, MdMoreVert, MdBlock } from "react-icons/md";
 import {
   FiMessageCircle,
@@ -35,6 +36,7 @@ import { HiDotsHorizontal } from "react-icons/hi";
 import MetaTags from '../../components/MetaTags';
 import VerificationBadge from '../../components/VerificationBadge';
 import { supabase } from '../../components/supabase';
+import { getUserLikeStatusBatch, getLikeCount, toggleLike as apiToggleLike } from '../../components/api';
 import { getActiveModerationExclusions } from '../../lib/moderationExclusions';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.verrsa.org';
@@ -102,6 +104,7 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
   const [showHeaderMenu, setShowHeaderMenu] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [expandedVideoTitles, setExpandedVideoTitles] = useState({});
 
   // Deep link: redirect mobile users to the native app
   useEffect(() => {
@@ -222,6 +225,40 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
   };
 
   // ── Posts ─────────────────────────────────────────────────────────────────
+  const syncProfilePostLikes = async (postsList = []) => {
+    if (!postsList.length) {
+      setLikedPosts(new Set());
+      return;
+    }
+
+    const items = postsList.map((post) => ({
+      id: post.id,
+      type: post.post_type || post.type,
+    }));
+
+    const [likeStatuses, likeCounts] = await Promise.all([
+      getUserLikeStatusBatch(items),
+      Promise.all(items.map(async (item) => [
+        `${item.id}_${item.type}`,
+        await getLikeCount(item.id, item.type),
+      ])),
+    ]);
+
+    const liked = new Set(
+      Object.entries(likeStatuses || {}).filter(([, value]) => value).map(([key]) => key.split('_')[0])
+    );
+    const countsByKey = Object.fromEntries(likeCounts || []);
+
+    setLikedPosts(liked);
+    setUserPosts((prev) => prev.map((post) => {
+      const key = `${post.id}_${post.post_type || post.type}`;
+      return {
+        ...post,
+        like_count: countsByKey[key] ?? Number(post.like_count || 0),
+      };
+    }));
+  };
+
   const fetchUserPosts = async () => {
     setLoadingPosts(true);
     setPostsError(null);
@@ -242,19 +279,22 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
 
     if (error) {
       setPostsError("Failed to load posts");
-    } else {
-      setUserPosts(
-        (data || [])
-          .filter((p) => {
-            const key = `${p.id}_${p.post_type}`;
-            return (
-              !excludedUserIds.has(String(p.user_id || "")) &&
-              !excludedPostKeys.has(key)
-            );
-          })
-          .map((p) => ({ ...p, type: p.post_type })),
-      );
+      setLoadingPosts(false);
+      return;
     }
+
+    const filteredPosts = (data || [])
+      .filter((p) => {
+        const key = `${p.id}_${p.post_type}`;
+        return (
+          !excludedUserIds.has(String(p.user_id || "")) &&
+          !excludedPostKeys.has(key)
+        );
+      })
+      .map((p) => ({ ...p, type: p.post_type }));
+
+    setUserPosts(filteredPosts);
+    await syncProfilePostLikes(filteredPosts);
     setLoadingPosts(false);
   };
 
@@ -356,16 +396,36 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
   // ── Like toggle ───────────────────────────────────────────────────────────
   const handleToggleLike = async (postId, postType) => {
     const isLiked = likedPosts.has(postId);
+    const nextLiked = !isLiked;
+
     setLikedPosts((prev) => {
       const s = new Set(prev);
-      isLiked ? s.delete(postId) : s.add(postId);
+      if (nextLiked) s.add(postId);
+      else s.delete(postId);
       return s;
     });
+
     setUserPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId ? { ...p, like_count: (p.like_count || 0) + (isLiked ? -1 : 1) } : p
-      )
+      prev.map((p) => {
+        if (p.id !== postId) return p;
+        const currentCount = Number(p.like_count || 0);
+        return { ...p, like_count: Math.max(currentCount + (nextLiked ? 1 : -1), 0) };
+      })
     );
+
+    const toggled = await apiToggleLike(postId, postType || 'article').catch(console.error);
+    const latestCount = await getLikeCount(postId, postType || 'article');
+
+    setUserPosts((prev) =>
+      prev.map((p) => p.id === postId ? { ...p, like_count: latestCount } : p)
+    );
+
+    setLikedPosts((prev) => {
+      const s = new Set(prev);
+      if (toggled) s.add(postId);
+      else s.delete(postId);
+      return s;
+    });
   };
 
   // ── Report ────────────────────────────────────────────────────────────────
@@ -442,15 +502,27 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
     return parts.length <= words ? stripped : parts.slice(0, words).join(" ") + "...";
   };
 
+  const getVideoTitlePreview = (titleText) => {
+    const text = String(titleText || "").trim();
+    if (!text) return { text: "", isLong: false };
+    if (text.length <= 150) return { text, isLong: false };
+
+    return {
+      text: `${text.slice(0, 150).trim()}...`,
+      isLong: true,
+    };
+  };
+
   // ── Render post ───────────────────────────────────────────────────────────
   const renderPost = (item) => {
     const userName = item.profiles?.full_name || profile?.full_name || "Creator";
     const userAvatar = item.profiles?.avatar_url || profile?.avatar_url || "/avatar.jpg";
     const likeCount = item.like_count || 0;
     const commentCount = item.comment_count || item.comments || 0;
-
-
- 
+    const videoTitleText = item.title || item.description || item.content || "";
+    const videoTitleMeta = getVideoTitlePreview(videoTitleText);
+    const isVideoTitleExpanded = !!expandedVideoTitles[item.id];
+    const displayVideoTitle = isVideoTitleExpanded ? videoTitleText : videoTitleMeta.text;
 
     return (
       <div key={item.id} style={styles.postCard}>
@@ -516,16 +588,6 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
           </div>
         </div>
 
-        {/* Title */}
-        {item.type !== "verse" && item.title && (
-          <h3 style={styles.postTitle}>
-            {item.title
-              .replace(/\*\*(.+?)\*\*/g, "$1")
-              .replace(/\*(.+?)\*/g, "$1")
-              .replace(/[*_]/g, "")}
-          </h3>
-        )}
-
         {/* Article */}
         {item.type === "article" && (
           <div style={{ marginBottom: "12px", cursor: "pointer" }} onClick={() => router.push(`/post/${item.id}`)}>
@@ -540,6 +602,33 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
         {/* Video */}
         {item.type === "video" && (
           <div style={styles.fullWidthVideo}>
+            {displayVideoTitle && (
+              <div style={styles.videoDescriptionWrap}>
+                <p
+                  style={{
+                    ...styles.videoDescriptionText,
+                    lineHeight: item.line_height || "1.7",
+                    letterSpacing: item.letter_spacing || "0.2px",
+                  }}
+                >
+                  {displayVideoTitle}
+                </p>
+                {videoTitleMeta.isLong && (
+                  <button
+                    type="button"
+                    style={styles.videoDescriptionToggle}
+                    onClick={() =>
+                      setExpandedVideoTitles((prev) => ({
+                        ...prev,
+                        [item.id]: !isVideoTitleExpanded,
+                      }))
+                    }
+                  >
+                    {isVideoTitleExpanded ? "see less" : "see more"}
+                  </button>
+                )}
+              </div>
+            )}
             <VideoPost videoUrl={item.video_url || item.video} thumbnailUrl={item.thumbnail_url} />
           </div>
         )}
@@ -568,9 +657,9 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
         <div style={styles.iconRow}>
           <button style={styles.iconButton} onClick={() => handleToggleLike(item.id, item.type)}>
             {likedPosts.has(item.id) ? (
-              <IoThumbsUp size={18} color="#00BFFF" />
-            ) : (
-              <IoThumbsUpOutline size={18} color="#666" />
+               <FaHeart size={18} color="#FF2D78" />
+                  ) : (
+               <FaRegHeart size={18} color="#888" />
             )}
           </button>
           <span style={styles.countText}>{likeCount}</span>
@@ -1282,6 +1371,36 @@ const styles: Record<string, React.CSSProperties> = {
     marginRight: "-16px",
     marginBottom: "12px",
   },
+  videoDescriptionWrap: {
+    marginTop: "12px",
+    paddingLeft: "16px",
+    paddingRight: "16px",
+    width: "100%",
+  },
+  videoDescriptionText: {
+    margin: 0,
+    color: "#444",
+    fontSize: "15px",
+    fontFamily: "'Instrument Sans', sans-serif",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    overflowWrap: "anywhere",
+  },
+  videoDescriptionToggle: {
+    marginTop: "8px",
+    background: "none",
+    border: "none",
+    color: "#00BFFF",
+    padding: 0,
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    fontFamily: "'Instrument Sans', sans-serif",
+    textAlign: "left",
+    outline: "none",
+    boxShadow: "none",
+    WebkitTapHighlightColor: "transparent",
+  },
   videoWrapper: {
     position: "relative",
     width: "100%",
@@ -1347,10 +1466,13 @@ const styles: Record<string, React.CSSProperties> = {
   iconButton: {
     background: "none",
     border: "none",
+    outline: "none",
+    boxShadow: "none",
     cursor: "pointer",
     padding: "4px",
     display: "flex",
     alignItems: "center",
+    WebkitTapHighlightColor: "transparent",
   },
   countText: {
     fontSize: "15px",

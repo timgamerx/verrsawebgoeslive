@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import {
   IoPersonOutline,
   IoCardOutline,
@@ -19,6 +19,7 @@ import {
   IoPhonePortraitOutline,
   IoMoonOutline,
 } from "react-icons/io5";
+import { FaCoins } from "react-icons/fa";
 import { supabase, signOut } from "../components/supabase";
 import VerificationBadge from "../components/VerificationBadge";
 
@@ -64,14 +65,14 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
           const { data: profile, error } = await supabase
             .from("profiles")
             .select(
-              "full_name, avatar_url, is_verified, subscription_status, subscription_plan"
+              "full_name, avatar_url, is_verified, subscription_status, subscription_plan",
             )
             .eq("id", user.id)
             .single();
 
           if (profile && !error) {
             setUserName(
-              profile.full_name || user.email?.split("@")[0] || "Your Name"
+              profile.full_name || user.email?.split("@")[0] || "Your Name",
             );
             setUserAvatar(profile.avatar_url);
 
@@ -113,7 +114,7 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
     try {
       // Switch account logic here
       console.log(`Switching to account: ${targetAccount?.email}`);
-      
+
       // Reload page to refresh session
       setSwitchModalVisible(false);
       window.location.reload();
@@ -127,8 +128,12 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
 
   const handleAddAccount = () => {
     setSwitchModalVisible(false);
-    
-    if (window.confirm("You will be redirected to the login screen to add another account.")) {
+
+    if (
+      window.confirm(
+        "You will be redirected to the login screen to add another account.",
+      )
+    ) {
       signOut().then(() => {
         router.push("/auth");
       });
@@ -139,8 +144,14 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
     const accountToRemove = storedAccounts.find((acc) => acc.id === accountId);
     if (!accountToRemove) return;
 
-    if (window.confirm(`Are you sure you want to remove the account "${accountToRemove.email}"?`)) {
-      const updatedAccounts = storedAccounts.filter((acc) => acc.id !== accountId);
+    if (
+      window.confirm(
+        `Are you sure you want to remove the account "${accountToRemove.email}"?`,
+      )
+    ) {
+      const updatedAccounts = storedAccounts.filter(
+        (acc) => acc.id !== accountId,
+      );
       setStoredAccounts(updatedAccounts);
       localStorage.setItem("verrsa_accounts", JSON.stringify(updatedAccounts));
 
@@ -160,8 +171,20 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
   if (!embedded && !isOpen) return null;
 
   const theme = isDarkMode
-    ? { background: "#1a1a1a", text: "#fff", secondaryText: "#aaa", border: "#333", icon: "#aaa" }
-    : { background: "#fff", text: "#111", secondaryText: "#666", border: "#e8e8e8", icon: "#666" };
+    ? {
+        background: "#1a1a1a",
+        text: "#fff",
+        secondaryText: "#aaa",
+        border: "#333",
+        icon: "#aaa",
+      }
+    : {
+        background: "#fff",
+        text: "#111",
+        secondaryText: "#666",
+        border: "#e8e8e8",
+        icon: "#666",
+      };
 
   return (
     <>
@@ -203,7 +226,12 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
           backgroundColor: theme.background,
         }}
       >
-        <div style={{ ...styles.scrollContainer, ...(embedded ? { paddingTop: "24px" } : {}) }}>
+        <div
+          style={{
+            ...styles.scrollContainer,
+            ...(embedded ? { paddingTop: "24px" } : {}),
+          }}
+        >
           {/* Profile Section */}
           <div style={styles.profileSection}>
             <img
@@ -215,13 +243,13 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
               }}
             />
             <div style={{ marginLeft: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
                 <h2 style={{ ...styles.profileName, color: theme.text }}>
                   {userName}
                 </h2>
-                {isVerified && (
-                  <VerificationBadge size={16} />
-                )}
+                {isVerified && <VerificationBadge size={16} />}
               </div>
               <p style={styles.profileSubText}>My Account</p>
             </div>
@@ -297,6 +325,20 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
             <button
               style={styles.menuItem}
               onClick={() => {
+                window.alert(
+                  "VerrsaCoin\n\nVerrsaCoin is Verrsa's creator reward system. Earn coins by posting content, getting likes, comments, and shares. Redeem your coins for cash withdrawals, premium features, and exclusive boosts. Coming soon!",
+                );
+              }}
+            >
+              <FaCoins size={22} color={"#00bfff"} />
+              <span style={{ ...styles.menuText, color: theme.text }}>
+                Explore VerrsaCoin
+              </span>
+            </button>
+
+            <button
+              style={styles.menuItem}
+              onClick={() => {
                 router.push("/about");
                 safeOnClose();
               }}
@@ -359,13 +401,13 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
                   </p>
                 </div>
               </div>
-              <div 
-                className="switch" 
+              <div
+                className="switch"
                 style={styles.switch}
                 onClick={() => setFollowSystemTheme(!followSystemTheme)}
               >
-                <span 
-                  className={followSystemTheme ? "slider active" : "slider"} 
+                <span
+                  className={followSystemTheme ? "slider active" : "slider"}
                   style={styles.slider}
                 ></span>
               </div>
@@ -376,17 +418,23 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
               <div style={styles.appearanceItem}>
                 <div style={styles.appearanceLeft}>
                   <IoMoonOutline size={20} color={theme.icon} />
-                  <p style={{ ...styles.appearanceText, color: theme.text, marginLeft: "12px" }}>
+                  <p
+                    style={{
+                      ...styles.appearanceText,
+                      color: theme.text,
+                      marginLeft: "12px",
+                    }}
+                  >
                     Dark Mode
                   </p>
                 </div>
-                <div 
-                  className="switch" 
+                <div
+                  className="switch"
                   style={styles.switch}
                   onClick={() => setIsDarkMode(!isDarkMode)}
                 >
-                  <span 
-                    className={isDarkMode ? "slider active" : "slider"} 
+                  <span
+                    className={isDarkMode ? "slider active" : "slider"}
                     style={styles.slider}
                   ></span>
                 </div>
@@ -434,13 +482,17 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
                     }}
                   />
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
                       <span style={styles.accountName}>
                         {account.full_name || account.email.split("@")[0]}
                       </span>
-                      {account.is_verified && (
-                        <VerificationBadge size={14} />
-                      )}
+                      {account.is_verified && <VerificationBadge size={14} />}
                     </div>
                     <p style={styles.accountEmail}>{account.email}</p>
                   </div>
@@ -533,7 +585,6 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
           </div>
         </div>
       )}
-
     </>
   );
 }
@@ -847,7 +898,7 @@ const styles = {
   },
   appearanceSection: {
     padding: "16px 16px",
-     marginBottom: "56px",
+    marginBottom: "56px",
   },
   appearanceSectionTitle: {
     fontSize: "12px",

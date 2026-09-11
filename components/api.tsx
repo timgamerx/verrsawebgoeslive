@@ -473,6 +473,12 @@ export const toggleLike = async (
       }
     }
 
+    const { data: postRow } = await supabase.from('posts').select('like_count').eq('id', contentId).single();
+    const currentCount = Number(postRow?.like_count || 0);
+    const nextCount = Math.max(currentCount + (hasLiked ? -1 : 1), 0);
+
+    await supabase.from('posts').update({ like_count: nextCount }).eq('id', contentId);
+
     return !hasLiked;
   } catch (error) {
     console.error('Error toggling like:', error);
