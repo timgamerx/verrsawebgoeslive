@@ -297,13 +297,28 @@ export default function LandingPage() {
 
   return (
     <>
-     <Head>
+      <Head>
         <title>Verrsa - Create, Publish, Live, Earn</title>
-        <meta name="google-site-verification" content="4WnVjWEkP5-rPUKeAW_xCSrOTq3VU3c2o9kPxfNbtVk" />
-        <meta name="description" content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required." />
-        <meta property="og:title" content="Verrsa - Create, Publish, Live, Earn" />
-        <meta property="og:description" content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required." />
-        <meta property="og:image" content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png" />
+        <meta
+          name="google-site-verification"
+          content="4WnVjWEkP5-rPUKeAW_xCSrOTq3VU3c2o9kPxfNbtVk"
+        />
+        <meta
+          name="description"
+          content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required."
+        />
+        <meta
+          property="og:title"
+          content="Verrsa - Create, Publish, Live, Earn"
+        />
+        <meta
+          property="og:description"
+          content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required."
+        />
+        <meta
+          property="og:image"
+          content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
+        />
       </Head>
 
       <SEO
@@ -318,399 +333,425 @@ export default function LandingPage() {
         structuredData={{}}
       />
       <div style={styles.container}>
-  
-      <div style={styles.header}>
-        <img
-          src="/verrsa-logo.png"
-          alt="Verrsa"
-          style={styles.logo}
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = "none";
-          }}
-        />
-        <button style={styles.signInButton} onClick={() => router.push('/auth')}>
-          <span style={styles.signInButtonText}>Sign In</span>
-        </button>
-      </div>
-
-
-      <div style={styles.heroSection}>
-        <div style={styles.badge}>
-          <span style={styles.badgeText}>
-            Application is live on App Store and Playstore
-          </span>
-        </div>
-
-        <div style={styles.appStoreBadges}>
-          <a
-            href="https://apps.apple.com/us/app/verrsa/id6756518229"
-            target="_blank"
-            rel="noopener noreferrer"
+        <div style={styles.header}>
+          <img
+            src="/verrsa-logo.png"
+            alt="Verrsa"
+            style={styles.logo}
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }}
+          />
+          <button
+            style={styles.signInButton}
+            onClick={() => router.push("/auth")}
           >
-            <img
-              src="https://ik.imagekit.io/te9biwxvl/app-store.png"
-              alt="Download on App Store"
-              style={{ ...styles.appStoreBadge, marginTop: "-2px" }}
-            />
-          </a>
-          <a
-            // href="https://play.google.com/store/apps/verrsa"
-            href="https://play.google.com/store/apps/details?id=com.verrsaapp.verrsa"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-              alt="Get it on Google Play"
-              style={styles.playStoreBadge}
-            />
-          </a>
-        </div>
-
-        <h1 className="max-w-[1000px] p-15 hidden md:block" style={styles.heroDesktopTitle}>Create, Publish, Go Live, and Earn</h1>
-        <h1 className="max-w-[400px] p-15 block md:hidden" style={styles.heroTitle}>Create, Publish, Go Live, and Earn</h1>
-        <p style={styles.heroSubtitle}>
-          Verrsa is a monetization-first creator platform for emerging creators.
-          Start earning from articles, podcasts, videos and live streams without
-          needing a large audience.
-        </p>
-
-        {/* CTA Buttons */}
-        <div style={styles.ctaContainer}>
-          <button style={styles.primaryCta} onClick={() => router.push('/auth')}>
-            <span style={styles.primaryCtaText}>Get Started</span>
+            <span style={styles.signInButtonText}>Sign In</span>
           </button>
         </div>
-      </div>
 
-       {/* Features Section */}
-      <div style={styles.featuresSection}>
-        <div style={styles.sectionBadge}>
-          <span style={styles.sectionBadgeText}>FEATURES</span>
+        <div style={styles.heroSection}>
+          <div style={styles.badge}>
+            <span style={styles.badgeText}>
+              Application is live on App Store and Playstore
+            </span>
+          </div>
+
+          <div style={styles.appStoreBadges}>
+            <a
+              href="https://apps.apple.com/us/app/verrsa/id6756518229"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://ik.imagekit.io/te9biwxvl/app-store.png"
+                alt="Download on App Store"
+                style={{ ...styles.appStoreBadge, marginTop: "-2px" }}
+              />
+            </a>
+            <a
+              // href="https://play.google.com/store/apps/verrsa"
+              href="https://play.google.com/store/apps/details?id=com.verrsaapp.verrsa"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                alt="Get it on Google Play"
+                style={styles.playStoreBadge}
+              />
+            </a>
+          </div>
+
+          <h1
+            className="max-w-[1000px] p-15 hidden md:block"
+            style={styles.heroDesktopTitle}
+          >
+            Create, Publish, Go Live, and Earn
+          </h1>
+          <h1
+            className="max-w-[400px] p-15 block md:hidden"
+            style={styles.heroTitle}
+          >
+            Create, Publish, Go Live, and Earn
+          </h1>
+          <p style={styles.heroSubtitle}>
+            Verrsa is a monetization-first creator platform for emerging
+            creators. Start earning from articles, podcasts, videos and live
+            streams without needing a large audience.
+          </p>
+
+          {/* CTA Buttons */}
+          <div style={styles.ctaContainer}>
+            <button
+              style={styles.primaryCta}
+              onClick={() => router.push("/auth")}
+            >
+              <span style={styles.primaryCtaText}>Get Started</span>
+            </button>
+          </div>
         </div>
-        <h2 style={styles.sectionTitle}>Everything You Need to Succeed</h2>
-        <div style={styles.featuresScroll}>
-          {features.map((feature, idx) => (
-            <div key={idx} style={styles.featureCard}>
-              <img src={feature.img} alt={feature.title} style={styles.featureImage} />
-              <h3 style={styles.featureTitle}>{feature.title}</h3>
-              <p style={styles.featureDesc}>{feature.desc}</p>
-            </div>
-          ))}
+
+        {/* Features Section */}
+        <div style={styles.featuresSection}>
+          <div style={styles.sectionBadge}>
+            <span style={styles.sectionBadgeText}>FEATURES</span>
+          </div>
+          <h2 style={styles.sectionTitle}>Everything You Need to Succeed</h2>
+          <div style={styles.featuresScroll}>
+            {features.map((feature, idx) => (
+              <div key={idx} style={styles.featureCard}>
+                <img
+                  src={feature.img}
+                  alt={feature.title}
+                  style={styles.featureImage}
+                />
+                <h3 style={styles.featureTitle}>{feature.title}</h3>
+                <p style={styles.featureDesc}>{feature.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-    {/* Verrsa Creators */}
-      <section className="bg-white py-10 mb-4"> 
-      <h2 className="text-3xl font-extrabold text-center text-black"> 
-        Top Verrsa Creators 
-      </h2> 
-      
-      <p className="text-gray-600 p-4 text-center max-w-2xl mx-auto"> 
-        Here are some of our top creators who are making waves on Verrsa. You can be part of them with just few steps. 
-      </p> 
-      
-      <div className="container mx-auto mt-8 px-4 sm:px-6 lg:px-8"> 
-        {/* FIXED: Added grid-cols-2 for mobile, and grid-flow-row-dense so rows pack tightly */}
-        <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-row-dense gap-6"> 
-          {loadingCreators ? ( 
-            <div className="col-span-full text-center py-8 text-gray-500"> 
-              Loading creators... 
-            </div> 
-          ) : topCreators.length === 0 ? ( 
-            /* CLEANED UP: Removed accidental grid layout classes from the error text wrapper */
-            <div className="col-span-full text-center py-8 text-gray-500"> 
-              No creators found 
-            </div> 
-          ) : ( 
-            topCreators.map((creator) => ( 
-              /* FIXED: row-span-2 creates the double-row height on mobile, drops back to single row on desktop */
-              <div key={creator.id} className="bg-blue-50 p-0 rounded-lg text-center flex flex-col justify-center row-span-2 md:row-span-1"> 
-                <Image 
-                  src={creator.img} 
-                  alt={creator.name} 
-                  width={200} 
-                  height={210} 
-                  className="mx-auto mb-4 rounded-lg object-cover" 
-                /> 
-                <h3 className="text-xl font-semibold text-black mb-1"> 
-                  {creator.name} 
-                </h3> 
-                <p className="text-gray-600">
-                  {creator.field}
-                </p> 
-              </div> 
-            )) 
-          )} 
-        </div> 
-      </div> 
-    </section>
-      
+        {/* Verrsa Creators */}
+        <section className="bg-white py-10 mb-4">
+          <h2 style={styles.sectionTitle}>
+            Top Verrsa Creators
+          </h2>
 
-    
+          <p className="text-gray-600 p-4 text-center max-w-2xl mx-auto">
+            Here are some of our top creators who are making waves on Verrsa.
+            You can be part of them with just few steps.
+          </p>
 
-
-      <section className="bg-white py-10 mb-4">
-        <h2 className="text-3xl font-semibold tracking-tighter text-center text-black">
-          Trending Contents
-        </h2>
-        <p className="text-gray-600 p-4 text-center max-w-2xl mx-auto">
-          Discover the most popular and engaging content on Verrsa right now.
-          See what&apos;s capturing the attention of our community.
-        </p>
-        <div className="container mx-auto mt-8 px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {loadingTrending ? (
-              <div className="col-span-full text-center py-8 text-gray-500">
-                Loading trending contents...
-              </div>
-            ) : trendingPosts.length === 0 ? (
-              <div className="col-span-full text-center py-8 text-gray-500">
-                No trending contents found
-              </div>
-            ) : (
-              trendingPosts.map((post) => (
-                <div
-                  key={post.id}
-                  className="bg-blue-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
-                >
-                  <Image
-                    src={post.cover_image_url || post.images?.[0]?.url || post.thumbnail_url || '/hero-image.jpg'}
-                    alt={post.title}
-                    width={400}
-                    height={250}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4">
-                    <span className="text-xs text-cyan-600 font-medium">
-                      {post.category || 'General'}
-                    </span>
-                    <h3 className="text-lg font-regular tracking-tighter text-black mt-2 mb-2">
-                      {post.title || post.content}
-                    </h3>
-                    <p className="text-gray-500 text-sm">
-                      👁️ {post.view_count || 0} views
-                    </p>
-                  </div>
+          <div className="container mx-auto mt-8 px-4 sm:px-6 lg:px-8">
+            {/* FIXED: Added grid-cols-2 for mobile, and grid-flow-row-dense so rows pack tightly */}
+            <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-row-dense gap-6">
+              {loadingCreators ? (
+                <div className="col-span-full text-center py-8 text-gray-500">
+                  Loading creators...
                 </div>
-              ))
-            )}
+              ) : topCreators.length === 0 ? (
+                /* CLEANED UP: Removed accidental grid layout classes from the error text wrapper */
+                <div className="col-span-full text-center py-8 text-gray-500">
+                  No creators found
+                </div>
+              ) : (
+                topCreators.map((creator) => (
+                  /* FIXED: row-span-2 creates the double-row height on mobile, drops back to single row on desktop */
+                  <div
+                    key={creator.id}
+                    className="bg-blue-50 p-0 rounded-lg text-center flex flex-col justify-center row-span-2 md:row-span-1"
+                  >
+                    <Image
+                      src={creator.img}
+                      alt={creator.name}
+                      width={200}
+                      height={210}
+                      className="mx-auto mb-4 rounded-lg object-cover"
+                    />
+                    <h3 className="text-xl font-medium text-black mb-1">
+                      {creator.name}
+                    </h3>
+                    <p className="text-gray-600">{creator.field}</p>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        </section>
 
-       
-        <div className="container mx-auto mt-16 px-4 sm:px-6 lg:px-8">
-          <div className="bg-white p-6 rounded-lg text-center max-w-3xl mx-auto relative">
-            <h1 className="text-3xl font-semibold tracking-tighter text-black mb-28">
-              Trusted by Content Creators
-              <br />
-              <span className="text-gray-500"> across the world</span>
-            </h1>
-
-            {/* Left Arrow */}
-            <button
-              onClick={prevTestimonial}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#00bfff] transition-colors text-3xl"
-              aria-label="Previous testimonial"
-            >
-              ‹
-            </button>
-
-            {/* Right Arrow */}
-            <button
-              onClick={nextTestimonial}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#00bfff] transition-colors text-3xl"
-              aria-label="Next testimonial"
-            >
-              ›
-            </button>
-
-            <Image
-              src={testimonials[currentTestimonial].image}
-              alt={testimonials[currentTestimonial].name}
-              width={300}
-              height={300}
-              className="mx-auto mb-4 rounded-full"
-            />
-            <div className="text-2xl mb-4">⭐ ⭐ ⭐ ⭐ ⭐</div>
-            <p className="text-gray-600 italic mb-4">
-              &quot;{testimonials[currentTestimonial].text}&quot;
-            </p>
-            <h3 className="text-lg font-regular tracking-tighter text-black">
-              - {testimonials[currentTestimonial].name},{" "}
-              {testimonials[currentTestimonial].role}
-            </h3>
+        <section className="bg-white py-10 mb-4">
+          <h2 style={styles.sectionTitle}>
+            Trending Contents
+          </h2>
+          <p className="text-gray-600 p-4 text-center max-w-2xl mx-auto">
+            Discover the most popular and engaging content on Verrsa right now.
+            See what&apos;s capturing the attention of our community.
+          </p>
+          <div className="container mx-auto mt-8 px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {loadingTrending ? (
+                <div className="col-span-full text-center py-8 text-gray-500">
+                  Loading trending contents...
+                </div>
+              ) : trendingPosts.length === 0 ? (
+                <div className="col-span-full text-center py-8 text-gray-500">
+                  No trending contents found
+                </div>
+              ) : (
+                trendingPosts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="bg-blue-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                  >
+                    <Image
+                      src={
+                        post.cover_image_url ||
+                        post.images?.[0]?.url ||
+                        post.thumbnail_url ||
+                        "/hero-image.jpg"
+                      }
+                      alt={post.title}
+                      width={400}
+                      height={250}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="p-4">
+                      <span className="text-xs text-cyan-600 font-medium">
+                        {post.category || "General"}
+                      </span>
+                      <h3 className="text-lg font-regular tracking-tighter text-black mt-2 mb-2">
+                        {post.title || post.content}
+                      </h3>
+                      <p className="text-gray-500 text-sm">
+                        👁️ {post.view_count || 0} views
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      </section>
 
-  <h1 className="hidden md:block flex justify-center items-center text-8xl font-semibold tracking-tighter text-gray-400 mb-[-108px] w-full text-center">
-  Success Stories
-</h1>
+          <div className="container mx-auto mt-16 px-4 sm:px-6 lg:px-8">
+            <div className="bg-white p-6 rounded-lg text-center max-w-3xl mx-auto relative">
+              <h1 className="text-3xl font-semibold tracking-tighter text-black mb-28">
+                Trusted by Content Creators
+                <br />
+                <span className="text-gray-500"> across the world</span>
+              </h1>
 
- <h1 className="block md:hidden flex justify-center items-center text-5xl font-semibold tracking-tighter text-gray-400 mb-[-103px] w-full text-center">
-  Success Stories
-</h1>
+              {/* Left Arrow */}
+              <button
+                onClick={prevTestimonial}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#00bfff] transition-colors text-3xl"
+                aria-label="Previous testimonial"
+              >
+                ‹
+              </button>
 
-      {/* <div className="shadow-[0_10px_20px_rgba(0,0,0,0.15)] rounded-lg p-6 bg-white">
+              {/* Right Arrow */}
+              <button
+                onClick={nextTestimonial}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#00bfff] transition-colors text-3xl"
+                aria-label="Next testimonial"
+              >
+                ›
+              </button>
+
+              <Image
+                src={testimonials[currentTestimonial].image}
+                alt={testimonials[currentTestimonial].name}
+                width={300}
+                height={300}
+                className="mx-auto mb-4 rounded-full"
+              />
+              <div className="text-2xl mb-4">⭐ ⭐ ⭐ ⭐ ⭐</div>
+              <p className="text-gray-600 italic mb-4">
+                &quot;{testimonials[currentTestimonial].text}&quot;
+              </p>
+              <h3 className="text-lg font-regular tracking-tighter text-black">
+                - {testimonials[currentTestimonial].name},{" "}
+                {testimonials[currentTestimonial].role}
+              </h3>
+            </div>
+          </div>
+        </section>
+
+        <h1 className="hidden md:block flex justify-center items-center text-8xl font-semibold tracking-tighter text-gray-400 mb-[-108px] w-full text-center">
+          Success Stories
+        </h1>
+
+        <h1 className="block md:hidden flex justify-center items-center text-5xl font-semibold tracking-tighter text-gray-400 mb-[-103px] w-full text-center">
+          Success Stories
+        </h1>
+
+        {/* <div className="shadow-[0_10px_20px_rgba(0,0,0,0.15)] rounded-lg p-6 bg-white">
       </div>*/}
 
-    <div className="h-px w-full bg-gray-300 shadow-lg box-shadow mt-24"></div>
+        <div className="h-px w-full bg-gray-300 shadow-lg box-shadow mt-24"></div>
 
-      {/* Stats Section */}
-      <div style={styles.statsSection}>
-        <div style={styles.statItem}>
-          <span style={styles.statNumber}>80%</span>
-          <span style={styles.statLabel}>Revenue Share</span>
+        {/* Stats Section */}
+        <div style={styles.statsSection}>
+          <div style={styles.statItem}>
+            <span style={styles.statNumber}>80%</span>
+            <span style={styles.statLabel}>Revenue Share</span>
+          </div>
+          <div style={styles.statDivider} />
+          <div style={styles.statItem}>
+            <span style={styles.statNumber}>$0</span>
+            <span style={styles.statLabel}>Min. to Start</span>
+          </div>
+          <div style={styles.statDivider} />
+          <div style={styles.statItem}>
+            <span style={styles.statNumber}>Day 1</span>
+            <span style={styles.statLabel}>Start Earning</span>
+          </div>
         </div>
-        <div style={styles.statDivider} />
-        <div style={styles.statItem}>
-          <span style={styles.statNumber}>$0</span>
-          <span style={styles.statLabel}>Min. to Start</span>
-        </div>
-        <div style={styles.statDivider} />
-        <div style={styles.statItem}>
-          <span style={styles.statNumber}>Day 1</span>
-          <span style={styles.statLabel}>Start Earning</span>
-        </div>
-      </div>
 
-      {/* What is Verrsa Section */}
-      <div style={styles.contentSection}>
-        <div style={styles.sectionBadge}>
-          <span style={styles.sectionBadgeText}>ABOUT VERRSA</span>
+        {/* What is Verrsa Section */}
+        <div style={styles.contentSection}>
+          <div style={styles.sectionBadge}>
+            <span style={styles.sectionBadgeText}>ABOUT VERRSA</span>
+          </div>
+          <h2 style={styles.sectionTitle}>What is Verrsa?</h2>
+          <p style={styles.sectionText}>
+            Verrsa is a monetization-first creator platform for emerging
+            creators. Unlike traditional platforms that require thousands of
+            followers before you can earn, Verrsa lets you monetize from day
+            one.
+          </p>
+          <p style={styles.sectionText}>
+            We're an all-in-one platform for writing, podcasting, live
+            streaming, and video content. Whether you're publishing articles,
+            hosting podcasts, or going live, every piece of content can generate
+            income immediately.
+          </p>
+          <p style={styles.sectionText}>
+            Built for creators globally. Verrsa provides localized payment
+            options and features designed to help creators succeed without
+            needing a massive audience.
+          </p>
         </div>
-        <h2 style={styles.sectionTitle}>What is Verrsa?</h2>
-        <p style={styles.sectionText}>
-          Verrsa is a monetization-first creator platform for emerging creators.
-          Unlike traditional platforms that require thousands of followers before
-          you can earn, Verrsa lets you monetize from day one.
-        </p>
-        <p style={styles.sectionText}>
-          We're an all-in-one platform for writing, podcasting, live streaming,
-          and video content. Whether you're publishing articles, hosting podcasts,
-          or going live, every piece of content can generate income immediately.
-        </p>
-        <p style={styles.sectionText}>
-          Built for creators globally. Verrsa provides localized payment options
-          and features designed to help creators succeed without needing a massive
-          audience.
-        </p>
-      </div>
 
-      {/* Who is Verrsa for Section */}
-      <div style={styles.contentSection}>
-        <div style={styles.sectionBadge}>
-          <span style={styles.sectionBadgeText}>FOR CREATORS</span>
-        </div>
-        <h2 style={styles.sectionTitle}>Who is Verrsa for?</h2>
-        <div style={styles.audienceList}>
-          <div style={styles.audienceItem}>
-            <div style={styles.iconCircle}>
-              <IoCheckmarkCircle size={24} color="#0EA5E9" />
-            </div>
-            <p style={styles.audienceText}>
-              <strong style={styles.audienceBold}>Creators</strong> who want to
-              monetize without 1,000 subscribers
-            </p>
+        {/* Who is Verrsa for Section */}
+        <div style={styles.contentSection}>
+          <div style={styles.sectionBadge}>
+            <span style={styles.sectionBadgeText}>FOR CREATORS</span>
           </div>
-          <div style={styles.audienceItem}>
-            <div style={styles.iconCircle}>
-              <IoCheckmarkCircle size={24} color="#0EA5E9" />
+          <h2 style={styles.sectionTitle}>Who is Verrsa for?</h2>
+          <div style={styles.audienceList}>
+            <div style={styles.audienceItem}>
+              <div style={styles.iconCircle}>
+                <IoCheckmarkCircle size={24} color="#0EA5E9" />
+              </div>
+              <p style={styles.audienceText}>
+                <strong style={styles.audienceBold}>Creators</strong> who want
+                to monetize without 1,000 subscribers
+              </p>
             </div>
-            <p style={styles.audienceText}>
-              <strong style={styles.audienceBold}>Micro-Influencers</strong>{" "}
-              looking for fair revenue sharing and direct payments
-            </p>
-          </div>
-          <div style={styles.audienceItem}>
-            <div style={styles.iconCircle}>
-              <IoCheckmarkCircle size={24} color="#0EA5E9" />
+            <div style={styles.audienceItem}>
+              <div style={styles.iconCircle}>
+                <IoCheckmarkCircle size={24} color="#0EA5E9" />
+              </div>
+              <p style={styles.audienceText}>
+                <strong style={styles.audienceBold}>Micro-Influencers</strong>{" "}
+                looking for fair revenue sharing and direct payments
+              </p>
             </div>
-            <p style={styles.audienceText}>
-              <strong style={styles.audienceBold}>Creators</strong> needing
-              localized payment methods and regional support
-            </p>
-          </div>
-          <div style={styles.audienceItem}>
-            <div style={styles.iconCircle}>
-              <IoCheckmarkCircle size={24} color="#0EA5E9" />
+            <div style={styles.audienceItem}>
+              <div style={styles.iconCircle}>
+                <IoCheckmarkCircle size={24} color="#0EA5E9" />
+              </div>
+              <p style={styles.audienceText}>
+                <strong style={styles.audienceBold}>Creators</strong> needing
+                localized payment methods and regional support
+              </p>
             </div>
-            <p style={styles.audienceText}>
-              <strong style={styles.audienceBold}>Writers & Podcasters</strong>{" "}
-              who want to earn from articles and audio content
-            </p>
-          </div>
-          <div style={styles.audienceItem}>
-            <div style={styles.iconCircle}>
-              <IoCheckmarkCircle size={24} color="#0EA5E9" />
+            <div style={styles.audienceItem}>
+              <div style={styles.iconCircle}>
+                <IoCheckmarkCircle size={24} color="#0EA5E9" />
+              </div>
+              <p style={styles.audienceText}>
+                <strong style={styles.audienceBold}>
+                  Writers & Podcasters
+                </strong>{" "}
+                who want to earn from articles and audio content
+              </p>
             </div>
-            <p style={styles.audienceText}>
-              <strong style={styles.audienceBold}>Live Streamers</strong> seeking
-              gift-based monetization and real-time earnings
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* How Verrsa Works Section */}
-      <div style={styles.contentSection}>
-        <div style={styles.sectionBadge}>
-          <span style={styles.sectionBadgeText}>HOW IT WORKS</span>
-        </div>
-        <h2 style={styles.sectionTitle}>How Does Verrsa Monetization Work?</h2>
-        <div style={styles.stepsList}>
-          <div style={styles.stepItem}>
-            <div style={styles.stepNumber}>
-              <span style={styles.stepNumberText}>1</span>
-            </div>
-            <div style={styles.stepContent}>
-              <h3 style={styles.stepTitle}>Create Your Content</h3>
-              <p style={styles.stepDesc}>
-                Publish articles, upload podcasts, or go live. All content types
-                are monetizable from the start.
+            <div style={styles.audienceItem}>
+              <div style={styles.iconCircle}>
+                <IoCheckmarkCircle size={24} color="#0EA5E9" />
+              </div>
+              <p style={styles.audienceText}>
+                <strong style={styles.audienceBold}>Live Streamers</strong>{" "}
+                seeking gift-based monetization and real-time earnings
               </p>
             </div>
           </div>
-          <div style={styles.stepItem}>
-            <div style={styles.stepNumber}>
-              <span style={styles.stepNumberText}>2</span>
-            </div>
-            <div style={styles.stepContent}>
-              <h3 style={styles.stepTitle}>Earn Immediately</h3>
-              <p style={styles.stepDesc}>
-                Receive gifts during live streams, earn from article views, and
-                get direct support from your audience. No minimum followers
-                needed.
-              </p>
-            </div>
-          </div>
-          <div style={styles.stepItem}>
-            <div style={styles.stepNumber}>
-              <span style={styles.stepNumberText}>3</span>
-            </div>
-            <div style={styles.stepContent}>
-              <h3 style={styles.stepTitle}>Keep 80% of Earnings</h3>
-              <p style={styles.stepDesc}>
-                Verrsa creators keep up to 80% of their earnings. We believe in
-                fair compensation for your work.
-              </p>
-            </div>
-          </div>
-          <div style={styles.stepItem}>
-            <div style={styles.stepNumber}>
-              <span style={styles.stepNumberText}>4</span>
-            </div>
-            <div style={styles.stepContent}>
-              <h3 style={styles.stepTitle}>Withdraw Anytime</h3>
-              <p style={styles.stepDesc}>
-                Get your earnings through bank transfer, mobile money, or digital
-                wallets with flexible withdrawal options.
-              </p>
-            </div>
-          </div>
+        </div>
 
-          {/* <div style={styles.stepItem}>
+        {/* How Verrsa Works Section */}
+        <div style={styles.contentSection}>
+          <div style={styles.sectionBadge}>
+            <span style={styles.sectionBadgeText}>HOW IT WORKS</span>
+          </div>
+          <h2 style={styles.sectionTitle}>
+            How Does Verrsa Monetization Work?
+          </h2>
+          <div style={styles.stepsList}>
+            <div style={styles.stepItem}>
+              <div style={styles.stepNumber}>
+                <span style={styles.stepNumberText}>1</span>
+              </div>
+              <div style={styles.stepContent}>
+                <h3 style={styles.stepTitle}>Create Your Content</h3>
+                <p style={styles.stepDesc}>
+                  Publish articles, upload podcasts, or go live. All content
+                  types are monetizable from the start.
+                </p>
+              </div>
+            </div>
+            <div style={styles.stepItem}>
+              <div style={styles.stepNumber}>
+                <span style={styles.stepNumberText}>2</span>
+              </div>
+              <div style={styles.stepContent}>
+                <h3 style={styles.stepTitle}>Earn Immediately</h3>
+                <p style={styles.stepDesc}>
+                  Receive gifts during live streams, earn from article views,
+                  and get direct support from your audience. No minimum
+                  followers needed.
+                </p>
+              </div>
+            </div>
+            <div style={styles.stepItem}>
+              <div style={styles.stepNumber}>
+                <span style={styles.stepNumberText}>3</span>
+              </div>
+              <div style={styles.stepContent}>
+                <h3 style={styles.stepTitle}>Keep 80% of Earnings</h3>
+                <p style={styles.stepDesc}>
+                  Verrsa creators keep up to 80% of their earnings. We believe
+                  in fair compensation for your work.
+                </p>
+              </div>
+            </div>
+            <div style={styles.stepItem}>
+              <div style={styles.stepNumber}>
+                <span style={styles.stepNumberText}>4</span>
+              </div>
+              <div style={styles.stepContent}>
+                <h3 style={styles.stepTitle}>Withdraw Anytime</h3>
+                <p style={styles.stepDesc}>
+                  Get your earnings through bank transfer, mobile money, or
+                  digital wallets with flexible withdrawal options.
+                </p>
+              </div>
+            </div>
+
+            {/* <div style={styles.stepItem}>
             <div style={styles.stepNumber}>
               <span style={styles.stepNumberText}>5</span>
             </div>
@@ -733,11 +774,10 @@ export default function LandingPage() {
               </p>
             </div>
           </div> */}
-
+          </div>
         </div>
-      </div>
 
-      {/* Comparison Section 
+        {/* Comparison Section 
       <div style={styles.contentSection}>
         <div style={styles.sectionBadge}>
           <span style={styles.sectionBadgeText}>COMPARISON</span>
@@ -773,8 +813,7 @@ export default function LandingPage() {
 
       </div> */}
 
-
- {/* Sign Up Section */}
+        {/* Sign Up Section */}
         <section className="relative bg-cyan-700 py-14 mt-15 mb-8 rounded-lg mx-4 md:mx-20 lg:mx-32 overflow-hidden">
           {/* Decorative corner images inside the bg */}
           <div className="absolute bottom-0 left-0 w-24 h-24 md:w-32 md:h-40 z-0">
@@ -804,26 +843,28 @@ export default function LandingPage() {
               Step into a world of possibilities where your creativity, passion,
               and ideas find the platform they deserve.
             </p>
-            <button 
-            onClick={() => router.push('/auth')}
-            className="bg-cyan-400 text-white px-6 py-3 rounded-lg hover:bg-cyan-500">
+            <button
+              onClick={() => router.push("/auth")}
+              className="bg-cyan-400 text-white px-6 py-3 rounded-lg hover:bg-cyan-500"
+            >
               Get Started
             </button>
           </div>
-
 
           {/* Newsletter Section */}
           <div style={styles.newsletterSection}>
             <h3 style={styles.newsletterTitle}>Stay Ahead with Verrsa</h3>
             <p style={styles.newsletterSubtitle}>
-              Join our newsletter for creator tips, platform updates, and insights
-              on writing, podcasting, video, and community growth.
+              Join our newsletter for creator tips, platform updates, and
+              insights on writing, podcasting, video, and community growth.
             </p>
 
             <form style={styles.newsletterForm} onSubmit={handleSubmit}>
               {error && <div style={styles.errorMessage}>{error}</div>}
-              {successMessage && <div style={styles.successMessage}>{successMessage}</div>}
-              
+              {successMessage && (
+                <div style={styles.successMessage}>{successMessage}</div>
+              )}
+
               <input
                 type="email"
                 style={styles.emailInput}
@@ -839,61 +880,143 @@ export default function LandingPage() {
                   ...styles.subscribeButton,
                   ...(submitted && styles.subscribeButtonDisabled),
                   opacity: loading ? 0.7 : 1,
-                  cursor: loading ? 'not-allowed' : 'pointer',
+                  cursor: loading ? "not-allowed" : "pointer",
                 }}
                 disabled={submitted || loading}
               >
-                {loading ? "Subscribing..." : submitted ? "Thank you!" : "Subscribe"}
+                {loading
+                  ? "Subscribing..."
+                  : submitted
+                    ? "Thank you!"
+                    : "Subscribe"}
               </button>
             </form>
           </div>
         </section>
 
-
-      {/* FAQ Section */}
-      <div style={styles.faqSection}>
-        <div style={styles.sectionBadge}>
-          <span style={styles.sectionBadgeText}>FAQ</span>
-        </div>
-        <h2 style={styles.sectionTitle}>Frequently Asked Questions</h2>
-        <p style={styles.sectionSubtext}>
-          Everything you need to know about monetizing your content on Verrsa
-        </p>
-        {faqs.map((faq, idx) => (
-          <div key={idx} style={styles.faqItem}>
-            <div style={styles.faqQuestion}>
-              <IoHelpCircle size={22} color="#0EA5E9" />
-              <h3 style={styles.faqQuestionText}>{faq.question}</h3>
-            </div>
-            <p style={styles.faqAnswer}>{faq.answer}</p>
+        {/* FAQ Section */}
+        <div style={styles.faqSection}>
+          <div style={styles.sectionBadge}>
+            <span style={styles.sectionBadgeText}>FAQ</span>
           </div>
-        ))}
-      </div>
-
-
-      {/* Footer */}
-      <div style={styles.footer}>
-        <div style={styles.footerLinks}>
-
-         
-          <Link href="/terms" style={styles.footerLink}>
-            Terms of Service
-          </Link>
-          <Link href="/privacy" style={styles.footerLink}>
-            Privacy Policy
-          </Link>
-          <Link href="/community-guidelines" style={styles.footerLink}>
-            Community Guidelines
-          </Link>
-          <a href="mailto:hello@verrsa.org" style={styles.footerLink}>
-            Contact Us
-          </a>
+          <h2 style={styles.sectionTitle}>Frequently Asked Questions</h2>
+          <p style={styles.sectionSubtext}>
+            Everything you need to know about monetizing your content on Verrsa
+          </p>
+          {faqs.map((faq, idx) => (
+            <div key={idx} style={styles.faqItem}>
+              <div style={styles.faqQuestion}>
+                <IoHelpCircle size={22} color="#0EA5E9" />
+                <h3 style={styles.faqQuestionText}>{faq.question}</h3>
+              </div>
+              <p style={styles.faqAnswer}>{faq.answer}</p>
+            </div>
+          ))}
         </div>
-        <p style={styles.copyright}>
-          © {new Date().getFullYear()} Verrsa. All rights reserved.
-        </p>
+
+        {/* Footer */}
+        <div style={styles.footer}>
+          <p
+            style={{
+              fontWeight: "500",
+              color: "#000",
+              marginLeft: 17,
+              padding: "8px",
+              marginTop: -30,
+            }}
+          >
+            COMPANY
+          </p>
+
+          <div
+            style={{
+              marginTop: -10,
+              marginLeft: 20,
+              padding: "8px",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              display: "flex",
+            }}
+          >
+            <Link
+              href="/terms"
+              style={{ color: "#6b6a6a", fontWeight: "400", fontSize: 14 }}
+            >
+              Terms of Service
+            </Link>
+            <Link
+              href="/privacy"
+              style={{
+                color: "#6b6a6a",
+                marginLeft: 10,
+                fontWeight: "400",
+                fontSize: 14,
+              }}
+            >
+              Privacy Policy
+            </Link>
+          </div>
+
+          <div
+            style={{
+              marginLeft: 20,
+              padding: "8px",
+              marginTop: -12,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              display: "flex",
+            }}
+          >
+            <Link
+              href="/community-guidelines"
+              style={{ color: "#6b6a6a", fontWeight: "400", fontSize: 14 }}
+            >
+              Community Guidelines
+            </Link>
+            <a
+              href="mailto:hello@verrsa.org"
+              style={{
+                color: "#6b6a6a",
+                marginLeft: 10,
+                fontWeight: "400",
+                fontSize: 14,
+              }}
+            >
+              Contact Us
+            </a>
+          </div>
+
+          <div
+            style={{
+              marginTop: -10,
+              marginLeft: 20,
+              padding: "8px",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              display: "flex",
+            }}
+          >
+            <Link
+              href="#"
+              style={{ color: "#6b6a6a", fontWeight: "400", fontSize: 14 }}
+            >
+              About Us
+            </Link>
+          </div>
+
+          <p
+            style={{
+              marginLeft: 20,
+              color: "#6b6a6a",
+              fontWeight: "400",
+              fontSize: 12,
+              padding: "8px",
+            }}
+          >
+            © {new Date().getFullYear()} Verrsa. All rights reserved.
+          </p>
+        </div>
       </div>
-    </div>
     </>
   );
 }
@@ -922,7 +1045,7 @@ const styles = {
     objectFit: "contain" as const,
   } as React.CSSProperties,
   signInButton: {
-     backgroundColor: "#00bfff",
+    backgroundColor: "#00bfff",
     padding: "12px 24px",
     borderRadius: "8px",
     border: "none",
@@ -953,11 +1076,11 @@ const styles = {
     boxShadow: "0 2px 8px rgba(14, 165, 233, 0.1)",
   },
   badgeText: {
+    letterSpacing: -0.6,
     fontSize: "15px",
     fontWeight: "400",
     color: "#0369A1",
     textAlign: "center" as const,
-    letterSpacing: "0.1px",
   } as React.CSSProperties,
   appStoreBadges: {
     display: "flex",
@@ -968,32 +1091,32 @@ const styles = {
     width: "153px",
     height: "55px",
     borderRadius: "8px",
-
   },
   playStoreBadge: {
     width: "153px",
     height: "50px",
     borderRadius: "8px",
-    },
+  },
   heroDesktopTitle: {
+    letterSpacing: -2.0,
     fontSize: "65px",
-    fontWeight: "600",
+    fontWeight: "500",
     color: "#0F172A",
     textAlign: "center" as const,
     marginBottom: "14px",
-    letterSpacing: "-1.5px",
     lineHeight: "56px",
   } as React.CSSProperties,
   heroTitle: {
+    letterSpacing: -2.0,
     fontSize: "45px",
-    fontWeight: "600",
+    fontWeight: "500",
     color: "#0F172A",
     textAlign: "center" as const,
     marginBottom: "7px",
-    letterSpacing: "-1.5px",
     lineHeight: "50px",
   } as React.CSSProperties,
   heroSubtitle: {
+    letterSpacing: -0.6,
     fontSize: "18px",
     fontWeight: "300",
     color: "#475569",
@@ -1087,11 +1210,11 @@ const styles = {
     letterSpacing: "1.2px",
   },
   sectionTitle: {
+    letterSpacing: -2.0,
     fontSize: "36px",
-    fontWeight: "600",
+    fontWeight: "500",
     color: "#0F172A",
     marginBottom: "20px",
-    letterSpacing: "-1px",
     textAlign: "center" as const,
   } as React.CSSProperties,
   sectionSubtext: {
@@ -1256,7 +1379,7 @@ const styles = {
   },
   featuresSection: {
     marginBottom: "40px",
-     marginTop: "40px",
+    marginTop: "40px",
     padding: "0 40px",
   },
   featuresScroll: {
