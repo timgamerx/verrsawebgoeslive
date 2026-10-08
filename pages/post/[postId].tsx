@@ -587,24 +587,80 @@ export default function PostPage({ post: initialPost, authorName: initialAuthorN
 
   
   const formatContent = (content: string = "") => {
-  const words = content.trim().split(/\s+/);
+  // Tokenize into words and whitespace (including newlines) so that
+  // line breaks in the original content are preserved when chunking.
+  const tokens = content.trim().match(/\S+|\s+/g) || [];
+  const wordCount = tokens.filter((t) => !/^\s+$/.test(t)).length;
 
-  // If 200 words or less → return normal (or truncated if you want)
-  if (words.length <= 200) {
+  // If 200 words or less → return normal (preserves original line breaks)
+  if (wordCount <= 200) {
     return content;
   }
 
-  // Split into 4 equal parts
-  const chunkSize = Math.ceil(words.length / 4);
+  // Split into 4 roughly equal parts while preserving original whitespace/newlines
+  const chunkSize = Math.ceil(wordCount / 4);
+  const paragraphs: string[] = [];
+  let currentChunk = "";
+  let currentWordCount = 0;
 
-  const paragraphs = [];
+  for (const token of tokens) {
+    const isWord = !/^\s+$/.test(token);
+    currentChunk += token;
+    if (isWord) {
+      currentWordCount++;
+      if (currentWordCount >= chunkSize && paragraphs.length < 3) {
+        paragraphs.push(currentChunk.trim());
+        currentChunk = "";
+        currentWordCount = 0;
+      }
+    }
+  }
 
-  for (let i = 0; i < 4; i++) {
-    const chunk = words.slice(i * chunkSize, (i + 1) * chunkSize).join(" ");
-    if (chunk) paragraphs.push(chunk);
+  if (currentChunk.trim()) {
+    paragraphs.push(currentChunk.trim());
   }
 
   return paragraphs;
+};
+
+// Parses markdown-style **bold** and *italic* markers into React elements
+// while leaving line breaks intact (rendered via CSS whiteSpace: "pre-wrap").
+const renderFormattedText = (text: string = ""): React.ReactNode => {
+  if (!text) return null;
+
+  const parts: React.ReactNode[] = [];
+  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(
+        <React.Fragment key={key++}>
+          {text.substring(lastIndex, match.index)}
+        </React.Fragment>,
+      );
+    }
+
+    const matchedText = match[0];
+
+    if (matchedText.startsWith("**") && matchedText.endsWith("**")) {
+      parts.push(<strong key={key++}>{matchedText.slice(2, -2)}</strong>);
+    } else if (matchedText.startsWith("*") && matchedText.endsWith("*")) {
+      parts.push(<em key={key++}>{matchedText.slice(1, -1)}</em>);
+    }
+
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(
+      <React.Fragment key={key++}>{text.substring(lastIndex)}</React.Fragment>,
+    );
+  }
+
+  return parts.length > 0 ? parts : text;
 };
 
 const formatted = formatContent(post.content || "");
@@ -618,28 +674,31 @@ const formatted = formatContent(post.content || "");
 
         {/* Open Graph */}
         <meta
-  property="og:type"
-  content={
-    post.post_type === "video"
-      ? "video.other"
-      : post.post_type === "podcast"
-      ? "music.song"
-      : "article"
-  }
-/>
+          property="og:type"
+          content={
+            post.post_type === "video"
+              ? "video.other"
+              : post.post_type === "podcast"
+                ? "music.song"
+                : "article"
+          }
+        />
         <meta property="og:title" content={post.title || "Verrsa Post"} />
         <meta property="og:description" content={description} />
         <meta property="og:image" content={image} />
         <meta property="og:url" content={url} />
         <meta property="og:site_name" content="Verrsa" />
         {post.post_type === "video" && (
-  <>
-    <meta property="og:video" content={post.video_url} />
-    <meta property="og:video:type" content="video/mp4" />
-    <meta name="twitter:player:stream" content={post.video_url} />
-    <meta name="twitter:player:stream:content_type" content="video/mp4" />
-  </>
-)}
+          <>
+            <meta property="og:video" content={post.video_url} />
+            <meta property="og:video:type" content="video/mp4" />
+            <meta name="twitter:player:stream" content={post.video_url} />
+            <meta
+              name="twitter:player:stream:content_type"
+              content="video/mp4"
+            />
+          </>
+        )}
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -666,775 +725,745 @@ const formatted = formatContent(post.content || "");
         }}
       >
         <div style={{ maxWidth: "800px", width: "100%", margin: "0 auto" }}>
-        {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: spacing.base,
-            marginTop: 16,
-            paddingLeft: spacing.base,
-            paddingRight: spacing.base,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
-            <button
-              onClick={() => router.back()}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: spacing.md,
-              }}
-            >
-              ←
-            </button>
+          {/* Header */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: spacing.base,
+              marginTop: 16,
+              paddingLeft: spacing.base,
+              paddingRight: spacing.base,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+              <button
+                onClick={() => router.back()}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: spacing.md,
+                }}
+              >
+                ←
+              </button>
 
-            <a href={`/user/${post.user_id}`}>
-              <img
-                src={post.profiles?.avatar_url || "/avatar.jpg"}
-                alt="Author"
+              <a href={`/user/${post.user_id}`}>
+                <img
+                  src={post.profiles?.avatar_url || "/avatar.jpg"}
+                  alt="Author"
+                  onClick={() => {
+                    if (post.user_id) {
+                      maybeShowArticleAuthorPrompt(post.user_id).catch(
+                        () => {},
+                      );
+                    }
+                  }}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    minWidth: 30,
+                    minHeight: 30,
+                    flexShrink: 0,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    marginRight: spacing.md,
+                    cursor: "pointer",
+                  }}
+                />
+              </a>
+
+              <div style={{ flex: 1, minWidth: 0, marginRight: spacing.sm }}>
+                <h1
+                  style={{
+                    fontSize: fontSize.lg,
+                    fontWeight: "400",
+                    margin: 0,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    color: theme.text,
+                  }}
+                >
+                  {post?.title || "".slice(0, 5)}
+                </h1>
+              </div>
+            </div>
+
+            {/* Share and Report buttons */}
+            <div
+              style={{ display: "flex", alignItems: "center", gap: spacing.sm }}
+            >
+              <button
+                onClick={handleShare}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: spacing.md,
+                  color: theme.iconSecondary,
+                  fontSize: fontSize.base,
+                }}
+              >
+                <IoShareSocialOutline size={22} color="#fff" />
+              </button>
+
+              <button
                 onClick={() => {
-                  if (post.user_id) {
-                    maybeShowArticleAuthorPrompt(post.user_id).catch(() => {});
-                  }
+                  setReportParams({
+                    contentId: post.id,
+                    contentType: "post",
+                    reportedUserId: post.user_id,
+                  });
+                  setShowReportModal(true);
                 }}
                 style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: "50%",
-                  marginRight: spacing.md,
+                  background: "none",
+                  border: "none",
                   cursor: "pointer",
+                  padding: spacing.md,
+                  color: theme.icon,
+                  fontSize: fontSize.base,
                 }}
-              />
-            </a>
-
-            <div style={{ flex: 1, marginRight: spacing.sm }}>
-
-        <h1 style={{
-                  fontSize: fontSize.lg,
-                  fontWeight: "400",
-                  margin: 0,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                  color: theme.text,
-                }}>
-          {post?.title || ""}
-        </h1>
-
-
+              >
+                <IoFlagOutline size={20} color="#fff" />
+              </button>
             </div>
           </div>
 
-          {/* Share and Report buttons */}
-          <div style={{ display: "flex", alignItems: "center", gap: spacing.sm }}>
-            <button
-              onClick={handleShare}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: spacing.md,
-                color: theme.iconSecondary,
-                fontSize: fontSize.base,
-              }}
-            >
-              <IoShareSocialOutline size={22} color="#fff" />
-            </button>
+          {/* Enforcement banner */}
+          <EnforcementBanner
+            postId={post.id}
+            postType={
+              post.post_type as "article" | "video" | "podcast" | "forum"
+            }
+            onStatusChange={(active) => setContentRestricted(active)}
+          />
 
-            <button
-              onClick={() => {
-                setReportParams({
-                  contentId: post.id,
-                  contentType: "post",
-                  reportedUserId: post.user_id,
-                });
-                setShowReportModal(true);
-              }}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: spacing.md,
-                color: theme.icon,
-                fontSize: fontSize.base,
-              }}
-            >
-              <IoFlagOutline size={20} color="#fff" />
-            </button>
-          </div>
-        </div>
-
-        {/* Enforcement banner */}
-        <EnforcementBanner
-          postId={post.id}
-          postType={post.post_type as "article" | "video" | "podcast" | "forum"}
-          onStatusChange={(active) => setContentRestricted(active)}
-        />
-
-        {/* Main content */}
-        <div
-          style={{
-            paddingLeft: spacing.md,
-            paddingRight: spacing.md,
-          }}
-        >
-          {/* Video UI */}
-          {post.post_type === 'video' && (
-            <>
-              {post.video_url ? (
-                <div style={{
-                  position: "relative",
-                  width: "100%",
-                  maxWidth: "600px",
-                  margin: "0 auto",
-                  marginBottom: spacing.base,
-                  borderRadius: radius.md,
-                  overflow: "hidden",
-                  backgroundColor: "#000",
-                }}>
-                  <video
-                    src={post.video_url}
-                    poster={post.cover_image_url || undefined}
+          {/* Main content */}
+          <div
+            style={{
+              paddingLeft: spacing.md,
+              paddingRight: spacing.md,
+            }}
+          >
+            {/* Video UI */}
+            {post.post_type === "video" && (
+              <>
+                {post.video_url ? (
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      maxWidth: "600px",
+                      margin: "0 auto",
+                      marginBottom: spacing.base,
+                      borderRadius: radius.md,
+                      overflow: "hidden",
+                      backgroundColor: "#000",
+                    }}
+                  >
+                    <video
+                      src={post.video_url}
+                      poster={post.cover_image_url || undefined}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        maxHeight: "600px",
+                        objectFit: "contain",
+                      }}
+                      controls
+                      playsInline
+                      preload="metadata"
+                    />
+                  </div>
+                ) : post.cover_image_url ? (
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      maxWidth: "600px",
+                      margin: "0 auto",
+                      marginBottom: spacing.base,
+                      borderRadius: radius.md,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <img
+                      src={post.cover_image_url}
+                      alt={post.title}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div
                     style={{
                       width: "100%",
-                      height: "auto",
-                      maxHeight: "600px",
-                      objectFit: "contain",
+                      maxWidth: "600px",
+                      height: "400px",
+                      margin: "0 auto",
+                      marginBottom: spacing.base,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "#1a1a1a",
+                      borderRadius: radius.md,
                     }}
-                    controls
-                    playsInline
-                    preload="metadata"
-                  />
+                  >
+                    <IoVideocam size={48} color="#444" />
+                  </div>
+                )}
+
+                <div
+                  style={{
+                    padding: spacing.base,
+                    backgroundColor: theme.background,
+                  }}
+                >
+                  <h2
+                    style={{
+                      fontSize: fontSize.xl2,
+                      fontWeight: "500",
+                      marginBottom: spacing.md,
+                      color: theme.text,
+                    }}
+                  >
+                    {post.title}
+                  </h2>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: spacing.sm,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: fontSize.base,
+                        color: theme.secondaryText,
+                      }}
+                    >
+                      By{" "}
+                      {post.profiles?.full_name ||
+                        post.profiles?.username ||
+                        authorName ||
+                        "Unknown Author"}
+                    </span>
+                    {post.profiles?.is_verified && (
+                      <span
+                        style={{ marginLeft: spacing.xs, color: "#00BFFF" }}
+                      >
+                        ✓
+                      </span>
+                    )}
+                  </div>
+
+                  {post.category && (
+                    <p
+                      style={{
+                        fontSize: fontSize.md,
+                        marginBottom: spacing.base,
+                        textTransform: "capitalize",
+                        color: theme.accent,
+                      }}
+                    >
+                      {post.category}
+                    </p>
+                  )}
+
+                  {post.description && (
+                    <p
+                      style={{
+                        fontSize: fontSize.base,
+                        lineHeight: "24px",
+                        marginBottom: spacing.base,
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                        color: theme.text,
+                      }}
+                    >
+                      {renderFormattedText(post.description)}
+                    </p>
+                  )}
                 </div>
-              ) : post.cover_image_url ? (
-                <div style={{
-                  position: "relative",
-                  width: "100%",
-                  maxWidth: "600px",
-                  margin: "0 auto",
-                  marginBottom: spacing.base,
-                  borderRadius: radius.md,
-                  overflow: "hidden",
-                }}>
+              </>
+            )}
+
+            {/* Podcast UI */}
+            {post.post_type === "podcast" && (
+              <>
+                {post.cover_image_url && (
                   <img
                     src={post.cover_image_url}
                     alt={post.title}
                     style={{
                       width: "100%",
-                      height: "auto",
+                      maxWidth: "600px",
+                      height: "300px",
                       objectFit: "cover",
+                      margin: "0 auto",
+                      marginBottom: spacing.base,
+                      borderRadius: radius.md,
                     }}
                   />
-                </div>
-              ) : (
-                <div style={{
-                  width: "100%",
-                  maxWidth: "600px",
-                  height: "400px",
-                  margin: "0 auto",
-                  marginBottom: spacing.base,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "#1a1a1a",
-                  borderRadius: radius.md,
-                }}>
-                  <IoVideocam size={48} color="#444" />
-                </div>
-              )}
-
-              <div style={{ padding: spacing.base, backgroundColor: theme.background }}>
-                <h2
-                  style={{
-                    fontSize: fontSize.xl2,
-                    fontWeight: "500",
-                    marginBottom: spacing.md,
-                    color: theme.text,
-                  }}
-                >
-                  {post.title}
-                </h2>
+                )}
 
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: spacing.sm,
+                    padding: spacing.base,
+                    backgroundColor: theme.background,
                   }}
                 >
-                  <span
+                  <h2
                     style={{
-                      fontSize: fontSize.base,
-                      color: theme.secondaryText,
-                    }}
-                  >
-                    By{" "}
-                    {post.profiles?.full_name ||
-                      post.profiles?.username ||
-                      authorName ||
-                      "Unknown Author"}
-                  </span>
-                  {post.profiles?.is_verified && (
-                    <span style={{ marginLeft: spacing.xs, color: "#00BFFF" }}>✓</span>
-                  )}
-                </div>
-
-                {post.category && (
-                  <p
-                    style={{
-                      fontSize: fontSize.md,
-                      marginBottom: spacing.base,
-                      textTransform: "capitalize",
-                      color: theme.accent,
-                    }}
-                  >
-                    {post.category}
-                  </p>
-                )}
-
-                {post.description && (
-                  <p
-                    style={{
-                      fontSize: fontSize.base,
-                      lineHeight: "24px",
-                      marginBottom: spacing.base,
-                      color: theme.text,
-                    }}
-                  >
-                    {post.description}
-                  </p>
-                )}
-              </div>
-            </>
-          )}
-
-          {/* Podcast UI */}
-          {post.post_type === 'podcast' && (
-            <>
-              {post.cover_image_url && (
-                <img
-                  src={post.cover_image_url}
-                  alt={post.title}
-                  style={{
-                    width: "100%",
-                    maxWidth: "600px",
-                    height: "300px",
-                    objectFit: "cover",
-                    margin: "0 auto",
-                    marginBottom: spacing.base,
-                    borderRadius: radius.md,
-                  }}
-                />
-              )}
-
-              <div style={{ padding: spacing.base, backgroundColor: theme.background }}>
-                <h2
-                  style={{
-                    fontSize: fontSize.xl2,
-                    fontWeight: "500",
-                    marginBottom: spacing.md,
-                    color: theme.text,
-                  }}
-                >
-                  {post.title}
-                </h2>
-
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: spacing.sm,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: fontSize.base,
-                      color: theme.secondaryText,
-                    }}
-                  >
-                    By{" "}
-                    {post.profiles?.full_name ||
-                      post.profiles?.username ||
-                      authorName ||
-                      "Unknown Author"}
-                  </span>
-                  {post.profiles?.is_verified && (
-                    <span style={{ marginLeft: spacing.xs, color: "#00BFFF" }}>✓</span>
-                  )}
-                </div>
-
-                {post.category && (
-                  <div style={{
-                    display: "inline-block",
-                    backgroundColor: "#00BFFF",
-                    padding: `${spacing.xs}px ${spacing.md}px`,
-                    borderRadius: radius.lg,
-                    marginBottom: spacing.base,
-                  }}>
-                    <span style={{
-                      color: "#fff",
-                      fontSize: fontSize.sm,
+                      fontSize: fontSize.xl2,
                       fontWeight: "500",
-                    }}>
-                      {post.category}
-                    </span>
-                  </div>
-                )}
-
-
-                {post.description && (
-                  <p
-                    style={{
-                      fontSize: fontSize.base,
-                      lineHeight: "24px",
-                      marginBottom: spacing.lg,
+                      marginBottom: spacing.md,
                       color: theme.text,
                     }}
                   >
-                    {post.description}
-                  </p>
-                )}
+                    {post.title}
+                  </h2>
 
-                
-              </div>
-            </>
-          )}
-
-
- {/* Podcast Player Controls - Fixed at bottom for podcasts */}
-      {post.post_type === 'podcast' && post.audio_url && (
-        <div style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: theme.cardBackground,
-          borderTop: `1px solid ${theme.border}`,
-          padding: spacing.base,
-          zIndex: 1000,
-          boxShadow: "0 -2px 10px rgba(0,0,0,0.1)",
-        }}>
-          <div style={{
-            maxWidth: "600px",
-            margin: "0 auto",
-          }}>
-            {/* Time Display */}
-            <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: spacing.xs,
-            }}>
-              <span style={{
-                fontSize: fontSize.sm,
-                color: theme.secondaryText,
-              }}>
-                {formatTime(audioProgress.position)}
-              </span>
-              <span style={{
-                fontSize: fontSize.sm,
-                color: theme.secondaryText,
-              }}>
-                {formatTime(audioProgress.duration)}
-              </span>
-            </div>
-
-            {/* Progress Bar */}
-            <div
-              onClick={handleSeek}
-              style={{
-                height: 6,
-                backgroundColor: theme.border,
-                borderRadius: radius.xs,
-                overflow: "hidden",
-                width: "100%",
-                marginBottom: spacing.md,
-                cursor: "pointer",
-                position: "relative",
-              }}
-            >
-              <div style={{
-                height: "100%",
-                width: audioProgress.duration
-                  ? `${(audioProgress.position / audioProgress.duration) * 100}%`
-                  : "0%",
-                backgroundColor: "#00BFFF",
-                borderRadius: radius.xs,
-                transition: "width 0.2s ease",
-              }} />
-            </div>
-
-            {/* Play/Pause Button */}
-            <button
-              style={{
-                backgroundColor: "#00BFFF",
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: `${spacing.sm}px ${spacing.base}px`,
-                borderRadius: radius.lg,
-                border: "none",
-                cursor: "pointer",
-                width: "100%",
-              }}
-              onClick={handlePlayPause}
-            >
-              {isPlaying ? (
-                <IoPauseCircle size={28} color="#fff" />
-              ) : (
-                <IoPlayCircle size={28} color="#fff" />
-              )}
-              <span style={{
-                color: "#fff",
-                fontSize: fontSize.base,
-                fontWeight: "600",
-                marginLeft: spacing.sm,
-              }}>
-                {isPlaying ? "Pause" : "Play"} Podcast
-              </span>
-            </button>
-          </div>
-        </div>
-      )}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          {/* Verse UI */}
-          {post.post_type === 'verse' && (
-            <div style={{
-              maxWidth: "640px",
-              margin: "0 auto",
-              padding: `${spacing.lg}px ${spacing.base}px`,
-            }}>
-              {/* Author row */}
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: spacing.base,
-              }}>
-                <a href={`/user/${post.user_id}`} style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-                  <img
-                    src={post.profiles?.avatar_url || "/avatar.jpg"}
-                    alt="Author"
-                    onError={(e) => { (e.target as HTMLImageElement).src = "/avatar.jpg"; }}
+                  <div
                     style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: "50%",
-                      marginRight: spacing.md,
-                      objectFit: "cover",
-                      border: `2px solid ${theme.border}`,
-                    }}
-                  />
-                </a>
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{
-                      fontSize: fontSize.base,
-                      fontWeight: "500",
-                      color: theme.text,
-                    }}>
-                      {post.profiles?.full_name || post.profiles?.username || authorName || "Creator"}
-                    </span>
-                    {post.profiles?.is_verified && (
-                      <span style={{ color: "#00BFFF", fontSize: fontSize.sm }}>✓</span>
-                    )}
-                  </div>
-                  {post.created_at && (
-                    <span style={{ fontSize: fontSize.sm, color: theme.secondaryText }}>
-                      {new Date(post.created_at).toLocaleDateString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Verse text */}
-              <p style={{
-                fontSize: "20px",
-                lineHeight: "32px",
-                color: theme.text,
-                marginBottom: spacing.base,
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}>
-                {post.content}
-              </p>
-
-              {/* Verse image */}
-              {post.image_url && (
-                <img
-                  src={post.image_url}
-                  alt="Verse image"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    maxHeight: 480,
-                    objectFit: "cover",
-                    borderRadius: 12,
-                    display: "block",
-                    marginTop: spacing.md,
-                  }}
-                />
-              )}
-            </div>
-          )}
-
-          {/* Article UI (existing) */}
-          {(!post.post_type || post.post_type === 'article') && (
-            <>
-              {post.cover_image_url && (
-                <img
-                  src={post.cover_image_url}
-                  alt="Post cover"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    maxHeight: 400,
-                    objectFit: "cover",
-                    marginBottom: spacing.base,
-                    display: "block",
-                  }}
-                />
-              )}
-
-              <div style={{ padding: spacing.base, backgroundColor: theme.background }}>
-                <h2
-                  style={{
-                    fontSize: fontSize.xl2,
-                    fontWeight: "500",
-                    marginBottom: spacing.md,
-                    color: theme.text,
-                  }}
-                >
-                  {post.title}
-                </h2>
-
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: spacing.sm,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: fontSize.base,
-                      color: theme.secondaryText,
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: spacing.sm,
                     }}
                   >
-                    By{" "}
-                    {post.profiles?.full_name ||
-                      post.profiles?.username ||
-                      authorName ||
-                      "Unknown Author"}
-                  </span>
-                  {post.profiles?.is_verified && (
-                    <span style={{ marginLeft: spacing.xs, color: "#00BFFF" }}>✓</span>
-                  )}
-                </div>
-
-                {post.category && (
-                  <p
-                    style={{
-                      fontSize: fontSize.md,
-                      marginBottom: spacing.base,
-                      textTransform: "capitalize",
-                      color: theme.accent,
-                    }}
-                  >
-                    {post.category}
-                  </p>
-                )}
-
-                {Array.isArray(formatted) ? (
-                  formatted.map((para, index) => (
-                    <p
-                      key={index}
+                    <span
                       style={{
-                        marginBottom: "16px",
-                        fontSize: "18px",
-                        lineHeight: "28px",
-                        color: theme.background === "#ffffff" ? "#1e293b" : "#cbd5e1",
+                        fontSize: fontSize.base,
+                        color: theme.secondaryText,
                       }}
                     >
-                      {para}
-                    </p>
-                  ))
-                ) : (
-                  <p
-                    style={{
-                      fontSize: "18px",
-                      lineHeight: "32px",
-                      color: "#1e293b",
-                    }}
-                  >
-                    {formatted}
-                  </p>
-                )}
+                      By{" "}
+                      {post.profiles?.full_name ||
+                        post.profiles?.username ||
+                        authorName ||
+                        "Unknown Author"}
+                    </span>
+                    {post.profiles?.is_verified && (
+                      <span
+                        style={{ marginLeft: spacing.xs, color: "#00BFFF" }}
+                      >
+                        ✓
+                      </span>
+                    )}
+                  </div>
 
-                <p
-                  style={{
-                    fontSize: fontSize.lg,
-                    lineHeight: "26px",
-                    marginBottom: spacing.base,
-                    fontWeight: "400",
-                    color: theme.text,
-                  }}
-                />
-              </div>
-            </>
-          )}
-
-          {/* Comments section - hidden for videos */}
-          {post.post_type !== 'video' && (
-            <>
-              <hr
-                style={{
-                  backgroundColor: theme.border,
-                  marginTop: spacing.base,
-                  marginBottom: spacing.base,
-                  border: "none",
-                  height: 1,
-                }}
-              />
-
-              <div style={{ marginTop: spacing.base }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginTop: spacing.base,
-              }}
-            >
-              <img
-                src={userProfile?.avatar_url || "/avatar.jpg"}
-                alt="Your avatar"
-                style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: "50%",
-                  marginRight: spacing.sm,
-                }}
-              />
-              <span
-                style={{
-                  fontWeight: "400",
-                  fontSize: fontSize.base,
-                  color: theme.text,
-                }}
-              >
-                {userProfile?.full_name || userProfile?.username || "You"}
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginTop: spacing.sm,
-                marginBottom: 27,
-              }}
-            >
-              <input
-                type="text"
-                style={{
-                  flex: 1,
-                  border: `0.5px solid ${theme.border}`,
-                  backgroundColor: theme.cardBackground,
-                  borderRadius: radius.md,
-                  paddingTop: spacing.sm,
-                  paddingBottom: spacing.sm,
-                  paddingLeft: spacing.base,
-                  paddingRight: spacing.base,
-                  height: 43,
-                  fontSize: fontSize.md2,
-                  marginRight: spacing.sm,
-                  color: theme.text,
-                }}
-                placeholder="Share your thoughts..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                disabled={submitting || contentRestricted}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter" && !submitting) {
-                    handleSubmitComment();
-                  }
-                }}
-              />
-              <button
-                onClick={handleSubmitComment}
-                disabled={submitting || !newComment.trim() || contentRestricted}
-                style={{
-                  opacity: submitting || !newComment.trim() || contentRestricted ? 0.5 : 1,
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "#00BFFF",
-                  fontSize: fontSize.base,
-                }}
-              >
-                Send
-              </button>
-            </div>
-
-            <h3
-              style={{
-                fontWeight: "400",
-                fontSize: fontSize.base,
-                marginTop: spacing.base,
-                marginBottom: spacing.sm,
-                color: theme.text,
-              }}
-            >
-              Feedbacks ({comments.length})
-            </h3>
-
-            {loadingComments ? (
-              <p style={{ color: theme.secondaryText, marginBottom: spacing.md }}>
-                Loading comments...
-              </p>
-            ) : comments.length === 0 ? (
-              <p style={{ color: theme.secondaryText, marginBottom: spacing.md }}>
-                No comments yet. Be the first to share your thoughts!
-              </p>
-            ) : (
-              comments.slice(0, 5).map((comment, idx) => (
-                <div key={comment.id}>
-                  {idx > 0 && (
-                    <hr
+                  {post.category && (
+                    <div
                       style={{
-                        backgroundColor: theme.border,
-                        opacity: 0.4,
-                        border: "none",
-                        height: 1,
-                        margin: `${spacing.sm} 0`,
+                        display: "inline-block",
+                        backgroundColor: "#00BFFF",
+                        padding: `${spacing.xs}px ${spacing.md}px`,
+                        borderRadius: radius.lg,
+                        marginBottom: spacing.base,
                       }}
-                    />
+                    >
+                      <span
+                        style={{
+                          color: "#fff",
+                          fontSize: fontSize.sm,
+                          fontWeight: "500",
+                        }}
+                      >
+                        {post.category}
+                      </span>
+                    </div>
                   )}
 
+                  {post.description && (
+                    <p
+                      style={{
+                        fontSize: fontSize.base,
+                        lineHeight: "24px",
+                        marginBottom: spacing.lg,
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                        color: theme.text,
+                      }}
+                    >
+                      {renderFormattedText(post.description)}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* Podcast Player Controls - Fixed at bottom for podcasts */}
+            {post.post_type === "podcast" && post.audio_url && (
+              <div
+                style={{
+                  position: "fixed",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  backgroundColor: theme.cardBackground,
+                  borderTop: `1px solid ${theme.border}`,
+                  padding: spacing.base,
+                  zIndex: 1000,
+                  boxShadow: "0 -2px 10px rgba(0,0,0,0.1)",
+                }}
+              >
+                <div
+                  style={{
+                    maxWidth: "600px",
+                    margin: "0 auto",
+                  }}
+                >
+                  {/* Time Display */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: spacing.xs,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: fontSize.sm,
+                        color: theme.secondaryText,
+                      }}
+                    >
+                      {formatTime(audioProgress.position)}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: fontSize.sm,
+                        color: theme.secondaryText,
+                      }}
+                    >
+                      {formatTime(audioProgress.duration)}
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div
+                    onClick={handleSeek}
+                    style={{
+                      height: 6,
+                      backgroundColor: theme.border,
+                      borderRadius: radius.xs,
+                      overflow: "hidden",
+                      width: "100%",
+                      marginBottom: spacing.md,
+                      cursor: "pointer",
+                      position: "relative",
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: "100%",
+                        width: audioProgress.duration
+                          ? `${(audioProgress.position / audioProgress.duration) * 100}%`
+                          : "0%",
+                        backgroundColor: "#00BFFF",
+                        borderRadius: radius.xs,
+                        transition: "width 0.2s ease",
+                      }}
+                    />
+                  </div>
+
+                  {/* Play/Pause Button */}
+                  <button
+                    style={{
+                      backgroundColor: "#00BFFF",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: `${spacing.sm}px ${spacing.base}px`,
+                      borderRadius: radius.lg,
+                      border: "none",
+                      cursor: "pointer",
+                      width: "100%",
+                    }}
+                    onClick={handlePlayPause}
+                  >
+                    {isPlaying ? (
+                      <IoPauseCircle size={28} color="#fff" />
+                    ) : (
+                      <IoPlayCircle size={28} color="#fff" />
+                    )}
+                    <span
+                      style={{
+                        color: "#fff",
+                        fontSize: fontSize.base,
+                        fontWeight: "600",
+                        marginLeft: spacing.sm,
+                      }}
+                    >
+                      {isPlaying ? "Pause" : "Play"} Podcast
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Verse UI */}
+            {post.post_type === "verse" && (
+              <div
+                style={{
+                  maxWidth: "640px",
+                  margin: "0 auto",
+                  padding: `${spacing.lg}px ${spacing.base}px`,
+                }}
+              >
+                {/* Author row */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: spacing.base,
+                  }}
+                >
+                  <a
+                    href={`/user/${post.user_id}`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <img
+                      src={post.profiles?.avatar_url || "/avatar.jpg"}
+                      alt="Author"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "/avatar.jpg";
+                      }}
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: "50%",
+                        marginRight: spacing.md,
+                        objectFit: "cover",
+                        border: `2px solid ${theme.border}`,
+                      }}
+                    />
+                  </a>
+                  <div>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 6 }}
+                    >
+                      <span
+                        style={{
+                          fontSize: fontSize.base,
+                          fontWeight: "500",
+                          color: theme.text,
+                        }}
+                      >
+                        {post.profiles?.full_name ||
+                          post.profiles?.username ||
+                          authorName ||
+                          "Creator"}
+                      </span>
+                      {post.profiles?.is_verified && (
+                        <span
+                          style={{ color: "#00BFFF", fontSize: fontSize.sm }}
+                        >
+                          ✓
+                        </span>
+                      )}
+                    </div>
+                    {post.created_at && (
+                      <span
+                        style={{
+                          fontSize: fontSize.sm,
+                          color: theme.secondaryText,
+                        }}
+                      >
+                        {new Date(post.created_at).toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Verse text */}
+                <p
+                  style={{
+                    fontSize: "20px",
+                    lineHeight: "32px",
+                    color: theme.text,
+                    marginBottom: spacing.base,
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {renderFormattedText(post.content || "")}
+                </p>
+
+                {/* Verse image */}
+                {post.image_url && (
+                  <img
+                    src={post.image_url}
+                    alt="Verse image"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      maxHeight: 480,
+                      objectFit: "cover",
+                      borderRadius: 12,
+                      display: "block",
+                      marginTop: spacing.md,
+                    }}
+                  />
+                )}
+              </div>
+            )}
+
+            {/* Article UI (existing) */}
+            {(!post.post_type || post.post_type === "article") && (
+              <>
+                {post.cover_image_url && (
+                  <img
+                    src={post.cover_image_url}
+                    alt="Post cover"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      maxHeight: 400,
+                      objectFit: "cover",
+                      marginBottom: spacing.base,
+                      display: "block",
+                    }}
+                  />
+                )}
+
+                <div
+                  style={{
+                    padding: spacing.base,
+                    backgroundColor: theme.background,
+                  }}
+                >
+                  <h2
+                    style={{
+                      fontSize: fontSize.xl2,
+                      fontWeight: "500",
+                      marginBottom: spacing.md,
+                      color: theme.text,
+                    }}
+                  >
+                    {post.title}
+                  </h2>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: spacing.sm,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: fontSize.base,
+                        color: theme.secondaryText,
+                      }}
+                    >
+                      By{" "}
+                      {post.profiles?.full_name ||
+                        post.profiles?.username ||
+                        authorName ||
+                        "Unknown Author"}
+                    </span>
+                    {post.profiles?.is_verified && (
+                      <span
+                        style={{ marginLeft: spacing.xs, color: "#00BFFF" }}
+                      >
+                        ✓
+                      </span>
+                    )}
+                  </div>
+
+                  {post.category && (
+                    <p
+                      style={{
+                        fontSize: fontSize.md,
+                        marginBottom: spacing.base,
+                        textTransform: "capitalize",
+                        color: theme.accent,
+                      }}
+                    >
+                      {post.category}
+                    </p>
+                  )}
+
+                  {Array.isArray(formatted) ? (
+                    formatted.map((para, index) => (
+                      <p
+                        key={index}
+                        style={{
+                          marginBottom: "16px",
+                          fontSize: "18px",
+                          lineHeight: "28px",
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                          color:
+                            theme.background === "#ffffff"
+                              ? "#1e293b"
+                              : "#cbd5e1",
+                        }}
+                      >
+                        {renderFormattedText(para)}
+                      </p>
+                    ))
+                  ) : (
+                    <p
+                      style={{
+                        fontSize: "18px",
+                        lineHeight: "32px",
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                        color: "#1e293b",
+                      }}
+                    >
+                      {renderFormattedText(formatted)}
+                    </p>
+                  )}
+
+                  <p
+                    style={{
+                      fontSize: fontSize.lg,
+                      lineHeight: "26px",
+                      marginBottom: spacing.base,
+                      fontWeight: "400",
+                      color: theme.text,
+                    }}
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Comments section - hidden for videos */}
+            {post.post_type !== "video" && (
+              <>
+                <hr
+                  style={{
+                    backgroundColor: theme.border,
+                    marginTop: spacing.base,
+                    marginBottom: spacing.base,
+                    border: "none",
+                    height: 1,
+                  }}
+                />
+
+                <div style={{ marginTop: spacing.base }}>
                   <div
                     style={{
                       display: "flex",
@@ -1443,8 +1472,8 @@ const formatted = formatContent(post.content || "");
                     }}
                   >
                     <img
-                      src={comment.profiles?.avatar_url || "/avatar.jpg"}
-                      alt="Commenter"
+                      src={userProfile?.avatar_url || "/avatar.jpg"}
+                      alt="Your avatar"
                       style={{
                         width: 30,
                         height: 30,
@@ -1452,218 +1481,171 @@ const formatted = formatContent(post.content || "");
                         marginRight: spacing.sm,
                       }}
                     />
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <span
-                        style={{
-                          fontWeight: "400",
-                          fontSize: fontSize.base,
-                          color: theme.text,
-                        }}
-                      >
-                        {comment.profiles?.full_name ||
-                          comment.profiles?.username ||
-                          "Anonymous"}
-                      </span>
-                      {comment.profiles?.is_verified && (
-                        <VerificationBadge size={12} />
-                      )}
-                    </div>
                     <span
                       style={{
-                        fontSize: fontSize.sm,
                         fontWeight: "400",
-                        marginLeft: spacing.sm,
-                        color: theme.secondaryText,
+                        fontSize: fontSize.base,
+                        color: theme.text,
                       }}
                     >
-                      {new Date(comment.created_at).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {userProfile?.full_name || userProfile?.username || "You"}
                     </span>
-                    <div style={{ flex: 1 }} />
-                    <button
-                      onClick={() => handleToggleCommentLike(comment.id)}
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginTop: spacing.sm,
+                      marginBottom: 27,
+                    }}
+                  >
+                    <input
+                      type="text"
                       style={{
-                        display: "flex",
-                        alignItems: "center",
+                        flex: 1,
+                        border: `0.5px solid ${theme.border}`,
+                        backgroundColor: theme.cardBackground,
+                        borderRadius: radius.md,
+                        paddingTop: spacing.sm,
+                        paddingBottom: spacing.sm,
+                        paddingLeft: spacing.base,
+                        paddingRight: spacing.base,
+                        height: 43,
+                        fontSize: fontSize.md2,
+                        marginRight: spacing.sm,
+                        color: theme.text,
+                      }}
+                      placeholder="Share your thoughts..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      disabled={submitting || contentRestricted}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter" && !submitting) {
+                          handleSubmitComment();
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={handleSubmitComment}
+                      disabled={
+                        submitting || !newComment.trim() || contentRestricted
+                      }
+                      style={{
+                        opacity:
+                          submitting || !newComment.trim() || contentRestricted
+                            ? 0.5
+                            : 1,
                         background: "none",
                         border: "none",
                         cursor: "pointer",
+                        color: "#00BFFF",
+                        fontSize: fontSize.base,
                       }}
                     >
-                      <span
-                        style={{
-                          color: commentLikes[comment.id]
-                            ? theme.accent
-                            : theme.icon,
-                        }}
-                      >
-                        👍
-                      </span>
-                      <span
-                        style={{
-                          marginLeft: spacing.xs,
-                          fontSize: fontSize.sm2,
-                          color: theme.secondaryText,
-                          minWidth: 18,
-                          textAlign: "right",
-                        }}
-                      >
-                        {typeof comment.like_count === "number"
-                          ? comment.like_count
-                          : 0}
-                      </span>
+                      Send
                     </button>
                   </div>
 
-                  <p
+                  <h3
                     style={{
-                      marginTop: spacing.sm,
-                      fontSize: fontSize.md,
-                      lineHeight: "21px",
-                      marginBottom: spacing.lg,
+                      fontWeight: "400",
+                      fontSize: fontSize.base,
+                      marginTop: spacing.base,
+                      marginBottom: spacing.sm,
                       color: theme.text,
                     }}
                   >
-                    {comment.content.replace(/^\[reply-to:(.+?)\]\s+/, "")}
-                  </p>
+                    Feedbacks ({comments.length})
+                  </h3>
 
-                  <div style={{ display: "flex", marginBottom: spacing.md }}>
-                    <button
-                      onClick={() => setReplyTargetId(comment.id)}
+                  {loadingComments ? (
+                    <p
                       style={{
-                        marginRight: spacing.base,
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: theme.accent,
-                      }}
-                    >
-                      Reply
-                    </button>
-                    {userProfile?.id && comment.user_id === userProfile.id && (
-                      <button
-                        onClick={() => handleDeleteCommentLocal(comment.id)}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          color: "#FF3B30",
-                        }}
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </div>
-
-                  {replyTargetId === comment.id && (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
+                        color: theme.secondaryText,
                         marginBottom: spacing.md,
                       }}
                     >
-                      <input
-                        type="text"
-                        value={replyText}
-                        onChange={(e) => setReplyText(e.target.value)}
-                        placeholder="Write a reply..."
-                        style={{
-                          flex: 1,
-                          border: `0.5px solid ${theme.border}`,
-                          backgroundColor: theme.cardBackground,
-                          borderRadius: radius.xl2,
-                          paddingLeft: spacing.base,
-                          paddingRight: spacing.base,
-                          paddingTop: 11,
-                          paddingBottom: 11,
-                          marginRight: spacing.sm,
-                          color: theme.text,
-                        }}
-                      />
-                      <button
-                        onClick={handleReply}
-                        disabled={submitting}
-                        style={{
-                          backgroundColor: theme.accent,
-                          paddingLeft: spacing.md,
-                          paddingRight: spacing.md,
-                          paddingTop: 11,
-                          paddingBottom: 11,
-                          borderRadius: radius.xl2,
-                          opacity: submitting ? 0.6 : 1,
-                          border: "none",
-                          cursor: "pointer",
-                          color: "#fff",
-                        }}
-                      >
-                        Send
-                      </button>
-                    </div>
-                  )}
-
-                  {(repliesMap[comment.id] || []).length > 0 && (
-                    <hr
+                      Loading comments...
+                    </p>
+                  ) : comments.length === 0 ? (
+                    <p
                       style={{
-                        backgroundColor: theme.border,
-                        opacity: 0.4,
-                        border: "none",
-                        height: 1,
-                        marginTop: spacing.xs,
-                        marginBottom: spacing.sm,
-                        marginLeft: 38,
-                      }}
-                    />
-                  )}
-
-                  {(repliesMap[comment.id] || []).map((reply, rIdx) => (
-                    <div
-                      key={reply.id}
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        marginTop: spacing.sm,
-                        marginLeft: 38,
-                        paddingTop: spacing.sm,
-                        borderTopWidth: rIdx > 0 ? 1 : 0,
-                        borderTopColor: theme.border,
+                        color: theme.secondaryText,
+                        marginBottom: spacing.md,
                       }}
                     >
-                      <img
-                        src={reply.profiles?.avatar_url || "/avatar.jpg"}
-                        alt="Reply author"
-                        style={{
-                          width: 26,
-                          height: 26,
-                          borderRadius: "50%",
-                          marginRight: spacing.sm,
-                        }}
-                      />
-                      <div style={{ flex: 1 }}>
+                      No comments yet. Be the first to share your thoughts!
+                    </p>
+                  ) : (
+                    comments.slice(0, 5).map((comment, idx) => (
+                      <div key={comment.id}>
+                        {idx > 0 && (
+                          <hr
+                            style={{
+                              backgroundColor: theme.border,
+                              opacity: 0.4,
+                              border: "none",
+                              height: 1,
+                              margin: `${spacing.sm} 0`,
+                            }}
+                          />
+                        )}
+
                         <div
-                          style={{ display: "flex", alignItems: "center" }}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginTop: spacing.base,
+                          }}
                         >
+                          <img
+                            src={comment.profiles?.avatar_url || "/avatar.jpg"}
+                            alt="Commenter"
+                            style={{
+                              width: 30,
+                              height: 30,
+                              borderRadius: "50%",
+                              marginRight: spacing.sm,
+                            }}
+                          />
+                          <div
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <span
+                              style={{
+                                fontWeight: "400",
+                                fontSize: fontSize.base,
+                                color: theme.text,
+                              }}
+                            >
+                              {comment.profiles?.full_name ||
+                                comment.profiles?.username ||
+                                "Anonymous"}
+                            </span>
+                            {comment.profiles?.is_verified && (
+                              <VerificationBadge size={12} />
+                            )}
+                          </div>
                           <span
                             style={{
-                              fontWeight: "500",
-                              fontSize: fontSize.sm2,
-                              color: theme.text,
+                              fontSize: fontSize.sm,
+                              fontWeight: "400",
+                              marginLeft: spacing.sm,
+                              color: theme.secondaryText,
                             }}
                           >
-                            {reply.profiles?.full_name ||
-                              reply.profiles?.username ||
-                              "Anonymous"}
+                            {new Date(comment.created_at).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )}
                           </span>
-                          {reply.profiles?.is_verified && (
-                            <VerificationBadge size={10} />
-                          )}
                           <div style={{ flex: 1 }} />
                           <button
-                            onClick={() =>
-                              handleToggleReplyLike(reply.id, comment.id)
-                            }
+                            onClick={() => handleToggleCommentLike(comment.id)}
                             style={{
                               display: "flex",
                               alignItems: "center",
@@ -1674,7 +1656,7 @@ const formatted = formatContent(post.content || "");
                           >
                             <span
                               style={{
-                                color: commentLikes[reply.id]
+                                color: commentLikes[comment.id]
                                   ? theme.accent
                                   : theme.icon,
                               }}
@@ -1684,25 +1666,56 @@ const formatted = formatContent(post.content || "");
                             <span
                               style={{
                                 marginLeft: spacing.xs,
-                                fontSize: fontSize.sm,
+                                fontSize: fontSize.sm2,
                                 color: theme.secondaryText,
-                                minWidth: 16,
+                                minWidth: 18,
                                 textAlign: "right",
                               }}
                             >
-                              {typeof reply.like_count === "number"
-                                ? reply.like_count
+                              {typeof comment.like_count === "number"
+                                ? comment.like_count
                                 : 0}
                             </span>
                           </button>
+                        </div>
+
+                        <p
+                          style={{
+                            marginTop: spacing.sm,
+                            fontSize: fontSize.md,
+                            lineHeight: "21px",
+                            marginBottom: spacing.lg,
+                            color: theme.text,
+                          }}
+                        >
+                          {comment.content.replace(
+                            /^\[reply-to:(.+?)\]\s+/,
+                            "",
+                          )}
+                        </p>
+
+                        <div
+                          style={{ display: "flex", marginBottom: spacing.md }}
+                        >
+                          <button
+                            onClick={() => setReplyTargetId(comment.id)}
+                            style={{
+                              marginRight: spacing.base,
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: theme.accent,
+                            }}
+                          >
+                            Reply
+                          </button>
                           {userProfile?.id &&
-                            reply.user_id === userProfile.id && (
+                            comment.user_id === userProfile.id && (
                               <button
                                 onClick={() =>
-                                  handleDeleteCommentLocal(reply.id)
+                                  handleDeleteCommentLocal(comment.id)
                                 }
                                 style={{
-                                  marginLeft: spacing.md,
                                   background: "none",
                                   border: "none",
                                   cursor: "pointer",
@@ -1713,83 +1726,253 @@ const formatted = formatContent(post.content || "");
                               </button>
                             )}
                         </div>
-                        <p
-                          style={{
-                            marginTop: 3,
-                            fontSize: fontSize.sm2,
-                            color: theme.text,
-                          }}
-                        >
-                          {reply.content}
-                        </p>
+
+                        {replyTargetId === comment.id && (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              marginBottom: spacing.md,
+                            }}
+                          >
+                            <input
+                              type="text"
+                              value={replyText}
+                              onChange={(e) => setReplyText(e.target.value)}
+                              placeholder="Write a reply..."
+                              style={{
+                                flex: 1,
+                                border: `0.5px solid ${theme.border}`,
+                                backgroundColor: theme.cardBackground,
+                                borderRadius: radius.xl2,
+                                paddingLeft: spacing.base,
+                                paddingRight: spacing.base,
+                                paddingTop: 11,
+                                paddingBottom: 11,
+                                marginRight: spacing.sm,
+                                color: theme.text,
+                              }}
+                            />
+                            <button
+                              onClick={handleReply}
+                              disabled={submitting}
+                              style={{
+                                backgroundColor: theme.accent,
+                                paddingLeft: spacing.md,
+                                paddingRight: spacing.md,
+                                paddingTop: 11,
+                                paddingBottom: 11,
+                                borderRadius: radius.xl2,
+                                opacity: submitting ? 0.6 : 1,
+                                border: "none",
+                                cursor: "pointer",
+                                color: "#fff",
+                              }}
+                            >
+                              Send
+                            </button>
+                          </div>
+                        )}
+
+                        {(repliesMap[comment.id] || []).length > 0 && (
+                          <hr
+                            style={{
+                              backgroundColor: theme.border,
+                              opacity: 0.4,
+                              border: "none",
+                              height: 1,
+                              marginTop: spacing.xs,
+                              marginBottom: spacing.sm,
+                              marginLeft: 38,
+                            }}
+                          />
+                        )}
+
+                        {(repliesMap[comment.id] || []).map((reply, rIdx) => (
+                          <div
+                            key={reply.id}
+                            style={{
+                              display: "flex",
+                              alignItems: "flex-start",
+                              marginTop: spacing.sm,
+                              marginLeft: 38,
+                              paddingTop: spacing.sm,
+                              borderTopWidth: rIdx > 0 ? 1 : 0,
+                              borderTopColor: theme.border,
+                            }}
+                          >
+                            <img
+                              src={reply.profiles?.avatar_url || "/avatar.jpg"}
+                              alt="Reply author"
+                              style={{
+                                width: 26,
+                                height: 26,
+                                borderRadius: "50%",
+                                marginRight: spacing.sm,
+                              }}
+                            />
+                            <div style={{ flex: 1 }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontWeight: "500",
+                                    fontSize: fontSize.sm2,
+                                    color: theme.text,
+                                  }}
+                                >
+                                  {reply.profiles?.full_name ||
+                                    reply.profiles?.username ||
+                                    "Anonymous"}
+                                </span>
+                                {reply.profiles?.is_verified && (
+                                  <VerificationBadge size={10} />
+                                )}
+                                <div style={{ flex: 1 }} />
+                                <button
+                                  onClick={() =>
+                                    handleToggleReplyLike(reply.id, comment.id)
+                                  }
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    background: "none",
+                                    border: "none",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      color: commentLikes[reply.id]
+                                        ? theme.accent
+                                        : theme.icon,
+                                    }}
+                                  >
+                                    👍
+                                  </span>
+                                  <span
+                                    style={{
+                                      marginLeft: spacing.xs,
+                                      fontSize: fontSize.sm,
+                                      color: theme.secondaryText,
+                                      minWidth: 16,
+                                      textAlign: "right",
+                                    }}
+                                  >
+                                    {typeof reply.like_count === "number"
+                                      ? reply.like_count
+                                      : 0}
+                                  </span>
+                                </button>
+                                {userProfile?.id &&
+                                  reply.user_id === userProfile.id && (
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteCommentLocal(reply.id)
+                                      }
+                                      style={{
+                                        marginLeft: spacing.md,
+                                        background: "none",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        color: "#FF3B30",
+                                      }}
+                                    >
+                                      Delete
+                                    </button>
+                                  )}
+                              </div>
+                              <p
+                                style={{
+                                  marginTop: 3,
+                                  fontSize: fontSize.sm2,
+                                  color: theme.text,
+                                }}
+                              >
+                                {reply.content}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
+
+                  <button
+                    onClick={() => setShowCommentModal(true)}
+                    style={{
+                      backgroundColor: theme.cardBackground,
+                      border: "none",
+                      padding: spacing.md,
+                      borderRadius: radius.full,
+                      cursor: "pointer",
+                      marginTop: spacing.lg,
+                      marginBottom: spacing.lg,
+                      width: "100%",
+                      color: theme.text,
+                    }}
+                  >
+                    See All Responses
+                  </button>
                 </div>
-              ))
+              </>
             )}
 
-            <button
-              onClick={() => setShowCommentModal(true)}
-              style={{
-                backgroundColor: theme.cardBackground,
-                border: "none",
-                padding: spacing.md,
-                borderRadius: radius.full,
-                cursor: "pointer",
-                marginTop: spacing.lg,
-                marginBottom: spacing.lg,
-                width: "100%",
-                color: theme.text,
-              }}
-            >
-              See All Responses
-            </button>
-              </div>
-            </>
-          )}
-
-          {/* Add padding at bottom for podcast player controls */}
-          {post.post_type === 'podcast' && post.audio_url && (
-            <div style={{ height: 140 }} />
-          )}
-        </div>
+            {/* Add padding at bottom for podcast player controls */}
+            {post.post_type === "podcast" && post.audio_url && (
+              <div style={{ height: 140 }} />
+            )}
+          </div>
         </div>
       </div>
 
       {/* Podcast Player Controls - Fixed at bottom for podcasts */}
-      {post.post_type === 'podcast' && post.audio_url && (
-        <div style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: theme.cardBackground,
-          borderTop: `1px solid ${theme.border}`,
-          padding: spacing.base,
-          zIndex: 1000,
-          boxShadow: "0 -2px 10px rgba(0,0,0,0.1)",
-        }}>
-          <div style={{
-            maxWidth: "600px",
-            margin: "0 auto",
-          }}>
+      {post.post_type === "podcast" && post.audio_url && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: theme.cardBackground,
+            borderTop: `1px solid ${theme.border}`,
+            padding: spacing.base,
+            zIndex: 1000,
+            boxShadow: "0 -2px 10px rgba(0,0,0,0.1)",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "600px",
+              margin: "0 auto",
+            }}
+          >
             {/* Time Display */}
-            <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: spacing.xs,
-            }}>
-              <span style={{
-                fontSize: fontSize.sm,
-                color: theme.secondaryText,
-              }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: spacing.xs,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: fontSize.sm,
+                  color: theme.secondaryText,
+                }}
+              >
                 {formatTime(audioProgress.position)}
               </span>
-              <span style={{
-                fontSize: fontSize.sm,
-                color: theme.secondaryText,
-              }}>
+              <span
+                style={{
+                  fontSize: fontSize.sm,
+                  color: theme.secondaryText,
+                }}
+              >
                 {formatTime(audioProgress.duration)}
               </span>
             </div>
@@ -1808,15 +1991,17 @@ const formatted = formatContent(post.content || "");
                 position: "relative",
               }}
             >
-              <div style={{
-                height: "100%",
-                width: audioProgress.duration
-                  ? `${(audioProgress.position / audioProgress.duration) * 100}%`
-                  : "0%",
-                backgroundColor: "#00BFFF",
-                borderRadius: radius.xs,
-                transition: "width 0.2s ease",
-              }} />
+              <div
+                style={{
+                  height: "100%",
+                  width: audioProgress.duration
+                    ? `${(audioProgress.position / audioProgress.duration) * 100}%`
+                    : "0%",
+                  backgroundColor: "#00BFFF",
+                  borderRadius: radius.xs,
+                  transition: "width 0.2s ease",
+                }}
+              />
             </div>
 
             {/* Play/Pause Button */}
@@ -1840,12 +2025,14 @@ const formatted = formatContent(post.content || "");
               ) : (
                 <IoPlayCircle size={28} color="#fff" />
               )}
-              <span style={{
-                color: "#fff",
-                fontSize: fontSize.base,
-                fontWeight: "600",
-                marginLeft: spacing.sm,
-              }}>
+              <span
+                style={{
+                  color: "#fff",
+                  fontSize: fontSize.base,
+                  fontWeight: "600",
+                  marginLeft: spacing.sm,
+                }}
+              >
                 {isPlaying ? "Pause" : "Play"} Podcast
               </span>
             </button>
@@ -1859,7 +2046,15 @@ const formatted = formatContent(post.content || "");
           visible={showCommentModal}
           onClose={() => setShowCommentModal(false)}
           contentId={post.id}
-          contentType={(post.post_type as "article" | "podcast" | "video" | "community" | "community_post" | "verse") || "article"}
+          contentType={
+            (post.post_type as
+              | "article"
+              | "podcast"
+              | "video"
+              | "community"
+              | "community_post"
+              | "verse") || "article"
+          }
         />
       )}
 

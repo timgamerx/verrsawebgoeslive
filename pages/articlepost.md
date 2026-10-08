@@ -647,7 +647,7 @@ setPost(data);
                   color: theme.text,
                 }}
               >
-                {article?.title || "".slice(0, 60)}
+                {article?.title || "".slice(0, 10)}
               </h1>
             </div>
           </div>
