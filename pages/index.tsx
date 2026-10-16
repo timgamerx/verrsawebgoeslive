@@ -295,16 +295,20 @@ export default function LandingPage() {
     }
   };
 
-  useEffect(() => {
-    if (window.location.pathname === "/joinverrsanewsletter") {
+    useEffect(() => {
+      if (window.location.pathname === "/joinverrsanewsletter") {
       window.history.replaceState(null, "", "/#newsletter");
 
-      document.getElementById("newsletter")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, []);
+      const timeout = setTimeout(() => {
+        document.getElementById("newsletter")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 3000);
+
+      return () => clearTimeout(timeout);
+      }
+    }, []);
 
   return (
     <>
