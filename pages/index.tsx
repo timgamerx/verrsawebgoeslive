@@ -296,17 +296,19 @@ export default function LandingPage() {
   };
 
     useEffect(() => {
-      if (window.location.pathname === "/joinverrsanewsletter") {
-      window.history.replaceState(null, "", "/#newsletter");
+      const params = new URLSearchParams(window.location.search);
 
-      const timeout = setTimeout(() => {
-        document.getElementById("newsletter")?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 6000);
+      if (params.get("scrollTo") === "newsletter") {
+        const timeout = setTimeout(() => {
+          document.getElementById("newsletter")?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
 
-      return () => clearTimeout(timeout);
+          window.history.replaceState(null, "", "/");
+        }, 3000);
+
+        return () => clearTimeout(timeout);
       }
     }, []);
 
