@@ -15,6 +15,17 @@ const nextConfig = {
       },
     ];
   },
+
+  async redirects() {
+    return [
+      {
+        source: '/joinverrsanewsletter',
+        destination: '/#newsletter',
+        permanent: false,
+      },
+    ];
+  },
+
   outputFileTracingRoot: __dirname,
   eslint: {
     ignoreDuringBuilds: true,

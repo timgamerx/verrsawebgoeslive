@@ -295,6 +295,17 @@ export default function LandingPage() {
     }
   };
 
+  useEffect(() => {
+    if (window.location.pathname === "/joinverrsanewsletter") {
+      window.history.replaceState(null, "", "/#newsletter");
+
+      document.getElementById("newsletter")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, []);
+
   return (
     <>
       <Head>
@@ -814,7 +825,8 @@ export default function LandingPage() {
       </div> */}
 
         {/* Sign Up Section */}
-        <section className="relative bg-cyan-700 py-14 mt-15 mb-8 rounded-lg mx-4 md:mx-20 lg:mx-32 overflow-hidden">
+        <section id="newsletter"
+        className="relative bg-cyan-700 py-14 mt-15 mb-8 rounded-lg mx-4 md:mx-20 lg:mx-32 overflow-hidden">
           {/* Decorative corner images inside the bg */}
           <div className="absolute bottom-0 left-0 w-24 h-24 md:w-32 md:h-40 z-0">
             <Image
