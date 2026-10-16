@@ -304,7 +304,7 @@ export default function LandingPage() {
           behavior: "smooth",
           block: "start",
         });
-      }, 3000);
+      }, 6000);
 
       return () => clearTimeout(timeout);
       }
