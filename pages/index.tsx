@@ -186,7 +186,7 @@ export default function LandingPage() {
     {
       question: "How can small creators earn without a large audience?",
       answer:
-        "Verrsa enables creators to monetize from day one through gift-based monetization, article payments, and live stream donations. You don't need 1,000 subscribers or followers to start earning. Every piece of content you create can generate income immediately.",
+        "Verrsa enables creators to monetize from day one through gift-based monetization, article payments, and live stream donations. You don't need 1,000 subscribers or followers to start earning. Every piece of content you create can generate income.",
     },
     {
       question: "What percentage do creators earn from gifts?",
@@ -211,7 +211,7 @@ export default function LandingPage() {
     {
       question: "How quickly can I start earning on Verrsa?",
       answer:
-        "You can start earning immediately after creating your first content. There's no waiting period, no minimum follower count, and no complex approval process. Just create, publish, and earn.",
+        "You can work towards earning on Verrsa by creating valuable content, growing your audience, and engaging with the community. Publish articles, podcasts, videos, build communities, or host live broadcasts around your interests and creativity."
     },
     {
       question: "Does Verrsa work for micro-influencers?",
@@ -320,7 +320,7 @@ export default function LandingPage() {
         />
         <meta
           name="description"
-          content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required."
+          content="Join Verrsa, the monetization-first creator platform for emerging creators. Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
         />
         <meta
           property="og:title"
@@ -328,7 +328,7 @@ export default function LandingPage() {
         />
         <meta
           property="og:description"
-          content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required."
+          content="Join Verrsa, the monetization-first creator platform for emerging creators. Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
         />
         <meta
           property="og:image"
@@ -338,7 +338,7 @@ export default function LandingPage() {
 
       <SEO
         title="Verrsa - Create, Publish, Live, Earn | Monetization-First Creator Platform"
-        description="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required."
+        description="Join Verrsa, the monetization-first creator platform for emerging creators. Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
         keywords="creator platform, monetization, earn money online, articles, podcasts, live streaming, content creation, emerging creators, micro-influencers, social media, Verrsa"
         url="https://verrsa.org"
         type="website"
@@ -450,9 +450,7 @@ export default function LandingPage() {
 
         {/* Verrsa Creators */}
         <section className="bg-white py-10 mb-4">
-          <h2 style={styles.sectionTitle}>
-            Top Verrsa Creators
-          </h2>
+          <h2 style={styles.sectionTitle}>Top Verrsa Creators</h2>
 
           <p className="text-gray-600 p-4 text-center max-w-2xl mx-auto">
             Here are some of our top creators who are making waves on Verrsa.
@@ -497,9 +495,7 @@ export default function LandingPage() {
         </section>
 
         <section className="bg-white py-10 mb-4">
-          <h2 style={styles.sectionTitle}>
-            Trending Contents
-          </h2>
+          <h2 style={styles.sectionTitle}>Trending Contents</h2>
           <p className="text-gray-600 p-4 text-center max-w-2xl mx-auto">
             Discover the most popular and engaging content on Verrsa right now.
             See what&apos;s capturing the attention of our community.
@@ -829,8 +825,10 @@ export default function LandingPage() {
       </div> */}
 
         {/* Sign Up Section */}
-        <section id="newsletter"
-        className="relative bg-cyan-700 py-14 mt-15 mb-8 rounded-lg mx-4 md:mx-20 lg:mx-32 overflow-hidden">
+        <section
+          id="newsletter"
+          className="relative bg-cyan-700 py-14 mt-15 mb-8 rounded-lg mx-4 md:mx-20 lg:mx-32 overflow-hidden"
+        >
           {/* Decorative corner images inside the bg */}
           <div className="absolute bottom-0 left-0 w-24 h-24 md:w-32 md:h-40 z-0">
             <Image

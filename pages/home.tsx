@@ -611,15 +611,25 @@ function Home() {
 
   return (
     <>
-
-<Head>
+      <Head>
         <title>Verrsa - Create, Publish, Live, Earn</title>
-        <meta name="description" content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required." />
-        <meta property="og:title" content="Verrsa - Create, Publish, Live, Earn" />
-        <meta property="og:description" content="Join Verrsa, the monetization-first creator platform for emerging creators. Start earning from articles, podcasts, videos, and live streams without needing a large audience. No minimum followers required." />
-        <meta property="og:image" content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png" />
+        <meta
+          name="description"
+          content="Join Verrsa, the monetization-first creator platform for emerging creators. Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
+        />
+        <meta
+          property="og:title"
+          content="Verrsa - Create, Publish, Live, Earn"
+        />
+        <meta
+          property="og:description"
+          content="Join Verrsa, the monetization-first creator platform for emerging creators. Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
+        />
+        <meta
+          property="og:image"
+          content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
+        />
       </Head>
-
 
       <style>{`
         @keyframes spin {
@@ -635,163 +645,197 @@ function Home() {
       />
 
       <div style={styles.container}>
-      <div style={styles.stickyHeader}>
-        <div style={styles.headerRow}>
-          <img src="/verrsa-logo.png" alt="Verrsa" style={styles.headerLogo} />
-          <div style={styles.headerActions}>
-            <button type="button" style={styles.headerIconButton} aria-label="Notifications"
-            onClick={(() => {router.push('/notification')})}>
-              <IoMdNotificationsOutline size={22} color="#111" />
-            </button>
-            {isMobile && (
-              <button type="button" style={styles.headerAvatarButton} aria-label="Open menu" onClick={navigateToMenu}>
-                <img src={userAvatar} alt="Menu" style={styles.avatarSmall} onError={(e) => { e.currentTarget.src = '/avatar.jpg'; }} />
+        <div style={styles.stickyHeader}>
+          <div style={styles.headerRow}>
+            <img
+              src="/verrsa-logo.png"
+              alt="Verrsa"
+              style={styles.headerLogo}
+            />
+            <div style={styles.headerActions}>
+              <button
+                type="button"
+                style={styles.headerIconButton}
+                aria-label="Notifications"
+                onClick={() => {
+                  router.push("/notification");
+                }}
+              >
+                <IoMdNotificationsOutline size={22} color="#111" />
               </button>
-            )}
+              {isMobile && (
+                <button
+                  type="button"
+                  style={styles.headerAvatarButton}
+                  aria-label="Open menu"
+                  onClick={navigateToMenu}
+                >
+                  <img
+                    src={userAvatar}
+                    alt="Menu"
+                    style={styles.avatarSmall}
+                    onError={(e) => {
+                      e.currentTarget.src = "/avatar.jpg";
+                    }}
+                  />
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div style={styles.scrollContent}>
-        {/* Search Section */}
-        <div style={styles.searchContainer}>
-         <IoSearchOutline size={17} color="#888" style={{ marginRight: "8px" }} />
-          <input
-            type="text"
-            placeholder="Search posts, creators..."
-            style={styles.searchInput}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        {/* Main Content */}
+        <div style={styles.scrollContent}>
+          {/* Search Section */}
+          <div style={styles.searchContainer}>
+            <IoSearchOutline
+              size={17}
+              color="#888"
+              style={{ marginRight: "8px" }}
+            />
+            <input
+              type="text"
+              placeholder="Search posts, creators..."
+              style={styles.searchInput}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-        {/* Category Section */}
-        <div style={styles.categoryContainer}>
-          {CATEGORIES.map((category) => (
-            <div
-              key={category}
-              style={
-                selectedCategory === category
-                  ? styles.categoryActive
-                  : styles.category
-              }
-              onClick={() => setSelectedCategory(category)}
-            >
-              <span
+          {/* Category Section */}
+          <div style={styles.categoryContainer}>
+            {CATEGORIES.map((category) => (
+              <div
+                key={category}
                 style={
                   selectedCategory === category
-                    ? styles.categoryTextActive
-                    : styles.categoryText
+                    ? styles.categoryActive
+                    : styles.category
                 }
+                onClick={() => setSelectedCategory(category)}
               >
-                {category}
-              </span>
+                <span
+                  style={
+                    selectedCategory === category
+                      ? styles.categoryTextActive
+                      : styles.categoryText
+                  }
+                >
+                  {category}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Posts */}
+          {loading ? (
+            <div style={styles.loadingContainer}>
+              <div style={styles.spinner}></div>
+              <p style={styles.loadingText}>Loading posts...</p>
             </div>
-          ))}
+          ) : posts.length > 0 ? (
+            posts.map((post) => renderPost(post))
+          ) : (
+            <div style={styles.emptyContainer}>
+              <p style={styles.emptyText}>No posts found</p>
+            </div>
+          )}
         </div>
 
-        {/* Posts */}
-        {loading ? (
-          <div style={styles.loadingContainer}>
-            <div style={styles.spinner}></div>
-            <p style={styles.loadingText}>Loading posts...</p>
-          </div>
-        ) : posts.length > 0 ? (
-          posts.map((post) => renderPost(post))
-        ) : (
-          <div style={styles.emptyContainer}>
-            <p style={styles.emptyText}>No posts found</p>
+        {/* FAB Button */}
+        <div
+          style={styles.fab}
+          onClick={() => setIsModalVisible(!isModalVisible)}
+        >
+          <span style={styles.fabText}>+</span>
+        </div>
+
+        {/* Modal */}
+        {isModalVisible && (
+          <div
+            style={styles.modalOverlay}
+            onClick={() => setIsModalVisible(false)}
+          >
+            <div style={styles.fabMenu} onClick={(e) => e.stopPropagation()}>
+              <div style={styles.menuItem}>
+                <span style={styles.menuText}>Podcast</span>
+                <div
+                  style={styles.iconCircleWhite}
+                  onClick={navigateToCreatePodcast}
+                >
+                  <IoMicOutline size={24} color="#00BFFF" />
+                </div>
+              </div>
+              <div style={styles.menuItem}>
+                <span style={styles.menuText}>Post/Create Video</span>
+                <div
+                  style={styles.iconCircleWhite}
+                  onClick={navigateToPostVideo}
+                >
+                  <IoVideocamOutline size={24} color="#00BFFF" />
+                </div>
+              </div>
+              <div style={styles.menuItem}>
+                <span style={styles.menuText}>Write Article</span>
+                <div
+                  style={styles.iconCircleWhite}
+                  onClick={navigateToWriteArticle}
+                >
+                  <IoPencilOutline size={24} color="#00BFFF" />
+                </div>
+              </div>
+              <div style={styles.menuItem}>
+                <span style={styles.menuText}>Create Verse</span>
+                <div
+                  style={styles.iconCircleWhite}
+                  onClick={navigateToCreateVerse}
+                >
+                  <IoChatbubbleOutline size={24} color="#00BFFF" />
+                </div>
+              </div>
+            </div>
           </div>
         )}
+
+        {/* Comment Modal */}
+        {selectedPost && (
+          <CommentModal
+            visible={commentModalVisible}
+            onClose={() => {
+              setCommentModalVisible(false);
+              setSelectedPost(null);
+            }}
+            contentId={selectedPost.id}
+            contentType={selectedPost.type}
+            onCommentAdded={() => {
+              setPosts(
+                posts.map((p) =>
+                  p.id === selectedPost.id
+                    ? { ...p, comment_count: (p.comment_count || 0) + 1 }
+                    : p,
+                ),
+              );
+            }}
+          />
+        )}
+
+        {/* Share Modal */}
+        {selectedPost && (
+          <SharePostModal
+            visible={shareModalVisible}
+            onClose={() => {
+              setShareModalVisible(false);
+              setSelectedPost(null);
+            }}
+            postId={selectedPost.id}
+            postType={selectedPost.type}
+            title={selectedPost.title || selectedPost.content}
+            description={selectedPost.content || selectedPost.description}
+            imageUrl={selectedPost.cover_image_url || selectedPost.image_url}
+            postUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/post/${selectedPost.id}`}
+          />
+        )}
       </div>
-
-      {/* FAB Button */}
-      <div
-        style={styles.fab}
-        onClick={() => setIsModalVisible(!isModalVisible)}
-      >
-        <span style={styles.fabText}>+</span>
-      </div>
-
-      {/* Modal */}
-      {isModalVisible && (
-        <div style={styles.modalOverlay} onClick={() => setIsModalVisible(false)}>
-          <div style={styles.fabMenu} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.menuItem}>
-              <span style={styles.menuText}>Podcast</span>
-              <div style={styles.iconCircleWhite}
-               onClick={navigateToCreatePodcast}
-              >
-                <IoMicOutline size={24} color="#00BFFF" 
-               
-                />
-              </div>
-            </div>
-            <div style={styles.menuItem}>
-              <span style={styles.menuText}>Post/Create Video</span>
-              <div style={styles.iconCircleWhite}
-               onClick={navigateToPostVideo}>
-                <IoVideocamOutline size={24} color="#00BFFF" />
-              </div>
-            </div>
-            <div style={styles.menuItem}>
-              <span style={styles.menuText}>Write Article</span>
-              <div style={styles.iconCircleWhite}
-               onClick={navigateToWriteArticle}
-               >
-                <IoPencilOutline size={24} color="#00BFFF" />
-              </div>
-            </div>
-            <div style={styles.menuItem}>
-              <span style={styles.menuText}>Create Verse</span>
-              <div style={styles.iconCircleWhite}
-               onClick={navigateToCreateVerse}
-              >
-                <IoChatbubbleOutline size={24} color="#00BFFF" />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Comment Modal */}
-      {selectedPost && (
-        <CommentModal
-          visible={commentModalVisible}
-          onClose={() => {
-            setCommentModalVisible(false);
-            setSelectedPost(null);
-          }}
-          contentId={selectedPost.id}
-          contentType={selectedPost.type}
-          onCommentAdded={() => {
-            setPosts(posts.map(p => 
-              p.id === selectedPost.id 
-                ? { ...p, comment_count: (p.comment_count || 0) + 1 }
-                : p
-            ));
-          }}
-        />
-      )}
-
-      {/* Share Modal */}
-      {selectedPost && (
-        <SharePostModal
-          visible={shareModalVisible}
-          onClose={() => {
-            setShareModalVisible(false);
-            setSelectedPost(null);
-          }}
-          postId={selectedPost.id}
-          postType={selectedPost.type}
-          title={selectedPost.title || selectedPost.content}
-          description={selectedPost.content || selectedPost.description}
-          imageUrl={selectedPost.cover_image_url || selectedPost.image_url}
-          postUrl={`${typeof window !== "undefined" ? window.location.origin : ""}/post/${selectedPost.id}`}
-        />
-      )}
-    </div>
     </>
   );
 }
