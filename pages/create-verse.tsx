@@ -6,6 +6,7 @@ import React, { useState, useRef } from "react";
 import { useRouter } from 'next/router';
 import { IoClose, IoImageOutline, IoCloseCircle } from "react-icons/io5";
 import { supabase } from "../components/supabase";
+import { useSubscription } from "../hooks/useSubscription";
 import { notifyFollowersOfNewPost, contentModerator, updateLastActive, sendNewPostNotification } from "../lib/postHelpers";
 
 // Upload image utility
@@ -51,7 +52,12 @@ const CreateVerse = () => {
   const fileInputRef = useRef(null);
   const router = useRouter();
 
-  const MAX_CHARS = 280; // Character limit like Twitter
+  // Basic & Premium creators: 1,350 characters / 223 words. Free: 280 characters.
+  const { plan } = useSubscription();
+  const isPaidCreator = plan === "basic" || plan === "premium";
+  const MAX_CHARS = isPaidCreator ? 1350 : 280;
+  const MAX_WORDS = 223;
+  const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
 
   const pickImage = () => {
     fileInputRef.current?.click();
@@ -123,6 +129,10 @@ const CreateVerse = () => {
     }
     if (content.trim().length > MAX_CHARS) {
       alert(`Verse must be ${MAX_CHARS} characters or less`);
+      return false;
+    }
+    if (isPaidCreator && wordCount > MAX_WORDS) {
+      alert(`Verse must be ${MAX_WORDS} words or less`);
       return false;
     }
     return true;
@@ -220,7 +230,8 @@ const CreateVerse = () => {
   };
 
   const charsRemaining = MAX_CHARS - content.length;
-  const isOverLimit = charsRemaining < 0;
+  const isOverLimit =
+    charsRemaining < 0 || (isPaidCreator && wordCount > MAX_WORDS);
 
   return (
     <div style={styles.container}>
@@ -257,8 +268,8 @@ const CreateVerse = () => {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             maxLength={MAX_CHARS + 50}
+            rows={isPaidCreator ? 10 : 6}
             autoFocus
-            rows={6}
           />
 
           {/* Character Count */}
@@ -274,6 +285,7 @@ const CreateVerse = () => {
               }}
             >
               {charsRemaining} characters remaining
+              {isPaidCreator ? ` · ${wordCount}/${MAX_WORDS} words` : ""}
             </span>
           </div>
 

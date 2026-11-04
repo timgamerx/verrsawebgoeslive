@@ -36,6 +36,7 @@ import { HiDotsHorizontal } from "react-icons/hi";
 import MetaTags from '../../components/MetaTags';
 import VerificationBadge from '../../components/VerificationBadge';
 import { supabase } from '../../components/supabase';
+import { linkifyText } from '../../components/LinkifiedText';
 import { getUserLikeStatusBatch, getLikeCount, toggleLike as apiToggleLike } from '../../components/api';
 import { getActiveModerationExclusions } from '../../lib/moderationExclusions';
 
@@ -805,7 +806,7 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
       return (
         <div style={{ padding: "20px 16px" }}>
           <h3 style={styles.sectionTitle}>About</h3>
-          <p style={styles.aboutText}>{profile?.bio || "No bio available."}</p>
+          <p style={styles.aboutText}>{profile?.bio ? linkifyText(profile.bio, "about") : "No bio available."}</p>
 
           {profile?.skills && profile.skills.length > 0 && (
             <>
@@ -1115,7 +1116,7 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
           </div>
 
           {/* Bio */}
-          {profile?.bio && <p style={styles.bioText}>{profile.bio}</p>}
+          {profile?.bio && <p style={styles.bioText}>{linkifyText(profile.bio, "bio")}</p>}
 
           {/* Action row */}
           <div style={styles.actionRow}>
@@ -1135,9 +1136,14 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
                 <button
                   style={styles.messageButton}
                   onClick={() => {
-                    alert(
-                      "Tips are coming soon.\nWe're launching Tips shortly, stay tuned for updates.",
-                    );
+                    router.push({
+                      pathname: "/sendtip",
+                      query: {
+                        userId: String(userId || ""),
+                        userName: profile?.full_name || profile?.username || "",
+                        userAvatar: profile?.avatar_url || "",
+                      },
+                    });
                   }}
                 >
                   <MdMoney size={24} color="#00BFFF" />
@@ -1165,11 +1171,7 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
 
                 <button
                   style={styles.messageButton}
-                  onClick={() => {
-                    alert(
-                      "Tips are coming soon.\nWe're launching Tips shortly, stay tuned for updates.",
-                    );
-                  }}
+                  onClick={() => router.push("/tips")}
                 >
                   <MdMoney size={24} color="#00BFFF" />
                 </button>

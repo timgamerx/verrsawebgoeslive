@@ -308,6 +308,40 @@ export const sendNewMessageNotification = async (
 /**
  * Send notification about community activity
  */
+/**
+ * Notify every other member of a community about a new chat or voice message.
+ * (Same behavior as the mobile app.) Preview is plain text: it passes through Expo.
+ */
+export const sendCommunityChatNotification = async (
+  communityId: string,
+  communityName: string,
+  senderId: string,
+  senderName: string,
+  messagePreview: string,
+) => {
+  try {
+    const { data: members, error } = await supabase
+      .from("community_members")
+      .select("user_id")
+      .eq("community_id", communityId)
+      .neq("user_id", senderId);
+    if (error || !members || members.length === 0) {
+      return { success: true, sent: 0 };
+    }
+    const preview =
+      messagePreview.length > 60 ? `${messagePreview.substring(0, 60)}…` : messagePreview;
+    return sendPushNotificationToUsers(
+      members.map((m: any) => m.user_id),
+      communityName || "Community chat",
+      `${senderName}: ${preview}`,
+      { type: "community_chat", communityId, communityName: communityName || "", senderId },
+    );
+  } catch (error) {
+    console.error("Error sending community chat notification:", error);
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+  }
+};
+
 export const sendCommunityNotification = async (
   recipientUserId: string,
   title: string,

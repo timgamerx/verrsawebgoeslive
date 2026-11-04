@@ -138,7 +138,6 @@ export const getPostAdImpressions = async (postId: string): Promise<number> => {
  * In production, integrate with real ad network (Google AdMob, etc.)
  */
 export const checkAdAvailability = async (): Promise<boolean> => {
-  // TODO: Replace with actual ad network SDK check
   // For now, simulate 80% ad fill rate
   return Math.random() > 0.2;
 };

@@ -6,6 +6,7 @@ import { spacing, radius, fontSize } from '../lib/theme';
 import { TbChevronLeft, TbChevronRight, TbDots, TbDotsVertical } from 'react-icons/tb';
 import { supabase } from '../components/supabase';
 import { getUserConversations } from '../lib/messaging';
+import { useTheme } from '../context/ThemeProvider';
 
 type Chat = {
   id: string;
@@ -20,6 +21,7 @@ type Chat = {
 
 const VerrsaChat = () => {
   const router = useRouter();
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<"all" | "contacts">("all");
   const [currentUserName, setCurrentUserName] = useState<string>("");
   const [currentUserId, setCurrentUserId] = useState<string>("");
@@ -234,7 +236,7 @@ const VerrsaChat = () => {
 
     return (
       <button
-        style={styles.chatRow}
+        style={{ ...styles.chatRow, borderBottomColor: theme.border }}
         onClick={() => {
           if (item.userId) {
             router.push(`/individualchat?userId=${item.userId}`);
@@ -242,13 +244,12 @@ const VerrsaChat = () => {
         }}
       >
         <img
-          src={
-            item.avatar ? { uri: item.avatar } : "/assets/../assets/avatar.jpg"
-          }
+          src={item.avatar || "/avatar.jpg"}
+          alt=""
           style={styles.avatar}
         />
-        <div style={{ flex: 1 }}>
-          <span style={styles.name}>{safeName}</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <span style={{ ...styles.name, color: theme.text }}>{safeName}</span>
           {safeMessage.length > 0 && (
             <span style={{...(styles.message || {}), ...(item.typing ? { color: "#00AEEF" } : {})}}>
               {safeMessage}
@@ -267,24 +268,31 @@ const VerrsaChat = () => {
     );
   };
   return (
-    <div style={styles.container}>
-      {/* Header */}
-      {/* Back Button */}
-      <button
-        style={styles.backButton}
-        onClick={() => router.back()}
-      >
-        <TbChevronLeft />
-      </button>
-      <span style={styles.hello}>Hello</span>
-      <span style={styles.username}>{currentUserName || "User"}</span>
+    <div
+      className="rn-flex"
+      style={{ ...styles.container, backgroundColor: theme.background }}
+    >
+      <div style={{ display: 'flex', flexDirection: "row" }}>
+        {/* Back Button */}
+        <button
+          style={{ ...styles.backButton, color: theme.text }}
+          onClick={() => router.back()}
+        >
+          <TbChevronLeft />
+        </button>
+        <span style={{ ...styles.hello, color: theme.text }}>Hello</span>
+        <span style={{ ...styles.username, color: theme.secondaryText }}>
+          {currentUserName || "User"}
+        </span>
+      </div>
 
       {/* Search */}
-      <div style={styles.searchBox}>
+      <div
+        style={{ ...styles.searchBox, backgroundColor: theme.cardBackground }}
+      >
         <input
           placeholder="Search conversations"
-          placeholderTextColor="#aaa"
-          style={styles.searchInput}
+          style={{ ...styles.searchInput, color: theme.text }}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -297,7 +305,10 @@ const VerrsaChat = () => {
           return (
             <button key={key} onClick={() => setActiveTab(key)}>
               <span
-                style={{...(styles.tabText || {}), ...(activeTab === key ? styles.activeTab : {})}}
+                style={{
+                  ...(styles.tabText || {}),
+                  ...(activeTab === key ? styles.activeTab : {}),
+                }}
               >
                 {tab}
               </span>
@@ -327,7 +338,7 @@ const VerrsaChat = () => {
                   : "No contacts available."}
               </span>
             </div>
-                )}
+          )}
         />
       )}
     </div>
@@ -336,45 +347,69 @@ const VerrsaChat = () => {
 
 export default VerrsaChat;
 
+const resetBtn: React.CSSProperties = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  font: "inherit",
+  textAlign: "left",
+};
+
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    minHeight: "100vh",
+    maxWidth: 700,
+    width: "100%",
+    margin: "0 auto",
+    boxSizing: "border-box",
     backgroundColor: "#fff",
     paddingLeft: spacing.base,
     paddingRight: spacing.base,
     paddingTop: spacing.lg,
+    position: "relative",
   },
-  hello: { fontSize: fontSize.xl2, fontWeight: "500", marginTop: 50, marginLeft: 50 },
+  hello: {
+    display: "block",
+    fontSize: fontSize.xl2,
+    fontWeight: 500,
+    marginTop: 20,
+    marginLeft: 40,
+  },
   username: {
-    fontSize: fontSize.xl,
-    fontWeight: "500",
+    display: "block",
+    marginTop: 20,
+    fontSize: fontSize.xl2,
+    fontWeight: 500,
     marginBottom: spacing.base,
     color: "#666",
-    marginLeft: 50,
+    marginLeft: 5,
   },
   searchBox: {
     backgroundColor: "#f1f1f1",
     borderRadius: radius.full,
-    paddingLeft: spacing.md,
-    paddingRight: spacing.md,
-    paddingTop: 11,
-    paddingBottom: 11,
+    padding: `11px ${spacing.md}px`,
     marginBottom: spacing.base,
   },
-  searchInput: { fontSize: fontSize.md2 },
-
+  searchInput: {
+    width: "100%",
+    border: "none",
+    outline: "none",
+    background: "transparent",
+    fontSize: fontSize.md2,
+  },
   tabs: {
+    display: "flex",
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: spacing.md,
   },
   tabText: {
+    display: "inline-block",
     fontSize: fontSize.md2,
     color: "gray",
-    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-    paddingLeft: 25,
-    paddingRight: 25,
+    padding: `${spacing.md}px 25px`,
   },
   activeTab: {
     backgroundColor: "#00AEEF",
@@ -382,48 +417,70 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: radius.xl2,
     overflow: "hidden",
   },
-
   chatRow: {
+    ...resetBtn,
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderColor: "#f2f2f2",
+    width: "100%",
+    padding: `${spacing.md}px 0`,
+    borderBottom: "1px solid #f2f2f2",
   },
-  avatar: { width: 50, height: 50, borderRadius: radius.full, marginRight: spacing.md },
-  name: { fontSize: fontSize.base, fontWeight: "400" },
-  message: { fontSize: fontSize.md, color: "gray" },
-  rightSide: { alignItems: "flex-end" },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: "50%",
+    objectFit: "cover",
+    marginRight: spacing.md,
+    flexShrink: 0,
+  },
+  name: {
+    display: "block",
+    fontSize: fontSize.base,
+    fontWeight: 400,
+    color: "#111",
+  },
+  message: {
+    display: "block",
+    fontSize: fontSize.md,
+    color: "gray",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    maxWidth: 380,
+  },
+  rightSide: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
+    flexShrink: 0,
+  },
   time: { fontSize: fontSize.sm, color: "gray", marginBottom: spacing.xs },
   unreadBadge: {
     backgroundColor: "#00AEEF",
     borderRadius: radius.lg,
-    paddingLeft: spacing.sm,
-    paddingRight: spacing.sm,
-    paddingTop: spacing.px,
-    paddingBottom: spacing.px,
+    padding: `${spacing.px}px ${spacing.sm}px`,
   },
   unreadText: { color: "#fff", fontSize: fontSize.sm, fontWeight: "bold" },
-
   backButton: {
+    ...resetBtn,
     position: "absolute",
-    top: 82,
-    left: 20,
+    top: 30,
+    left: -5,
     zIndex: 10,
+    fontSize: 24,
+    display: "flex",
+    alignItems: "center",
   },
   loadingContainer: {
-    flex: 1,
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 50,
   },
-  loadingText: {
-    fontSize: fontSize.base,
-    color: "#666",
-  },
+  loadingText: { fontSize: fontSize.base, color: "#666" },
   emptyContainer: {
-    flex: 1,
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 50,
@@ -432,7 +489,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: fontSize.base,
     color: "#999",
     textAlign: "center",
-    paddingLeft: spacing.lg,
-    paddingRight: spacing.lg,
+    padding: `0 ${spacing.lg}px`,
   },
 };
+

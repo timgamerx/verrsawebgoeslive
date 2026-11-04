@@ -15,6 +15,8 @@ export const GIFT_METADATA = {
 };
 
 export const iapService = {
+  getIAPStatus: () => ({ isWeb: true, functionsAvailable: {} }),
+  getProducts: async (ids: string[]) => [],
   initialize: async () => true,
   destroy: async () => true,
   purchaseProduct: async (productId: string) => ({ success: true, productId }),

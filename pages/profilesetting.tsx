@@ -607,11 +607,11 @@ export default function ProfileSetting() {
   };
 
   const handleDeleteAccount = () => {
-    if (window.confirm("This action cannot be undone. Are you sure you want to delete your account?")) { /* TODO: handle confirm */ }
+    if (window.confirm("This action cannot be undone. Are you sure you want to delete your account?")) { }
   };
 
   return (
-    <div style={{...(styles.container || {}), backgroundColor: theme.background}}>
+    <div className="rn-flex" style={{...(styles.container || {}), backgroundColor: theme.background}}>
       <button
         style={styles.backButton}
         onClick={() => router.back()}
@@ -634,20 +634,16 @@ export default function ProfileSetting() {
           onClick={() => router.push("/editprofileinformation")}
         >
           <img
-            src={
-              userProfile.avatar
-                ? { uri: userProfile.avatar }
-                : "/avatar.jpg"
-            }
+            src={userProfile.avatar || "/avatar.jpg"}
+            alt=""
             style={{
               width: 85,
               height: 85,
-              borderRadius: radius.full,
-              borderWidth: 3,
-              borderColor: "#000",
-              alignSelf: "center",
-              marginBottom: spacing.lg,
-              marginTop: spacing.lg,
+              borderRadius: "50%",
+              objectFit: "cover",
+              border: "3px solid #000",
+              display: "block",
+              margin: `${spacing.lg}px auto`,
             }}
           />
         </button>
@@ -1370,6 +1366,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: spacing.lg,
   },
   menuItem: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     padding: spacing.sm,
@@ -1388,7 +1385,7 @@ const styles: Record<string, React.CSSProperties> = {
     paddingBottom: spacing.base,
     borderBottomColor: "#eee",
   },
-  infoContainer: { marginBottom: spacing.lg, alignItems: "center" },
+  infoContainer: { display: "flex", marginBottom: spacing.lg, alignItems: "center" },
   infoText: { fontSize: fontSize.xl, marginBottom: spacing.xs, marginTop: -9 },
   infoSubText: { fontSize: fontSize.md, color: "#777" },
   divider: {
@@ -1410,14 +1407,15 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: spacing.base,
   },
   settingItem: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.06)",
+    borderBottom: "1px solid rgba(0,0,0,0.06)",
   },
   settingLeft: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
@@ -1436,6 +1434,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginRight: spacing.sm,
   },
   devicesSectionHeader: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     marginBottom: spacing.sm,
@@ -1446,15 +1445,17 @@ const styles: Record<string, React.CSSProperties> = {
     marginLeft: spacing.sm,
   },
   deviceCard: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     padding: spacing.md,
     marginBottom: spacing.md,
     borderRadius: radius.md,
-    borderWidth: 1,
+    borderStyle: "solid", borderWidth: 1,
   },
   deviceInfo: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
@@ -1466,6 +1467,7 @@ const styles: Record<string, React.CSSProperties> = {
     flex: 1,
   },
   deviceTitleRow: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     marginBottom: spacing.xs,
@@ -1498,6 +1500,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: spacing.sm,
   },
   modalContainer: {
+    display: "flex",
     flex: 1,
     justifyContent: "flex-end",
     backgroundColor: "rgba(0,0,0,0.4)",
@@ -1508,15 +1511,16 @@ const styles: Record<string, React.CSSProperties> = {
     borderTopRightRadius: 12,
   },
   optionRow: {
+    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.06)",
+    borderBottom: "1px solid rgba(0,0,0,0.06)",
   },
   modalButtons: {
+    display: "flex",
     flexDirection: "row",
     justifyContent: "flex-end",
     marginTop: spacing.md,
@@ -1537,13 +1541,13 @@ const styles: Record<string, React.CSSProperties> = {
     borderTopRightRadius: 16,
   },
   modalHeader: {
+    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: spacing.base,
     paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.1)",
+    borderBottom: "1px solid rgba(0,0,0,0.1)",
   },
   modalTitle: {
     fontSize: fontSize.xl,
@@ -1555,8 +1559,7 @@ const styles: Record<string, React.CSSProperties> = {
   notificationCategory: {
     marginBottom: spacing.xl,
     paddingBottom: spacing.base,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.05)",
+    borderBottom: "1px solid rgba(0,0,0,0.05)",
   },
   notificationCategoryTitle: {
     fontSize: fontSize.base,
@@ -1568,6 +1571,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: spacing.md,
   },
   notificationRow: {
+    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -1590,7 +1594,6 @@ const styles: Record<string, React.CSSProperties> = {
     paddingTop: spacing.base,
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.1)",
+    borderTop: "1px solid rgba(0,0,0,0.1)",
   },
 };

@@ -16,7 +16,6 @@ import {
   getPromptDelay
 } from '../lib/appDownloadPromptManager';
 import { isMobileDevice } from '../lib/deviceDetection';
-import { setupAppDownloadModalTesting } from '../lib/testAppDownloadModal';
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -59,13 +58,6 @@ function MyApp({ Component, pageProps }) {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [router.pathname]);
-
-  // Setup testing utilities in development
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      setupAppDownloadModalTesting();
-    }
-  }, []);
 
   // App Download Prompt Logic - Show every 5 minutes
   useEffect(() => {

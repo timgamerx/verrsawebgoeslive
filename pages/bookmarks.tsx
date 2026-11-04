@@ -20,9 +20,9 @@ import { useTheme } from '../context/ThemeProvider';
 import { isExclusiveEarlyCreator } from '../lib/profileUtils';
 import { getActiveModerationExclusions } from '../lib/moderationExclusions';
 import { TbChevronLeft, TbDotsVertical } from 'react-icons/tb'
-import { FiSearch } from 'react-icons/fi'
-import { MdCheck } from 'react-icons/md'
-import { IoChevronBack, IoBookmarkOutline } from 'react-icons/io5'
+import { FiMessageCircle, FiShare2 } from 'react-icons/fi'
+import { MdAnalytics, MdArrowForwardIos } from 'react-icons/md'
+import { IoChevronBack, IoBookmarkOutline, IoHeart, IoHeartOutline, IoMic, IoPlay, IoPeople, IoVideocamOutline } from 'react-icons/io5'
 import Menu from './menu'
 
 // Article interface from Articles
@@ -543,47 +543,41 @@ export default function Bookmarks() {
     videoUrl?: string | null;
     thumbnailUrl?: string | null;
   }) => {
-    const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+    const playIcon = (
+      <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(255,255,255,0.9)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <IoPlay size={26} color="#000" style={{ marginLeft: 3 }} />
+      </div>
+    );
+    const frame = { position: "relative", width: "100%", height: 400, overflow: "hidden", backgroundColor: "#000", borderRadius: radius.md };
+    const fill = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
+    const overlay = { position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.25)", pointerEvents: "none" };
 
     if (!videoUrl && !thumbnailUrl) {
       return (
-        <div style={{...(styles.videoPlayer || {}), ...(styles.placeholderVideo || {})}}>
-          <IoChevronBack />
-          <span style={styles.placeholderText}>Video not available</span>
+        <div style={{ ...frame, backgroundColor: "#f0f0f0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <IoVideocamOutline size={40} color="#999" />
+          <span style={{ marginTop: spacing.sm, color: "#999", fontSize: fontSize.md }}>Video not available</span>
         </div>
       );
     }
 
-    if (!videoUrl && thumbnailUrl) {
-      return (
-        <div style={styles.videoWrapper}>
-          <img src={thumbnailUrl } style={styles.videoPlayer} />
-          <div style={styles.videoOverlay}>
-            <IoChevronBack />
-          </div>
-        </div>
-      );
-    }
-
+    // Muted looping preview like mobile; the thumbnail shows until the video can play
     return (
-      <div style={styles.videoWrapper}>
-        <Video
-          src={videoUrl || "" }
-          style={styles.videoPlayer}
-          resizeMode={ResizeMode.COVER}
-          shouldPlay={isVideoPlaying}
-          isLooping={true}
-          isMuted={true}
-        />
-        <button
-          style={styles.videoOverlay}
-          onClick={() => setIsVideoPlaying(!isVideoPlaying)}
-        >
-          <IoChevronBack />
-        </button>
-        <div style={styles.muteIndicator}>
-          <IoChevronBack />
-        </div>
+      <div style={frame}>
+        {videoUrl ? (
+          <video
+            src={videoUrl}
+            poster={thumbnailUrl || undefined}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            style={fill}
+          />
+        ) : (
+          <img src={thumbnailUrl} alt="" style={fill} />
+        )}
+        <div style={overlay}>{playIcon}</div>
       </div>
     );
   };
@@ -710,16 +704,14 @@ export default function Bookmarks() {
           >
             <img
               src={
-                item.profiles?.avatar_url
-                  ? { uri: item.profiles.avatar_url }
-                  : userAvatar && typeof userAvatar === "string"
-                    ? { uri: userAvatar }
-                    : "/assets/../assets/avatar.jpg"
+                item.profiles?.avatar_url ||
+                (userAvatar && typeof userAvatar === "string" ? userAvatar : "/avatar.jpg")
               }
-              style={styles.avatar}
+              alt=""
+              style={{ ...styles.avatar, objectFit: "cover", borderRadius: "50%" }}
             />
           </button>
-          <div style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "row", alignItems: "center", gap: 4 }}>
             <span style={{...(styles.username || {}), color: theme.text}}>{userName}</span>
             {isExclusiveEarlyCreator(item.profiles) && (
               <ExclusiveEarlyCreatorBadge compact />
@@ -787,19 +779,9 @@ export default function Bookmarks() {
             <button onClick={() => handleNavigateToArticlePost(item)}>
               <div style={styles.rowContent}>
                 <img
-                  src={{
-                    uri:
-                      item.image ||
-                      item.cover_image_url ||
-                      "https://via.placeholder.com/90x90",
-                  }}
-                  style={styles.thumbnail}
-                  onError={() => {
-                    console.log(
-                      "Failed to load image:",
-                      item.image || item.cover_image_url,
-                    );
-                  }}
+                  src={item.image || item.cover_image_url || "/avatar.jpg"}
+                  alt=""
+                  style={{ ...styles.articleThumbnail, objectFit: "cover", flexShrink: 0 }}
                 />
                 <span style={{...styles.postText, color: theme.secondaryText}}>
                   {displayContent}
@@ -863,15 +845,9 @@ export default function Bookmarks() {
               >
                 <div style={{ position: "relative" }}>
                   <img
-                    src={
-                      item.cover_image_url
-                        ? { uri: item.cover_image_url }
-                        : "/assets/../assets/podcast1.jpg"
-                    }
-                    style={styles.thumbnail}
-                    onError={(error) => {
-                      console.warn("Thumbnail image load error:", error);
-                    }}
+                    src={item.cover_image_url || "/podcast.jpg"}
+                    alt=""
+                    style={{ ...styles.thumbnail, objectFit: "cover" }}
                   />
                 </div>
               </button>
@@ -880,12 +856,11 @@ export default function Bookmarks() {
         )}
 
         {item.type === "community" && (
-          <button
-            onClick={() => {
-              router.push("/community-profile");
-            }}
+          <div
+            onClick={() => router.push(`/community/${item.id}`)}
+            style={{ cursor: "pointer", textAlign: "left" }}
           >
-            <span style={{...(styles.postText || {}), color: theme.secondaryText}}>{displayContent}</span>
+            <div style={{...(styles.postText || {}), marginLeft: 0, color: theme.secondaryText}}>{displayContent}</div>
             <div style={styles.communityStats}>
               <span style={{...(styles.communityStatText || {}), color: theme.secondaryText}}>
                 {item.member_count || 0} members
@@ -895,18 +870,21 @@ export default function Bookmarks() {
               )}
             </div>
             {postImage && (
-              <img src={postImage } style={styles.thumbnail} />
+              <img src={postImage} alt="" style={{ ...styles.thumbnail, objectFit: "cover", marginTop: spacing.sm, display: "block" }} />
             )}
-          </button>
+          </div>
       )}
         {item.type === "verse" && !isEnforced && (
-          <div style={styles.verseContainer}>
+          <div
+            style={{ ...styles.verseContainer, cursor: "pointer" }}
+            onClick={() => router.push(`/post/${item.id}`)}
+          >
             {item.is_boosted && (
               <PromotedBadge size="small" style={{ marginBottom: spacing.xs }} />
             )}
-            <span style={{...(styles.verseText || {}), color: theme.secondaryText}}>{displayContent}</span>
+            <div style={{...(styles.verseText || {}), color: theme.secondaryText}}>{displayContent}</div>
             {postImage && (
-              <img src={postImage } style={styles.verseImage} />
+              <img src={postImage} alt="" style={{ ...styles.verseImage, display: "block" }} />
             )}
           </div>
       )}
@@ -930,9 +908,9 @@ export default function Bookmarks() {
                   ? likedPodcasts.has(item.id)
                   : likedPosts.has(item.id)
             ) ? (
-              <IoChevronBack />
+              <IoHeart size={22} color="#FF2D78" />
             ) : (
-              <IoChevronBack />
+              <IoHeartOutline size={22} color={theme.icon} />
             )}
           </button>
           <span style={{ color: theme.secondaryText }}>
@@ -944,7 +922,7 @@ export default function Bookmarks() {
           </span>
 
           <button disabled>
-            <MdCheck />
+            <MdAnalytics size={18} color={theme.iconSecondary || theme.secondaryText} />
           </button>
           <span style={{ color: theme.secondaryText }}>{item.view_count || 0}</span>
 
@@ -959,7 +937,7 @@ export default function Bookmarks() {
               setShowCommentModal(true);
             }}
           >
-            <FiSearch />
+            <FiMessageCircle size={18} color={theme.icon} />
           </button>
           <span style={{ color: theme.secondaryText }}>{item.comment_count || 0}</span>
 
@@ -978,10 +956,10 @@ export default function Bookmarks() {
               setShowShare(true);
             }}
           >
-            <FiSearch />
+            <FiShare2 size={18} color={theme.icon} />
           </button>
 
-          <TbDotsVertical />
+          <TbDotsVertical size={16} color={theme.iconSecondary || theme.secondaryText} />
 
           <span style={{...(styles.dateText || {}), color: theme.secondaryText}}>
             {(item.type === "podcast" || item.type === "video") &&
@@ -995,7 +973,7 @@ export default function Bookmarks() {
               <button
                 onClick={() => handleNavigateToArticlePost(item)}
               >
-                <MdCheck />
+                <MdArrowForwardIos size={14} color="#00BFFF" />
               </button>
             </div>
         )}
@@ -1007,7 +985,7 @@ export default function Bookmarks() {
                   router.push("/podcasts-post");
                 }}
               >
-                <IoMic />
+                <IoMic size={14} color="#32CD32" />
               </button>
             </div>
         )}
@@ -1025,7 +1003,7 @@ export default function Bookmarks() {
                   router.push("/reel-video");
                 }}
               >
-                <IoChevronBack />
+                <IoPlay size={14} color="#FF6347" />
               </button>
             </div>
         )}
@@ -1036,7 +1014,7 @@ export default function Bookmarks() {
                   router.push("/community-profile");
                 }}
               >
-                <IoPeople />
+                <IoPeople size={14} color="#9B59B6" />
               </button>
             </div>
       )}
@@ -1088,7 +1066,8 @@ export default function Bookmarks() {
         }
       `}</style>
       <div
-      style={{...(styles.outerContainer || {}), flexDirection: isDesktop ? "row" : "column",
+      className="rn-flex"
+      style={{...(styles.outerContainer || {}), display: "flex", flexDirection: isDesktop ? "row" : "column",
           backgroundColor: theme.background,}}
     >
       {/* Main Content Area - 80% on desktop */}
@@ -1100,10 +1079,10 @@ export default function Bookmarks() {
             style={styles.backButton}
             onClick={() => router.back()}
           >
-            <TbChevronLeft size={24} color={theme.icon} />
+            <TbChevronLeft size={24} color={theme.icon} style={{ border: `1.5px solid ${theme.icon}`, borderRadius: "50%", padding: 1 }} />
           </button>
           <span style={{...(styles.headerText || {}), color: theme.text, fontFamily: "'Instrument Sans', sans-serif"}}>Bookmarks</span>
-          <div style={{ flexDirection: "row", gap: spacing.md }}>
+          <div style={{ display: "flex", flexDirection: "row", gap: spacing.md }}>
             <button
               onClick={async () => {
                 await refreshBookmarks();
@@ -1213,10 +1192,12 @@ export default function Bookmarks() {
 const styles: Record<string, React.CSSProperties> = {
   container: { flex: 1, backgroundColor: "#fff" },
   centerContent: {
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
   },
   header: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -1246,6 +1227,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "'Instrument Sans', sans-serif",
   },
   emptyContainer: {
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 100,
@@ -1279,7 +1261,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: spacing.xl2,
     backgroundColor: "#fff",
   },
-  postHeader: { flexDirection: "row", alignItems: "center", marginBottom: spacing.sm },
+  postHeader: { display: "flex", flexDirection: "row", alignItems: "center", marginBottom: spacing.sm },
   username: { fontWeight: "400", fontSize: fontSize.lg, marginBottom: spacing.xs, fontFamily: "'Instrument Sans', sans-serif" },
   time: { fontSize: fontSize.md, color: "#888", fontFamily: "'Instrument Sans', sans-serif" },
   postTitle: { fontSize: fontSize.lg, fontWeight: "400", marginBottom: spacing.sm, fontFamily: "'Instrument Sans', sans-serif" },
@@ -1312,12 +1294,14 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   rowContent: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
     marginBottom: spacing.sm,
   },
   iconRow: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
@@ -1332,25 +1316,18 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: radius.lg,
     padding: spacing.xs,
   },
-  dateText: { fontSize: fontSize.md, color: "#555", marginLeft: spacing.sm, marginRight: 90, fontFamily: "'Instrument Sans', sans-serif" },
+  dateText: { fontSize: fontSize.md, color: "#555", marginLeft: spacing.sm, fontFamily: "'Instrument Sans', sans-serif" },
   readMoreCircle: {
+    display: "flex",
     width: 25,
     height: 25,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: "#00BFFF",
+    borderRadius: "50%",
+    border: "1px solid #00BFFF",
+    boxSizing: "border-box",
     justifyContent: "center",
     alignItems: "center",
-    ...Platform.select({
-      ios: {
-        position: "absolute",
-        right: 0,
-        marginLeft: 0,
-      },
-      android: {
-        marginLeft: -2,
-      },
-    }),
+    marginLeft: "auto",
+    flexShrink: 0,
   },
   icon: {
     marginLeft: spacing.xs,
@@ -1370,6 +1347,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: spacing.md,
   },
   backButton: {
+    display: "flex",
     width: 24,
     height: 24,
     justifyContent: "center",
@@ -1377,11 +1355,15 @@ const styles: Record<string, React.CSSProperties> = {
   },
   // Video styles from Home
   fullWidthVideoWrapper: {
-    marginLeft: -20,
-    marginRight: -20,
     marginBottom: spacing.sm,
   },
   videoContainer: {
+    display: "block",
+    width: "100%",
+    padding: 0,
+    border: "none",
+    background: "none",
+    cursor: "pointer",
     marginBottom: spacing.sm,
   },
   videoWrapper: {
@@ -1397,6 +1379,7 @@ const styles: Record<string, React.CSSProperties> = {
     height: "100%",
   },
   videoOverlay: {
+    display: "flex",
     position: "absolute",
     top: 0,
     left: 0,
@@ -1415,6 +1398,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: spacing.xs,
   },
   placeholderVideo: {
+    display: "flex",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#f0f0f0",
@@ -1444,6 +1428,7 @@ const styles: Record<string, React.CSSProperties> = {
     paddingBottom: 100,
   },
   communityStats: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     marginTop: spacing.xs,

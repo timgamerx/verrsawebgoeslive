@@ -77,12 +77,25 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
-  border-color: #646cff;
+/* No box outline on hover/click for buttons (removed the purple hover border
+   and the thick focus ring). Keyboard users still get a subtle focus ring. */
+button:hover,
+button:active,
+button:focus {
+  outline: none;
+  box-shadow: none;
 }
-button:focus,
+button:focus:not(:focus-visible) {
+  outline: none;
+}
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid rgba(0, 191, 255, 0.55);
+  outline-offset: 2px;
+}
+a:focus,
+[role="button"]:focus,
+div[onclick]:focus {
+  outline: none;
 }
 
 @media (prefers-color-scheme: light) {
@@ -224,3 +237,21 @@ div[style*="flex: 1"] {
   }
 }
 
+
+/* React-Native-style inline layouts (flexDirection/alignItems/justifyContent on a
+   plain div) need display:flex on web. Scoped to pages that opt in with .rn-flex
+   so the rest of the app is unaffected. Inline styles still win when set. */
+.rn-flex div[style*="flex-direction"],
+.rn-flex div[style*="align-items"],
+.rn-flex div[style*="justify-content"],
+.rn-flex button[style*="flex-direction"],
+.rn-flex button[style*="align-items"],
+.rn-flex button[style*="justify-content"] {
+  display: flex;
+}
+.rn-flex div[style*="align-items"]:not([style*="flex-direction"]),
+.rn-flex div[style*="justify-content"]:not([style*="flex-direction"]) {
+  flex-direction: column;
+}
+.rn-flex div[style*="flex-direction: row"] { flex-direction: row; }
+.rn-flex div[style*="flex-direction: row"] > span { flex-shrink: 1; min-width: 0; }

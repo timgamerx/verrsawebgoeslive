@@ -247,8 +247,13 @@ export default function CommentModal({
     }
   };
 
+  if (!visible) return null;
+
   return (
-    <div style={{position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.5)"}}>
+    <div
+      style={{position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0,0,0,0.5)"}}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div>
         <div style={{...(styles.modal || {}), backgroundColor: theme.cardBackground}}>
           {/* Header */}

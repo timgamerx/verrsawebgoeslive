@@ -268,7 +268,6 @@ export default function PaymentDashboard() {
 
   React.useEffect(() => {
     // Example using exchangerate-api.com or similar
-    // Replace YOUR_API_KEY and endpoint as needed
     fetch("https://open.er-api.com/v6/latest/USD")
       .then((res) => res.json())
       .then((data) => {

@@ -292,7 +292,6 @@ export default function CommunityLive() {
         : ClientRoleType.ClientRoleAudience;
       agoraEngineRef.current.setClientRole(role);
 
-      // Generate token (null for development without token server)
       const token = await generateAgoraToken(
         channelName,
         uid,
@@ -539,7 +538,7 @@ export default function CommunityLive() {
     if (!message.trim() || !currentUser) return;
 
     const newMessage = {
-      id: Date.now(), // Temporary ID
+      id: Date.now(),
       live_id: liveId,
       user_id: currentUser.id,
       content: message.trim(),

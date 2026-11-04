@@ -102,7 +102,6 @@ const CreateCommunity = () => {
         return;
       }
     }
-    // Prepare payload (log for debugging RLS / FK issues)
     const payload = {
       name: name.trim(),
       description: description.trim(),
@@ -114,13 +113,6 @@ const CreateCommunity = () => {
       is_private: isPrivate,
       created_at: new Date().toISOString(),
     };
-    console.log("Creating community with payload:", payload);
-
-    // debug before insert
-    const { data: sessionData } = await supabase.auth.getSession();
-    console.log("supabase sessionData:", sessionData);
-    console.log("session user id (auth):", sessionData?.session?.user?.id);
-    console.log("payload created_by (profile id):", payload.created_by);
 
     // Insert into community table
     const { data, error } = await supabase

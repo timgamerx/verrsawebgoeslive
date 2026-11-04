@@ -25,7 +25,6 @@ const EPISODE_COUNT_LIMITS = {
   premium: Infinity,
 };
 
-// Direct Supabase API functions
 const createPodcast = async (podcastData) => {
   try {
     console.log("Attempting to create podcast with data:", podcastData);

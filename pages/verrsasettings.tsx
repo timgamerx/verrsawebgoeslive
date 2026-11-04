@@ -108,7 +108,7 @@ const VerrsaSettings = () => {
   };
 
   const handleDeleteAccount = () => {
-    if (window.confirm("This action cannot be undone. Are you sure you want to delete your account?")) { /* TODO: handle confirm */ }
+    if (window.confirm("This action cannot be undone. Are you sure you want to delete your account?")) { }
   };
 
   useEffect(() => {

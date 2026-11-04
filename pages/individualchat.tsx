@@ -16,6 +16,20 @@ import {
   storeUserPublicKey,
 } from '../lib/messaging';
 import { initializeEncryption } from '../lib/encryption';
+import { isV2Supported, getPublishablePublicKey } from '../lib/aesGcm';
+import { useTheme } from '../context/ThemeProvider';
+import { IoCall } from 'react-icons/io5';
+import { VoiceBubble } from '../components/CommunityChatBubble';
+import { resolveV2Key } from '../lib/messaging';
+
+// Voice notes are stored as JSON {url, duration} in `content`
+const decodeAudioContent = (content: string) => {
+  try {
+    const p = JSON.parse(content);
+    if (p?.url) return { url: p.url, duration: Number(p.duration) || 0 };
+  } catch {}
+  return null;
+};
 import { sendNewMessageNotification } from '../lib/pushNotifications';
 
 type IndividualChatRouteProp = RouteProp<RootStackParamList, "IndividualChat">;
@@ -28,11 +42,29 @@ interface Conversation {
 
 const IndividualChat = () => {
   const router = useRouter();
+  const { theme } = useTheme();
   const userId = typeof router.query.userId === "string" ? router.query.userId : "";
+  // Name/avatar come from the URL when present, otherwise from the profile
+  const [otherProfile, setOtherProfile] = useState<any>(null);
+  const [voiceKeys, setVoiceKeys] = useState<any>({ dmKey: null, epochKeys: {} });
+  useEffect(() => {
+    if (!userId) return;
+    supabase
+      .from("profiles")
+      .select("full_name, username, avatar_url")
+      .eq("id", userId)
+      .single()
+      .then(({ data }) => data && setOtherProfile(data));
+  }, [userId]);
   const userName =
-    typeof router.query.userName === "string" ? router.query.userName : "";
+    (typeof router.query.userName === "string" && router.query.userName) ||
+    otherProfile?.full_name ||
+    otherProfile?.username ||
+    "";
   const userAvatar =
-    typeof router.query.userAvatar === "string" ? router.query.userAvatar : "";
+    (typeof router.query.userAvatar === "string" && router.query.userAvatar) ||
+    otherProfile?.avatar_url ||
+    "";
   
 
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -184,8 +216,11 @@ const IndividualChat = () => {
       // Initialize encryption for current user
       try {
         const { publicKey } = await initializeEncryption();
-        // Store public key in user's profile
-        await storeUserPublicKey(user.id, publicKey);
+        // Publish the EC public key (AES-GCM v2) so phone and web read each other
+        const publishKey = isV2Supported()
+          ? await getPublishablePublicKey()
+          : publicKey;
+        await storeUserPublicKey(user.id, publishKey);
       } catch (encryptError) {
         console.error("Error initializing encryption:", encryptError);
         window.alert("Encryption setup failed. Messages will be sent unencrypted.");
@@ -200,6 +235,10 @@ const IndividualChat = () => {
       }
 
       setConversationId(convId);
+      // AES key for decrypting voice notes in this chat
+      resolveV2Key(convId).then((dmKey) =>
+        setVoiceKeys({ dmKey, epochKeys: {} }),
+      );
 
       // Setup encryption for this conversation
       try {
@@ -324,7 +363,7 @@ const IndividualChat = () => {
 
     // Create optimistic message
     const optimisticMessage: MessageType = {
-      id: `temp_${Date.now()}`, // Temporary ID
+      id: `temp_${Date.now()}`,
       conversation_id: conversationId,
       sender_id: currentUserId,
       content: messageContent,
@@ -401,22 +440,51 @@ const IndividualChat = () => {
     const isOptimistic = item.id.startsWith("temp_");
 
     return (
-      <div
-        style={{...(styles.messageContainer || {}), ...(isOwnMessage ? styles.ownMessage : styles.otherMessage || {})}}
-      >
+      <div style={{ display: "flex", margin: "2px 0", justifyContent: isOwnMessage ? "flex-end" : "flex-start" }}>
         <div
-          style={{...(styles.messageBubble || {}), ...(isOwnMessage ? styles.ownBubble : styles.otherBubble || {}), ...(isOptimistic ? styles.optimisticMessage : {})}}
+          style={{
+            maxWidth: "80%",
+            padding: spacing.md,
+            borderRadius: 20,
+            boxSizing: "border-box",
+            wordBreak: "break-word",
+            opacity: isOptimistic ? 0.7 : 1,
+            ...(isOwnMessage
+              ? { backgroundColor: "#00BFFF", borderBottomRightRadius: 5 }
+              : { backgroundColor: theme.cardBackground, borderBottomLeftRadius: 5 }),
+          }}
         >
-          <span
-            style={{...(styles.messageText || {}), ...(isOwnMessage ? styles.ownMessageText : styles.otherMessageText || {}), ...(isOptimistic ? styles.optimisticText : {})}}
-          >
-            {item.content || ""}
-          </span>
-          <span
-            style={{...(styles.messageTime || {}), ...(isOwnMessage ? styles.ownMessageTime : styles.otherMessageTime || {})}}
+          {item.message_type === "audio" && decodeAudioContent(item.content) ? (
+            <VoiceBubble
+              url={decodeAudioContent(item.content).url}
+              duration={decodeAudioContent(item.content).duration}
+              isOwn={isOwnMessage}
+              textColor={isOwnMessage ? undefined : theme.text}
+              keys={voiceKeys}
+            />
+          ) : (
+            <div
+              style={{
+                fontSize: fontSize.base,
+                lineHeight: "20px",
+                whiteSpace: "pre-wrap",
+                color: isOwnMessage ? "#fff" : theme.text,
+                fontStyle: isOptimistic ? "italic" : "normal",
+              }}
+            >
+              {item.content || ""}
+            </div>
+          )}
+          <div
+            style={{
+              fontSize: fontSize.xs,
+              marginTop: spacing.xs,
+              textAlign: "right",
+              color: isOwnMessage ? "rgba(255,255,255,0.7)" : "#999",
+            }}
           >
             {item.created_at ? formatTime(item.created_at) : ""}
-          </span>
+          </div>
         </div>
       </div>
     );
@@ -431,24 +499,26 @@ const IndividualChat = () => {
   );
 
   return (
-    <div>
+    <div style={{ height: "100vh", width: "100%", display: "flex", justifyContent: "center", backgroundColor: theme.background }}>
+    <div style={{ display: "flex", flexDirection: "column", width: "100%", maxWidth: 760, height: "100%" }}>
       {/* Header */}
-      <div style={styles.header}>
+      <div style={{ ...styles.header, backgroundColor: theme.background, borderBottom: `1px solid ${theme.border}` }}>
         <button
           style={styles.backButton}
           onClick={() => router.back()}
         >
-          <IoArrowBack />
+          <IoArrowBack size={24} color={theme.text} />
         </button>
 
         <div style={styles.headerContent}>
           <img
-            src={userAvatar || "/avatar.png"}
+            src={userAvatar || "/avatar.jpg"}
+            alt=""
             style={styles.headerAvatar}
           />
           <div style={styles.headerInfo}>
             <div style={styles.headerNameRow}>
-              <span style={styles.headerName}>
+              <span style={{ ...styles.headerName, color: theme.text }}>
                 {userName || "Unknown User"}
               </span>
               {encryptionReady && (
@@ -468,14 +538,14 @@ const IndividualChat = () => {
           onClick={() => window.alert("Voice call feature coming soon!")}
           style={styles.headerAction}
         >
-          <IoMic size={22} color="#333" />
+          <IoCall size={24} color="#00BFFF" />
         </button>
       </div>
 
       {/* Messages */}
       <div
         ref={flatListRef}
-        style={{ flex: 1, overflowY: "auto", padding: `0 ${spacing.base}px` }}
+        style={{ flex: 1, overflowY: "auto", padding: spacing.base, display: "flex", flexDirection: "column" }}
       >
         {messages.length === 0 ? renderEmptyList() : messages.map((item) => (
           <div key={item.id}>{renderMessage({ item })}</div>
@@ -483,16 +553,16 @@ const IndividualChat = () => {
       </div>
 
       {/* Input */}
-      <div style={styles.inputContainer}>
+      <div style={{ ...styles.inputContainer, backgroundColor: theme.background, borderTop: `1px solid ${theme.border}` }}>
         <button
           style={styles.attachButton}
           onClick={() => window.alert("Image and file attachments coming soon!")}
         >
-          <IoAttach size={20} color="#666" />
+          <IoAdd size={24} color={theme.secondaryText} />
         </button>
 
         <textarea
-          style={styles.textInput as any}
+          style={{ ...(styles.textInput as any), backgroundColor: theme.cardBackground, borderColor: theme.border, color: theme.text }}
           placeholder="Type a message..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
@@ -514,6 +584,7 @@ const IndividualChat = () => {
         </button>
       </div>
     </div>
+    </div>
   );
 }
 
@@ -533,13 +604,14 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "space-between",
     paddingLeft: spacing.base,
     paddingRight: spacing.base,
-    paddingTop: spacing.xl5,
+    paddingTop: spacing.base,
     paddingBottom: spacing.base,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    flexShrink: 0,
   },
   backButton: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -650,47 +722,53 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#999",
   },
   inputContainer: {
+    display: "flex",
     flexDirection: "row",
     alignItems: "flex-end",
+    gap: spacing.md,
     paddingLeft: spacing.base,
     paddingRight: spacing.base,
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    flexShrink: 0,
   },
   attachButton: {
+    display: "flex",
     width: 40,
     height: 40,
+    padding: 0,
+    border: "none",
+    cursor: "pointer",
     borderRadius: radius.xl2,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "transparent",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: spacing.md,
   },
   textInput: {
     flex: 1,
     maxHeight: 100,
     minHeight: 40,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    border: "1px solid #e0e0e0",
     borderRadius: radius.xl2,
-    paddingLeft: spacing.base,
-    paddingRight: spacing.base,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
+    padding: `10px ${spacing.base}px`,
     fontSize: fontSize.base,
-    backgroundColor: "#f9f9f9",
+    resize: "none",
+    outline: "none",
+    fontFamily: "inherit",
+    boxSizing: "border-box",
   },
   sendButton: {
+    display: "flex",
     width: 40,
     height: 40,
+    padding: 0,
+    border: "none",
+    cursor: "pointer",
     borderRadius: radius.xl2,
     backgroundColor: "#00BFFF",
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: spacing.md,
+    flexShrink: 0,
   },
   sendButtonDisabled: {
     backgroundColor: "#f0f0f0",

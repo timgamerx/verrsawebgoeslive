@@ -9,6 +9,8 @@ import {
   IoMegaphoneOutline,
   IoStatsChartOutline,
   IoInformationCircleOutline,
+  IoMailOutline,
+  IoTrashOutline,
   IoSwapHorizontalOutline,
   IoLogOutOutline,
   IoClose,
@@ -325,11 +327,40 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
 
             <button
               style={styles.menuItem}
-              onClick={() => setVerrsaCoinModalVisible(true)}
+              onClick={() => {
+                router.push("/verrsacoin");
+                safeOnClose();
+              }}
             >
               <FaCoins size={22} color={"#00bfff"} />
               <span style={{ ...styles.menuText, color: theme.text }}>
                 Explore VerrsaCoin
+              </span>
+            </button>
+
+            <button
+              style={styles.menuItem}
+              onClick={() => {
+                router.push("/newsletters");
+                safeOnClose();
+              }}
+            >
+              <IoMailOutline size={22} color={theme.icon} />
+              <span style={{ ...styles.menuText, color: theme.text }}>
+                Newsletters
+              </span>
+            </button>
+
+            <button
+              style={styles.menuItem}
+              onClick={() => {
+                router.push("/recentlydeleted");
+                safeOnClose();
+              }}
+            >
+              <IoTrashOutline size={22} color={theme.icon} />
+              <span style={{ ...styles.menuText, color: theme.text }}>
+                Recently Deleted
               </span>
             </button>
 

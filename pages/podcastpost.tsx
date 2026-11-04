@@ -327,22 +327,6 @@ export default function PodcastPost() {
     durations,
   ]);
 
-  // Debug logging
-  useEffect(() => {
-    if (currentPodcast) {
-      console.log("=== PODCAST DEBUG DATA ===");
-      console.log("Raw audio_urls:", currentPodcast.audio_urls);
-      console.log("Type of audio_urls:", typeof currentPodcast.audio_urls);
-      console.log("Raw durations:", currentPodcast.durations);
-      console.log("Type of durations:", typeof currentPodcast.durations);
-      console.log("Episode count field:", currentPodcast.episode_count);
-      console.log("Parsed audioUrls:", audioUrls);
-      console.log("audioUrls.length:", audioUrls.length);
-      console.log("Parsed durations:", durations);
-      console.log("Calculated episodeCount:", episodeCount);
-      console.log("========================");
-    }
-  }, [currentPodcast?.id]);
 
   // Save any remaining listen time when podcast changes or component unmounts
   useEffect(() => {

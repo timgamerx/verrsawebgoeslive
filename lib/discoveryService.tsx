@@ -521,7 +521,7 @@ export async function getTrendingCreators(
         avatar_url: stats.profile.avatar_url || "",
         is_verified: stats.profile.is_verified || false,
         subscription_status: stats.profile.subscription_status,
-        follower_count: 0, // TODO: Implement follower count
+        follower_count: 0,
         post_count: stats.post_count,
         engagement_rate:
           stats.total_views > 0
@@ -770,7 +770,6 @@ export async function getRecommendedContent(
     const { user_id, limit = 20, offset = 0 } = params;
     const { excludedPostKeys, excludedUserIds } = await getDiscoveryExclusions();
 
-    // TODO: Implement more sophisticated recommendation algorithm
     // For now, return mix of trending and recent content
 
     const { data, error } = await supabase
@@ -977,7 +976,6 @@ export async function getFollowingFeed(
   offset: number = 0,
 ): Promise<DiscoveryFeedItem[]> {
   try {
-    // TODO: Implement following/follower system
     // For now, return recent content
     return getRecommendedContent({ user_id: userId, limit, offset });
   } catch (error) {

@@ -1196,6 +1196,16 @@ const CommunityProfile = () => {
               </button>
             )}
 
+            {(currentUser?.id === community?.created_by || isMember) && (
+              <button
+                style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
+                onClick={() => { handleGoLiveClose(); router.push(`/community-chat?communityId=${cleanCommunityId}&communityName=${encodeURIComponent(community?.name || "Community")}`); }}
+              >
+                <img src="/bubble-chat.png" alt="" style={{ width: 25, height: 25, marginRight: 8 }} />
+                <span style={{ fontSize: fontSize.base, color: theme.text }}>Chat</span>
+              </button>
+            )}
+
             {currentUser?.id === community?.created_by && (
               <>
                 <button
