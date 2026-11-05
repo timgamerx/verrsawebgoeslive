@@ -10,6 +10,7 @@ import { useTheme } from '../context/ThemeProvider';
 import { sendBroadcastNotification } from '../lib/pushNotifications';
 import EmailCampaignManager from "../components/EmailCampaignManager";
 import { supabase } from '../components/supabase';
+import { withAuthGuard } from '../components/AuthGuard';
 import { IoArrowBack, IoChevronBack, IoNotifications } from 'react-icons/io5'
 
 interface ModerationReport {
@@ -31,7 +32,9 @@ interface ModerationReport {
     | "reported_comments";
 }
 
-export default function ModerationDashboard() {
+export default withAuthGuard(ModerationDashboard, true);
+
+function ModerationDashboard() {
   const router = useRouter();
     const { theme, colors } = useTheme();
   const [reports, setReports] = useState<ModerationReport[]>([]);

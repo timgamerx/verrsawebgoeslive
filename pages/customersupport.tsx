@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { spacing, radius, fontSize } from '../lib/theme';
 import { IoChevronBack } from 'react-icons/io5';
 import { TbChevronLeft } from 'react-icons/tb'
+import { withAuthGuard } from '../components/AuthGuard';
 import {
   supportService,
   SupportMessageWithSender,
@@ -495,4 +496,4 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-export default CustomerSupport;
+export default withAuthGuard(CustomerSupport, false);

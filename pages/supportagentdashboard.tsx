@@ -11,6 +11,7 @@ import {
 import { emailService, emailTemplates } from '../lib/emailService';
 import { useTheme } from '../context/ThemeProvider';
 import { supabase } from '../components/supabase';
+import { withAuthGuard } from '../components/AuthGuard';
 import { TbChevronLeft } from 'react-icons/tb'
 import { MdCheck } from 'react-icons/md'
 
@@ -605,4 +606,4 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-export default SupportAgentDashboard;
+export default withAuthGuard(SupportAgentDashboard, true);
