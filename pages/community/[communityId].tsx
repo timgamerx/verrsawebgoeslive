@@ -200,7 +200,7 @@ const CommunityProfile = () => {
     if (!cleanCommunityId) return;
 
     const newPostsChannel = supabase
-      .channel(`community-posts-new-${cleanCommunityId}`)
+      .channel(`communityposts-new-${cleanCommunityId}`)
       .on(
         "postgres_changes",
         {
@@ -1189,7 +1189,7 @@ const CommunityProfile = () => {
             {(currentUser?.id === community?.created_by || isMember) && (
               <button
                 style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
-                onClick={() => { handleGoLiveClose(); router.push(`/create-community-post?communityId=${cleanCommunityId}&communityName=${encodeURIComponent(community?.name || "Community")}`); }}
+                onClick={() => { handleGoLiveClose(); router.push(`/createcommunitypost?communityId=${cleanCommunityId}&communityName=${encodeURIComponent(community?.name || "Community")}`); }}
               >
                 <MdAddBox size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
                 <span style={{ fontSize: fontSize.base, color: theme.text }}>Make a New Post</span>
@@ -1199,7 +1199,7 @@ const CommunityProfile = () => {
             {(currentUser?.id === community?.created_by || isMember) && (
               <button
                 style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
-                onClick={() => { handleGoLiveClose(); router.push(`/community-chat?communityId=${cleanCommunityId}&communityName=${encodeURIComponent(community?.name || "Community")}`); }}
+                onClick={() => { handleGoLiveClose(); router.push(`/communitychat?communityId=${cleanCommunityId}&communityName=${encodeURIComponent(community?.name || "Community")}`); }}
               >
                 <img src="/bubble-chat.png" alt="" style={{ width: 25, height: 25, marginRight: 8 }} />
                 <span style={{ fontSize: fontSize.base, color: theme.text }}>Chat</span>
@@ -1210,7 +1210,7 @@ const CommunityProfile = () => {
               <>
                 <button
                   style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
-                  onClick={() => { handleGoLiveClose(); router.push(`/edit-community?communityId=${cleanCommunityId}`); }}
+                  onClick={() => { handleGoLiveClose(); router.push(`/editcommunity?communityId=${cleanCommunityId}`); }}
                 >
                   <MdEdit size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
                   <span style={{ fontSize: fontSize.base, color: theme.text }}>Edit Community Info</span>
@@ -1218,7 +1218,7 @@ const CommunityProfile = () => {
 
                 <button
                   style={{ display: "flex", flexDirection: "row", alignItems: "center", padding: `${spacing.md}px ${spacing.sm}px`, borderBottom: `1px solid ${theme.border}`, background: "none", border: "none", cursor: "pointer", width: "100%" }}
-                  onClick={() => { handleGoLiveClose(); router.push(`/community-members?communityId=${cleanCommunityId}&communityName=${encodeURIComponent(community?.name || "Community")}`); }}
+                  onClick={() => { handleGoLiveClose(); router.push(`/communitymembers?communityId=${cleanCommunityId}&communityName=${encodeURIComponent(community?.name || "Community")}`); }}
                 >
                   <MdPeople size={20} color={theme.icon || "#333"} style={{ marginRight: spacing.md }} />
                   <span style={{ fontSize: fontSize.base, color: theme.text }}>See Community Members</span>

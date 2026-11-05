@@ -93,7 +93,7 @@ export function getPostUrl(postType: string, postId: string): string {
     case 'community':
       return `${baseUrl}/community/${postId}`;
     case 'communitypost':
-      return `${baseUrl}/community-posts/${postId}`;
+      return `${baseUrl}/communityposts/${postId}`;
     default:
       return `${baseUrl}/post/${postId}`;
   }

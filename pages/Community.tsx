@@ -364,7 +364,7 @@ function Community() {
 
       {/* Floating Action Button */}
       <button style={styles.fab}
-        onClick={() => window.location.href = "/create-community"}
+        onClick={() => window.location.href = "/createcommunity"}
       >
         <span style={styles.fabText}>+</span>
       </button>

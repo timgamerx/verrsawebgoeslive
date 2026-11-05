@@ -174,7 +174,7 @@ const CreateCommunityPost = ({ navigation, route }: Props) => {
     try {
       const fileExt = uri.split(".").pop() || "jpg";
       const fileName = `${Date.now()}_${Math.random().toString(36)}.${fileExt}`;
-      const filePath = `community-posts/${fileName}`;
+      const filePath = `communityposts/${fileName}`;
 
       // For React Native, we need to read the file as ArrayBuffer
       const response = await fetch(uri);
@@ -203,7 +203,7 @@ const CreateCommunityPost = ({ navigation, route }: Props) => {
   const uploadVideo = async (uri: string) => {
     try {
       const fileName = `${Date.now()}_${Math.random().toString(36)}.mp4`;
-      const filePath = `community-posts/${fileName}`;
+      const filePath = `communityposts/${fileName}`;
 
       // Read the video file as ArrayBuffer
       const response = await fetch(uri);

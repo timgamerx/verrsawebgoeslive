@@ -107,7 +107,7 @@ export const deriveCommunityKey = (communityId: string) =>
   hkdf32(
     utf8(`verrsa-community:${communityId}`),
     "verrsa-community-v2",
-    "verrsa-community-chat",
+    "verrsa-communitychat",
   );
 
 const gcmEncrypt = async (data: Uint8Array, key: Uint8Array) => {
