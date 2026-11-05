@@ -1,0 +1,46 @@
+// @ts-nocheck
+import { spacing, radius, fontSize } from "./theme";
+
+export const makeBookmarkStyles = (theme) => ({
+  container: { minHeight: "100vh", backgroundColor: theme.background },
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: `${spacing.md}px ${spacing.base}px`,
+    backgroundColor: theme.background,
+    borderBottom: `1px solid ${theme.border}`,
+    position: "sticky",
+    top: 0,
+    zIndex: 10,
+  },
+  content: { maxWidth: 720, margin: "0 auto", padding: `0 ${spacing.base}px 80px` },
+  iconBtn: { background: "none", border: "none", padding: 4, cursor: "pointer", display: "flex", alignItems: "center" },
+  linkBtn: { background: "none", border: "none", cursor: "pointer", fontSize: fontSize.md, color: "#00BFFF", padding: 0 },
+  postContainer: { padding: `${spacing.base}px 0`, backgroundColor: theme.background },
+  postHeader: { display: "flex", alignItems: "center", gap: spacing.sm, marginBottom: spacing.sm },
+  avatar: { width: 40, height: 40, borderRadius: "50%", objectFit: "cover" },
+  username: { fontWeight: 600, fontSize: fontSize.md2 },
+  postTitle: { fontSize: fontSize.base, fontWeight: 600, color: theme.text, marginBottom: spacing.sm },
+  postText: { fontSize: fontSize.md, lineHeight: 1.5, flex: 1 },
+  rowContent: { display: "flex", gap: spacing.md, alignItems: "flex-start" },
+  thumbnail: { width: 90, height: 90, borderRadius: radius.md, objectFit: "cover" },
+  verseImage: { width: "100%", maxHeight: 360, borderRadius: radius.md, objectFit: "cover", marginTop: spacing.sm },
+  video: { width: "100%", maxHeight: 420, borderRadius: radius.md, backgroundColor: "#000" },
+  enforcement: {
+    padding: spacing.md,
+    borderRadius: radius.md,
+    border: `1px solid ${theme.border}`,
+    backgroundColor: theme.cardBackground,
+    marginBottom: spacing.sm,
+  },
+  communityStats: { display: "flex", gap: spacing.sm, margin: `${spacing.sm}px 0` },
+  privateLabel: { fontSize: fontSize.sm, color: "#FF9800" },
+  iconRow: { display: "flex", alignItems: "center", gap: spacing.md, marginTop: spacing.md },
+  readMoreCircle: {
+    width: 28, height: 28, borderRadius: "50%", border: "1.5px solid #00BFFF",
+    background: "none", display: "flex", alignItems: "center", justifyContent: "center",
+    cursor: "pointer", padding: 0,
+  },
+  empty: { display: "flex", flexDirection: "column", alignItems: "center", padding: "80px 0", textAlign: "center" },
+});

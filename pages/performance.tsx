@@ -198,7 +198,7 @@ function StatCard({ item, theme, navigate }: any) {
       {item.key === "earnings" && (
         <button
           style={styles.paymentButton}
-          onClick={() => navigate("/payment-dashboard")}
+          onClick={() => navigate("/paymentdashboard")}
         >
           <span style={styles.paymentButtonText}>Go to Dashboard</span>
         </button>
@@ -601,7 +601,7 @@ export default function Performance() {
                       cursor: withdrawEnabled ? "pointer" : "not-allowed",
                     }}
                     disabled={!withdrawEnabled}
-                    onClick={() => router.push("/payment-dashboard")}
+                    onClick={() => router.push("/paymentdashboard")}
                   >
                     <span style={styles.paymentButtonText}>Withdraw</span>
                   </button>
@@ -682,7 +682,7 @@ export default function Performance() {
                 </div>
                 <button
                   style={styles.upgradeButton}
-                  onClick={() => router.push("/verrsa-subscription")}
+                  onClick={() => router.push("/verrsasubscription")}
                 >
                   <span style={styles.upgradeButtonText}>Upgrade Now</span>
                 </button>

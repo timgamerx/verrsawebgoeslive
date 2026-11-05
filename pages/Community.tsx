@@ -217,7 +217,8 @@ function Community() {
               onClick={() => router.push(`/community/${community.id}`)}
             >
               <img
-                src={community.avatar_url}
+                src={community.avatar_url || community.cover_image_url || "/avatar.jpg"}
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/avatar.jpg"; }}
                 alt={community.name}
                 style={styles.circleAvatar}
               />
@@ -244,7 +245,8 @@ function Community() {
                   onClick={() => router.push(`/community/${community.id}`)}
                 >
                   <img
-                    src={community.avatar_url}
+                    src={community.avatar_url || community.cover_image_url || "/avatar.jpg"}
+                    onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/avatar.jpg"; }}
                     alt={community.name}
                     style={styles.avatar}
                   />

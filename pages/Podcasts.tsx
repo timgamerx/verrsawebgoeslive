@@ -191,8 +191,34 @@ const Podcasts = () => {
   };
 
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem("verrsa-podcasts-cache-v1");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed.items) && parsed.items.length > 0) {
+          setPodcasts(parsed.items);
+          setLikedPodcasts(new Set(parsed.liked || []));
+          setBookmarkedPodcasts(new Set(parsed.bookmarked || []));
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to restore podcasts cache:", e);
+    }
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (loading || typeof window === "undefined") return;
+    try {
+      sessionStorage.setItem("verrsa-podcasts-cache-v1", JSON.stringify({
+        items: podcasts,
+        liked: Array.from(likedPodcasts),
+        bookmarked: Array.from(bookmarkedPodcasts),
+      }));
+    } catch (e) {}
+  }, [podcasts, likedPodcasts, bookmarkedPodcasts, loading]);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);

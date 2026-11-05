@@ -17,6 +17,12 @@ import {
 } from "react-icons/io5";
 import { MdComment } from "react-icons/md";
 import { supabase } from "../components/supabase";
+import { useTheme } from "../context/ThemeProvider";
+import { useSubscription } from "../hooks/useSubscription";
+import NewsletterCard from "../components/NewsletterCard";
+
+const FREE_NEWSLETTER_LIMIT = 3;
+const SUBSCRIBE_ROUTE = "/verrsasubscription";
 
 const NotificationItem = ({ item, onPress }) => {
   let icon;
@@ -89,6 +95,26 @@ export default function Notifications() {
   const [refreshing, setRefreshing] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const currentUserId = useRef(null);
+  const { theme } = useTheme();
+  const { subscription } = useSubscription();
+  const isPaid = subscription?.plan === "basic" || subscription?.plan === "premium";
+  const [newsletters, setNewsletters] = useState([]);
+  const [newslettersLoaded, setNewslettersLoaded] = useState(false);
+
+  useEffect(() => {
+    if (activeTab !== "Newsletters" || newslettersLoaded) return;
+    (async () => {
+      const { data, error } = await supabase
+        .from("verrsa_newsletters")
+        .select("id, subject, body, cta_text, cta_url, image_url, sent_at")
+        .order("sent_at", { ascending: false });
+      if (error) console.error("Newsletter load error:", error);
+      setNewsletters(data || []);
+      setNewslettersLoaded(true);
+    })();
+  }, [activeTab, newslettersLoaded]);
+
+  const isNewsletterLocked = (i) => !isPaid && i >= FREE_NEWSLETTER_LIMIT;
 
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
@@ -361,7 +387,7 @@ export default function Notifications() {
 
       {/* Tabs */}
       <div style={styles.tabs}>
-        {["All", "Engagements", "Monetization"].map((tab) => (
+        {["All", "Engagements", "Monetization", "Newsletters"].map((tab) => (
           <div
             key={tab}
             style={{
@@ -384,7 +410,30 @@ export default function Notifications() {
 
       {/* Notification List */}
       <div style={styles.list}>
-        {filteredData.length === 0 ? (
+        {activeTab === "Newsletters" ? (
+          !newslettersLoaded ? (
+            <p style={styles.emptyText}>Loading newsletters...</p>
+          ) : newsletters.length === 0 ? (
+            <div style={styles.emptyContainer}>
+              <IoNotificationsOutline size={48} color="#999" />
+              <p style={styles.emptyText}>No newsletters yet</p>
+              <p style={styles.emptySubText}>Our weekly newsletters will appear here</p>
+            </div>
+          ) : (
+            newsletters.map((item, i) => (
+              <NewsletterCard
+                key={item.id}
+                item={item}
+                locked={isNewsletterLocked(i)}
+                isPaid={isPaid}
+                theme={theme}
+                onOpen={() =>
+                  router.push(isNewsletterLocked(i) ? SUBSCRIBE_ROUTE : `/newsletter/${item.id}`)
+                }
+              />
+            ))
+          )
+        ) : filteredData.length === 0 ? (
           <div style={styles.emptyContainer}>
             <IoNotificationsOutline size={48} color="#999" />
             <p style={styles.emptyText}>No notifications yet</p>

@@ -102,7 +102,7 @@ const CreateCommunityPost = ({ navigation, route }: Props) => {
     try {
       // Check if user has Basic or Premium subscription
       if (plan === "free") {
-        if (window.confirm("Video posting is only available for Basic and Premium subscribers. Upgrade your subscription to post videos in communities.")) { router.push("/verrsa-subscription") }
+        if (window.confirm("Video posting is only available for Basic and Premium subscribers. Upgrade your subscription to post videos in communities.")) { router.push("/verrsasubscription") }
         return;
       }
 
@@ -141,7 +141,7 @@ const CreateCommunityPost = ({ navigation, route }: Props) => {
                 { text: "Cancel", style: "cancel" },
                 {
                   text: "Upgrade Plan",
-                  onPress: () => router.push("/verrsa-subscription"),
+                  onPress: () => router.push("/verrsasubscription"),
                 },
               ],
             );

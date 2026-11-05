@@ -479,7 +479,7 @@ export default function VerrsaSubscription() {
             <TbChevronLeft size={26} color={theme.text} />
           </button>
           <img src="/Verrsalogo.png" alt="Verrsa" style={ms.logo} />
-          <button style={ms.iconBtn} onClick={() => router.push("/subscription-info")}>
+          <button style={ms.iconBtn} onClick={() => router.push("/subscriptioninfo")}>
             <IoEllipsisVertical size={22} color={theme.text} />
           </button>
         </div>

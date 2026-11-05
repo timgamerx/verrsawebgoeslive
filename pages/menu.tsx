@@ -341,19 +341,6 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
             <button
               style={styles.menuItem}
               onClick={() => {
-                router.push("/newsletters");
-                safeOnClose();
-              }}
-            >
-              <IoMailOutline size={22} color={theme.icon} />
-              <span style={{ ...styles.menuText, color: theme.text }}>
-                Newsletters
-              </span>
-            </button>
-
-            <button
-              style={styles.menuItem}
-              onClick={() => {
                 router.push("/recentlydeleted");
                 safeOnClose();
               }}

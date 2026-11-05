@@ -179,8 +179,34 @@ function Articles() {
   };
 
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem('verrsa-articles-cache-v1');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed.items) && parsed.items.length > 0) {
+          setArticles(parsed.items);
+          setLikedArticles(new Set(parsed.liked || []));
+          setBookmarkedArticles(new Set(parsed.bookmarked || []));
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to restore articles cache:', e);
+    }
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (loading || typeof window === 'undefined') return;
+    try {
+      sessionStorage.setItem('verrsa-articles-cache-v1', JSON.stringify({
+        items: articles,
+        liked: Array.from(likedArticles),
+        bookmarked: Array.from(bookmarkedArticles),
+      }));
+    } catch (e) {}
+  }, [articles, likedArticles, bookmarkedArticles, loading]);
 
   const fetchData = async () => {
     try {

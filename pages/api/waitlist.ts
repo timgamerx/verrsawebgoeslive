@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { WaitlistApiResponse } from '../../types/waitlist';
+import { sendWelcomeEmail } from '../../lib/newsletterWelcomeEmail';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -61,6 +62,14 @@ export default async function handler(
       console.error('Supabase insert error:', insertError);
       return res.status(500).json({ error: 'Failed to add email' });
     }
+
+    // Instant welcome email; only show "Join Creators" CTA if not already a Verrsa user
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
+    await sendWelcomeEmail(normalizedEmail, !existingProfile);
 
     return res.status(201).json({
       success: true,

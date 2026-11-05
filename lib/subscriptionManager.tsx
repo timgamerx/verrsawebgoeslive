@@ -104,7 +104,10 @@ export const getUserSubscription = async (
     }
 
     const plan = (profile.subscription_plan as SubscriptionPlan) || "free";
-    const isActive = profile.subscription_status === "active";
+    const expired =
+      !!profile.subscription_expires_at &&
+      new Date(profile.subscription_expires_at).getTime() < Date.now();
+    const isActive = profile.subscription_status === "active" && !expired;
 
     // Fast path: if not active or free plan, return immediately without querying subscriptions table
     if (!isActive || plan === "free") {
@@ -133,8 +136,9 @@ export const hasFeatureAccess = (
   userPlan: SubscriptionPlan,
   feature: keyof PlanFeatures,
 ): boolean => {
-  const planFeatures = PLAN_FEATURES[userPlan];
-  return planFeatures[feature] as boolean;
+  const normalized = String(userPlan || "free").toLowerCase() as SubscriptionPlan;
+  const planFeatures = PLAN_FEATURES[normalized] || PLAN_FEATURES.free;
+  return planFeatures[feature] === true;
 };
 
 /**

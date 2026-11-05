@@ -203,7 +203,7 @@ export default function SubscriptionInfo() {
 
               <button
                 style={{...(styles.resubscribeButton || {}), backgroundColor: "#00AEEF"}}
-                onClick={() => router.push("/verrsa-subscription")}
+                onClick={() => router.push("/verrsasubscription")}
               >
                 <span style={styles.resubscribeButtonText}>Resubscribe</span>
               </button>
@@ -259,7 +259,7 @@ export default function SubscriptionInfo() {
                   <button
                     style={{...(styles.resubscribeButton || {}), backgroundColor: "#00AEEF"}}
                     onClick={() =>
-                      router.push("/verrsa-subscription")
+                      router.push("/verrsasubscription")
                     }
                   >
                     <span style={styles.resubscribeButtonText}>Subscribe</span>

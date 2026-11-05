@@ -163,9 +163,15 @@ export const useFeatureAccess = (
   feature: keyof PlanFeatures,
   featureName?: string
 ) => {
-  const { plan, loading, refreshSubscription } = useSubscription();
+  const { plan, loading, isActive, subscription, refreshSubscription } =
+    useSubscription();
 
-  const hasAccess = hasFeatureAccess(plan, feature);
+  // Deny while loading, or if a paid plan isn't active
+  const hasAccess =
+    !loading &&
+    subscription !== null &&
+    (plan === "free" || isActive) &&
+    hasFeatureAccess(plan, feature);
   const validation = validateFeatureAccess(plan, feature, featureName);
 
   return {
