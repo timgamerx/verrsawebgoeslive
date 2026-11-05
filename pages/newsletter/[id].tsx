@@ -6,6 +6,7 @@ import { supabase } from "../../components/supabase";
 import { useTheme } from "../../context/ThemeProvider";
 import { useSubscription } from "../../hooks/useSubscription";
 import { spacing, radius, fontSize } from "../../lib/theme";
+import { parseBody } from "../../lib/richText";
 
 const FREE_NEWSLETTER_LIMIT = 3;
 
@@ -76,7 +77,26 @@ export default function NewsletterPost() {
               })}
             </div>
             <h1 style={{ ...styles.title, color: theme.text }}>{newsletter.subject}</h1>
-            <div style={{ ...styles.body, color: theme.text }}>{newsletter.body}</div>
+            <div style={{ ...styles.body, color: theme.text }}>
+              {parseBody(newsletter.body).map((line, i) => {
+                if (line.type === "blank") return <div key={i} style={{ height: 12 }} />;
+                const content = line.segments.map((s, j) => {
+                  let node: React.ReactNode = s.text;
+                  if (s.italic) node = <em key={`e${j}`}>{node}</em>;
+                  if (s.bold) node = <strong key={`b${j}`}>{node}</strong>;
+                  return <React.Fragment key={j}>{node}</React.Fragment>;
+                });
+                if (line.type === "li") {
+                  return (
+                    <div key={i} style={{ display: "flex", paddingLeft: 8, marginBottom: 4 }}>
+                      <span style={{ width: 24, flexShrink: 0 }}>{line.marker}</span>
+                      <span style={{ flex: 1 }}>{content}</span>
+                    </div>
+                  );
+                }
+                return <div key={i}>{content}</div>;
+              })}
+            </div>
 
             {newsletter.cta_url ? (
               <a

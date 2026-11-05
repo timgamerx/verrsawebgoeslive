@@ -2,9 +2,10 @@
 import React from "react";
 import { IoLockClosed } from "react-icons/io5";
 import { spacing, radius, fontSize } from "../lib/theme";
+import { stripMarkers } from "../lib/richText";
 
 const preview = (body: string) =>
-  (body || "").replace(/\s+/g, " ").trim().slice(0, 110);
+  stripMarkers(body || "").slice(0, 110);
 
 export default function NewsletterCard({ item, locked, isPaid, theme, onOpen }) {
   return (

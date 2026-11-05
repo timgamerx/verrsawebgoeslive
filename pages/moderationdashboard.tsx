@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { spacing, radius, fontSize } from '../lib/theme';
 import { MdAdd, MdArrowBack, MdArrowForward, MdBlock, MdCheck, MdClose, MdDelete, MdEdit, MdFavorite, MdHome, MdNotifications, MdPerson, MdRemove, MdReport, MdSearch, MdSettings, MdShare, MdStar, MdVerified } from 'react-icons/md';
 import { contentModerator } from '../lib/contentModerator';
+import { htmlToMarkers } from '../lib/htmlToMarkers';
 import { fetchCurrentUserProfile } from '../lib/profileUtils';
 import { useTheme } from '../context/ThemeProvider';
 import { sendBroadcastNotification } from '../lib/pushNotifications';
@@ -669,12 +670,21 @@ export default function ModerationDashboard() {
           />
 
           {/* Body */}
-          <input
-            placeholder="Type email message..."
-            placeholderTextColor="#888"
-            multiline
+          <textarea
+            placeholder="Type email message... (**bold**, *italic*, - bullets supported; formatting is kept when pasted)"
+            rows={10}
             value={emailBody}
             onChange={(e) => setEmailBody(e.target.value)}
+            onPaste={(e) => {
+              const html = e.clipboardData.getData("text/html");
+              if (!html) return; // plain text pastes normally (newlines kept by textarea)
+              e.preventDefault();
+              const converted = htmlToMarkers(html);
+              const t = e.currentTarget;
+              const start = t.selectionStart;
+              const end = t.selectionEnd;
+              setEmailBody(emailBody.slice(0, start) + converted + emailBody.slice(end));
+            }}
             style={{
               backgroundColor: theme.background,
               color: theme.text,

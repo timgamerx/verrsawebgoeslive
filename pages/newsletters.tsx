@@ -7,11 +7,12 @@ import { useTheme } from "../context/ThemeProvider";
 import { useSubscription } from "../hooks/useSubscription";
 import NewsletterCard from "../components/NewsletterCard";
 import { spacing, radius, fontSize } from "../lib/theme";
+import { stripMarkers } from "../lib/richText";
 
 const FREE_NEWSLETTER_LIMIT = 3;
 const SUBSCRIBE_ROUTE = "/verrsasubscription";
 const preview = (body: string) =>
-  (body || "").replace(/\s+/g, " ").trim().slice(0, 110);
+  stripMarkers(body || "").slice(0, 110);
 
 // Weekly newsletters. Newest 3 are free; older ones need Basic/Premium.
 export default function Newsletters() {
