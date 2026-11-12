@@ -255,6 +255,11 @@ export default function Auth() {
   
   const signIn = async () => {
     if (!validateInputs()) return;
+
+    if (!captchaToken) {
+      window.alert('Please complete the CAPTCHA verification');
+      return;
+    }
     
     try {
       setLoading(true);
@@ -269,10 +274,13 @@ export default function Auth() {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
+        options: { captchaToken },
       });
 
       if (error) {
         window.alert(`Login Error\n\n${error.message}`);
+        try { captchaRef.current?.resetCaptcha(); } catch (e) {}
+        setCaptchaToken(null);
         setLoading(false);
         return;
       }
@@ -521,17 +529,17 @@ export default function Auth() {
             </div>
           )}
 
-          {/* hCaptcha - shown on sign up */}
-          {!isLogin && (
-            <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-              <HCaptcha
-                ref={captchaRef}
-                sitekey="20000ae4-a4f8-44ec-bf0c-5726118ad0e8"
-                onVerify={(token) => setCaptchaToken(token)}
-                theme="light"
-              />
-            </div>
-          )}
+          {/* hCaptcha - shown on sign in and sign up */}
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+            <HCaptcha
+              key={isLogin ? 'login' : 'signup'}
+              ref={captchaRef}
+              sitekey="20000ae4-a4f8-44ec-bf0c-5726118ad0e8"
+              onVerify={(token) => setCaptchaToken(token)}
+              onExpire={() => setCaptchaToken(null)}
+              theme="light"
+            />
+          </div>
 
           {/* Forgot Password */}
           {isLogin && (
@@ -568,7 +576,7 @@ export default function Auth() {
           </button>
 
           {/* Switch Mode */}
-          <div style={styles.switchMode} onClick={() => setIsLogin(!isLogin)}>
+          <div style={styles.switchMode} onClick={() => { setCaptchaToken(null); setIsLogin(!isLogin); }}>
             <span style={styles.switchModeText}>
               {isLogin ? (
                 <>

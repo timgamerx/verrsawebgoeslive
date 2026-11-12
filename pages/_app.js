@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../styles/index.css';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeProvider';
@@ -58,6 +58,48 @@ function MyApp({ Component, pageProps }) {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [router.pathname]);
+
+  // Website visit tracking: one count per browser session (not per page, not per refresh).
+  // Counted only after real user interaction, which filters out most bots.
+  useEffect(() => {
+    if (typeof window === 'undefined' || !router.isReady) return;
+    if (!['/', '/auth', '/home'].includes(router.pathname)) return;
+
+    const KEY = 'verrsa_visit_counted';
+    try {
+      if (window.sessionStorage.getItem(KEY)) return;
+    } catch (e) {
+      return;
+    }
+
+    const events = ['pointerdown', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+    const path = router.pathname;
+    let sent = false;
+
+    function cleanup() {
+      events.forEach((ev) => window.removeEventListener(ev, onInteract));
+    }
+    function onInteract() {
+      if (sent) return;
+      sent = true;
+      cleanup();
+      try {
+        if (window.sessionStorage.getItem(KEY)) return;
+        window.sessionStorage.setItem(KEY, '1');
+      } catch (e) {
+        return;
+      }
+      fetch('/api/track-visit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path }),
+        keepalive: true,
+      }).catch(() => {});
+    }
+
+    events.forEach((ev) => window.addEventListener(ev, onInteract, { passive: true }));
+    return cleanup;
+  }, [router.isReady, router.pathname]);
 
   // App Download Prompt Logic - Show every 5 minutes
   useEffect(() => {
