@@ -861,7 +861,7 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
 
   // ── Render ─────────────────────────────────────────────────────────────────
   const profileUsername = profile?.username || "";
-  const profileImage = profile?.avatar_url || "https://ik.imagekit.io/te9biwxvl/verrsa-team.png";
+  const profileImage = profile?.avatar_url || "https://ik.imagekit.io/verrsa/verrsa-creators.jpg";
 
   return (
     <>

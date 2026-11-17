@@ -110,7 +110,7 @@ export default function Monetization() {
   return (
     <>
     <Head>
-        <title>Verrsa - Create, Publish, Live, Earn | Monetization-First Creator Platform</title>
+        <title>Verrsa - Create, Publish, Live, Earn</title>
         <meta name="description" content="How to earn on Verrsa - Turn your content into income. Learn about our transparent payout structure and start monetizing your posts today." />
         <meta property="og:title" content="Verrsa - Create, Publish, Live, Earn | Monetization-First Creator Platform" />
         <meta property="og:description" content="How to earn on Verrsa - Turn your content into income. Learn about our transparent payout structure and start monetizing your posts today." />

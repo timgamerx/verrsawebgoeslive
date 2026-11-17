@@ -5,7 +5,7 @@ const INVITE_RECIPIENTS = [
 
 const INVITE_HTML = `
  <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
-    <img src="https://ik.imagekit.io/te9biwxvl/verrsa-team.png" alt="Verrsa"
+    <img src="https://ik.imagekit.io/verrsa/verrsa-creators.jpg" alt="Verrsa"
       style="width:100%; border-radius:10px; margin-bottom:20px;" />
 
     <p style="margin-bottom: 20px;">Hi, Sekoni Pelumi</p>
@@ -102,7 +102,7 @@ export default async function handler(req: any, res: any) {
 
   const html = `
     <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
-      <img src="https://ik.imagekit.io/te9biwxvl/verrsa-team.png" alt="Verrsa"
+      <img src="https://ik.imagekit.io/verrsa/verrsa-creators.jpg" alt="Verrsa"
         style="width:100%; border-radius:10px; margin-bottom:20px;" />
       <div style="font-size: 15px; line-height: 1.7; color: #333;">
         ${body.trim().replace(/\n/g, '<br/>')}

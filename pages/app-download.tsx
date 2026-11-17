@@ -80,22 +80,25 @@ export default function AppDownloadPage() {
   return (
     <>
       <Head>
-        <title>Verrsa - Monetization Platform for Creators | Earn Without 1000 Subscribers</title>
+        <title>Verrsa | Earn Without 1000 Subscribers</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
-          content="Verrsa is a monetization-first creator platform for emerging creators. Start earning from articles, podcasts, and live streams without needing a large audience. Alternative to YouTube for creators."
+          content="Verrsa is a creator platform for content creation and community building. Create and publish articles, podcasts, videos and posts, connect with communities, go live, grow your audience and monetize your creativity."
         />
         <meta
           name="keywords"
-          content="creator monetization, creator platform, monetize without subscribers, live streaming Africa, creator earnings, YouTube alternative, micro influencer tools, gift-based monetization, emerging creators, creator platform Africa"
+          content="content creation, communities, community building, streaming, live streaming, live streaming platform, live streaming platforms, earn from videos, post videos, earn from videos, publish podcasts, earn from podcasts, write articles, earn from articles, creator monetization, creator platform, monetize without subscribers, live streaming Africa, creator earnings, YouTube alternative, micro influencer tools, gift-based monetization, emerging creators, creator platform Africa"
         />
 
         {/* Open Graph */}
-        <meta property="og:title" content="Verrsa - Monetization Platform for Creators" />
+        <meta
+          property="og:title"
+          content="Verrsa | Earn Without 1000 Subscribers"
+        />
         <meta
           property="og:description"
-          content="Verrsa is a monetization-first creator platform for emerging creators. Start earning from day one without 1000 subscribers."
+          content="Verrsa is a creator platform for content creation and community building. Create and publish articles, podcasts, videos and posts, connect with communities, go live, grow your audience and monetize your creativity."
         />
         <meta property="og:image" content={OG_IMAGE} />
         <meta property="og:type" content="website" />
@@ -103,7 +106,10 @@ export default function AppDownloadPage() {
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Verrsa - Monetization Platform for Creators" />
+        <meta
+          name="twitter:title"
+          content="Verrsa | Earn Without 1000 Subscribers"
+        />
         <meta
           name="twitter:description"
           content="Start earning from articles, podcasts, and live streams without needing a large audience."
@@ -113,7 +119,9 @@ export default function AppDownloadPage() {
         {/* Structured Data */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
         />
         <script
           type="application/ld+json"
@@ -125,10 +133,10 @@ export default function AppDownloadPage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo4.png" alt="Verrsa Logo" style={styles.logo} />
 
-        <h1 style={styles.title}>Create, Publish, Go Live, and Earn</h1>
+        <h1 style={styles.title}>Create, Publish, Live, and Earn</h1>
         <p style={styles.subtitle}>
-          Verrsa is a monetization-first creator platform for emerging creators. Start earning from
-          articles, podcasts, videos and live streams without needing a large audience.
+          Content creation and community. Built for creators | Understand your
+          audience and monetize your creativity. Join Verrsa ↓
         </p>
 
         <div style={styles.buttons}>
@@ -139,9 +147,9 @@ export default function AppDownloadPage() {
             style={{
               ...styles.button,
               ...styles.darkButton,
-              ...(hovered === 'ios' ? styles.buttonHover : {}),
+              ...(hovered === "ios" ? styles.buttonHover : {}),
             }}
-            onMouseEnter={() => setHovered('ios')}
+            onMouseEnter={() => setHovered("ios")}
             onMouseLeave={() => setHovered(null)}
           >
             <AppleIcon />
@@ -153,9 +161,9 @@ export default function AppDownloadPage() {
             rel="noopener noreferrer"
             style={{
               ...styles.button,
-              ...(hovered === 'android' ? styles.buttonHover : {}),
+              ...(hovered === "android" ? styles.buttonHover : {}),
             }}
-            onMouseEnter={() => setHovered('android')}
+            onMouseEnter={() => setHovered("android")}
             onMouseLeave={() => setHovered(null)}
           >
             <PlayIcon />

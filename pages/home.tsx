@@ -615,7 +615,7 @@ function Home() {
         <title>Verrsa - Create, Publish, Live, Earn</title>
         <meta
           name="description"
-          content="Join Verrsa, the monetization-first creator platform for emerging creators. Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
+          content="Join Verrsa, Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
         />
         <meta
           property="og:title"
@@ -623,11 +623,11 @@ function Home() {
         />
         <meta
           property="og:description"
-          content="Join Verrsa, the monetization-first creator platform for emerging creators. Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
+          content="Join Verrsa, Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
         />
         <meta
           property="og:image"
-          content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
+          content="https://ik.imagekit.io/verrsa/verrsa-creators.jpg"
         />
       </Head>
 

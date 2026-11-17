@@ -322,7 +322,10 @@ export default function LandingPage() {
         />
         <meta
           name="description"
-          content="Join Verrsa, the monetization-first creator platform for emerging creators. Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
+          content="Verrsa is a creator platform for content creation and community
+            building. Create and publish articles, podcasts, videos and posts,
+            connect with communities, go live, grow your audience and monetize
+            your creativity."
         />
         <meta
           property="og:title"
@@ -330,21 +333,27 @@ export default function LandingPage() {
         />
         <meta
           property="og:description"
-          content="Join Verrsa, the monetization-first creator platform for emerging creators. Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
+          content="Verrsa is a creator platform for content creation and community
+            building. Create and publish articles, podcasts, videos and posts,
+            connect with communities, go live, grow your audience and monetize
+            your creativity."
         />
         <meta
           property="og:image"
-          content="https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
+          content="https://ik.imagekit.io/verrsa/verrsa-creators.jpg"
         />
       </Head>
 
       <SEO
-        title="Verrsa - Create, Publish, Live, Earn | Monetization-First Creator Platform"
-        description="Join Verrsa, the monetization-first creator platform for emerging creators. Share knowledge, stories, and creativity, discover meaningful content, grow audiences, and unlock earning opportunities."
-        keywords="creator platform, monetization, earn money online, articles, podcasts, live streaming, content creation, emerging creators, micro-influencers, social media, Verrsa"
+        title="Verrsa - Create, Publish, Live, Earn"
+        description="Verrsa is a creator platform for content creation and community
+            building. Create and publish articles, podcasts, videos and posts,
+            connect with communities, go live, grow your audience and monetize
+            your creativity."
+        keywords="creator platform, monetization, earn money online, articles, podcasts, live streaming, content creation, emerging creators, micro-influencers, social media, Verrsa, content creation, communities, community building, streaming, live streaming, live streaming platform, live streaming platforms, earn from videos, post videos, earn from videos, publish podcasts, earn from podcasts, write articles, earn from articles, creator monetization, creator platform, monetize without subscribers, live streaming Africa, creator earnings, YouTube alternative, micro influencer tools, gift-based monetization, emerging creators, creator platform Africa"
         url="https://verrsa.org"
         type="website"
-        image="https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
+        image="https://ik.imagekit.io/verrsa/verrsa-creators.jpg"
         publishedTime={new Date().toISOString()}
         modifiedTime={new Date().toISOString()}
         structuredData={{}}
@@ -413,9 +422,10 @@ export default function LandingPage() {
             Create, Publish, Go Live, and Earn
           </h1>
           <p style={styles.heroSubtitle}>
-            Verrsa is a monetization-first creator platform for emerging
-            creators. Start earning from articles, podcasts, videos and live
-            streams without needing a large audience.
+            Verrsa is a creator platform for content creation and community
+            building. Create and publish articles, podcasts, videos and posts,
+            connect with communities, go live, grow your audience and monetize
+            your creativity.
           </p>
 
           {/* CTA Buttons */}

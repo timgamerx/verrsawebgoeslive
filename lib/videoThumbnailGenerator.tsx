@@ -11,7 +11,7 @@
  * @returns Thumbnail URL or fallback image
  */
 export function generateVideoThumbnail(videoUrl: string | undefined): string {
-  const fallbackImage = "https://ik.imagekit.io/te9biwxvl/verrsa-team.png";
+  const fallbackImage = "https://ik.imagekit.io/verrsa/verrsa-creators.jpg";
   
   if (!videoUrl || videoUrl.trim() === "") {
     return fallbackImage;
@@ -53,7 +53,7 @@ export function getVideoThumbnailWithFallback(
   videoUrl: string | undefined,
   coverImageUrl: string | undefined
 ): string {
-  const fallbackImage = "https://ik.imagekit.io/te9biwxvl/verrsa-team.png";
+  const fallbackImage = "https://ik.imagekit.io/verrsa/verrsa-creators.jpg";
   
   // Priority 1: Use cover_image_url if available
   if (coverImageUrl && coverImageUrl.trim() !== "") {

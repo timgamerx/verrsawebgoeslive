@@ -13,16 +13,16 @@ interface MetaTagsProps {
 }
 
 export default function MetaTags({
-  title = 'Verrsa - Create, Publish, Live, Earn',
-  description = 'Monetization-first creator platform for emerging creators. Write. Post. Go live. Monetize. All in one place.',
-  image = 'https://ik.imagekit.io/te9biwxvl/verrsa-team.png',
-  url = 'https://verrsa.org',
-  type = 'website',
+  title = "Verrsa - Create, Publish, Live, Earn",
+  description = "Verrsa is a creator platform for content creation and community building. Create and publish articles, podcasts, videos and posts, connect with communities, go live, grow your audience and monetize your creativity.",
+  image = "https://ik.imagekit.io/verrsa/verrsa-creators.jpg",
+  url = "https://verrsa.org",
+  type = "website",
   video,
-  siteName = 'Verrsa',
+  siteName = "Verrsa",
 }: MetaTagsProps) {
-  const fullUrl = url.startsWith('http') ? url : `https://verrsa.org${url}`;
-  
+  const fullUrl = url.startsWith("http") ? url : `https://verrsa.org${url}`;
+
   return (
     <Helmet>
       {/* Primary Meta Tags */}
@@ -37,7 +37,7 @@ export default function MetaTags({
       <meta property="og:description" content={description} />
       <meta property="og:image" content={image} />
       <meta property="og:site_name" content={siteName} />
-      
+
       {video && (
         <>
           <meta property="og:video" content={video} />
@@ -54,17 +54,23 @@ export default function MetaTags({
       />
 
       {/* Twitter */}
-      <meta property="twitter:card" content={video ? "player" : "summary_large_image"} />
+      <meta
+        property="twitter:card"
+        content={video ? "player" : "summary_large_image"}
+      />
       <meta property="twitter:url" content={fullUrl} />
       <meta property="twitter:title" content={title} />
       <meta property="twitter:description" content={description} />
       <meta property="twitter:image" content={image} />
-      
+
       {video && (
         <>
           <meta property="twitter:player" content={video} />
           <meta property="twitter:player:stream" content={video} />
-          <meta property="twitter:player:stream:content_type" content="video/mp4" />
+          <meta
+            property="twitter:player:stream:content_type"
+            content="video/mp4"
+          />
         </>
       )}
     </Helmet>

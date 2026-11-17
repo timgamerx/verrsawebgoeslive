@@ -17,37 +17,38 @@ import { Helmet } from 'react-helmet-async';
  * @param {boolean} props.noindex - Prevent indexing
  */
 export default function SEO({
-  title = 'Verrsa - Create, Publish, Live, Earn',
-  description = 'Monetization-first creator platform for emerging creators. Write. Post. Go live. Monetize. All in one place.',
-  keywords = 'Verrsa, social media, community, live stream, posts, videos, articles, podcasts, creator platform, monetization',
-  image = 'https://ik.imagekit.io/te9biwxvl/verrsa-team.png',
-  url = 'https://verrsa.org',
-  type = 'website',
-  author = 'Verrsa',
+  title = "Verrsa - Create, Publish, Live, Earn",
+  description = "Verrsa is a creator platform for content creation and community building. Create and publish articles, podcasts, videos and posts, connect with communities, go live, grow your audience and monetize your creativity.",
+  keywords = "Verrsa, social media, community, live stream, posts, videos, articles, podcasts, creator platform, monetization, content creation, communities, community building, streaming, live streaming, live streaming platform, live streaming platforms, earn from videos, post videos, earn from videos, publish podcasts, earn from podcasts, write articles, earn from articles, creator monetization, creator platform, monetize without subscribers, live streaming Africa, creator earnings, YouTube alternative, micro influencer tools, gift-based monetization, emerging creators, creator platform Africa",
+  image = "https://ik.imagekit.io/verrsa/verrsa-creators.jpg",
+  url = "https://verrsa.org",
+  type = "website",
+  author = "Verrsa",
   publishedTime,
   modifiedTime,
   structuredData,
   noindex = false,
 }) {
-  const fullTitle = title.includes('Verrsa') ? title : `${title} | Verrsa`;
+  const fullTitle = title.includes("Verrsa") ? title : `${title} | Verrsa`;
 
   // Default structured data for the organization
   const defaultStructuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'Verrsa',
-    url: 'https://verrsa.org',
-    logo: 'https://verrsa.org/verrsa-logo.png',
-    description: 'Monetization-first creator platform for emerging creators',
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Verrsa",
+    url: "https://verrsa.org",
+    logo: "https://verrsa.org/verrsa-logo.png",
+    description:
+      "Content creation and community. Built for creators | Understand your audience and monetize your creativity.",
     sameAs: [
-      'https://twitter.com/verrsa',
-      'https://facebook.com/verrsa',
-      'https://instagram.com/verrsa',
+      "https://twitter.com/verrsa",
+      "https://facebook.com/verrsa",
+      "https://instagram.com/verrsa",
     ],
     contactPoint: {
-      '@type': 'ContactPoint',
-      contactType: 'Customer Support',
-      email: 'support@verrsa.org',
+      "@type": "ContactPoint",
+      contactType: "Customer Support",
+      email: "support@verrsa.org",
     },
   };
 
@@ -58,13 +59,18 @@ export default function SEO({
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
       {author && <meta name="author" content={author} />}
-      
+
       {/* Canonical URL */}
       <link rel="canonical" href={url} />
 
       {/* Robots */}
       {noindex && <meta name="robots" content="noindex, nofollow" />}
-      {!noindex && <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />}
+      {!noindex && (
+        <meta
+          name="robots"
+          content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+        />
+      )}
 
       {/* Open Graph / Facebook / WhatsApp / LinkedIn */}
       <meta property="og:url" content={url} />
@@ -74,11 +80,15 @@ export default function SEO({
       <meta property="og:image" content={image} />
       <meta property="og:site_name" content="Verrsa" />
       <meta property="og:locale" content="en_US" />
-      
-      {type === 'article' && (
+
+      {type === "article" && (
         <>
-          {publishedTime && <meta property="article:published_time" content={publishedTime} />}
-          {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+          {publishedTime && (
+            <meta property="article:published_time" content={publishedTime} />
+          )}
+          {modifiedTime && (
+            <meta property="article:modified_time" content={modifiedTime} />
+          )}
           {author && <meta property="article:author" content={author} />}
         </>
       )}
@@ -94,7 +104,10 @@ export default function SEO({
       <meta name="theme-color" content="#00BFFF" />
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+      />
       <meta name="apple-mobile-web-app-title" content="Verrsa" />
 
       {/* Structured Data (JSON-LD) */}

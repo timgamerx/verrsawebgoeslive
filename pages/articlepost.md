@@ -557,7 +557,7 @@ setPost(data);
           content={
             article.cover_image_url && article.cover_image_url.trim() !== ""
               ? article.cover_image_url
-              : "https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
+              : "https://ik.imagekit.io/verrsa/verrsa-creators.jpg"
           }
         />
         <meta property="og:type" content="article" />
@@ -577,7 +577,7 @@ setPost(data);
           content={
             article.cover_image_url && article.cover_image_url.trim() !== ""
               ? article.cover_image_url
-              : "https://ik.imagekit.io/te9biwxvl/verrsa-team.png"
+              : "https://ik.imagekit.io/verrsa/verrsa-creators.jpg"
           }
         />
       </Head>

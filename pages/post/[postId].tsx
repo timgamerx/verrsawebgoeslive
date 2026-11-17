@@ -581,7 +581,7 @@ export default function PostPage({ post: initialPost, authorName: initialAuthorN
     ? getVideoMetaThumbnail(post.video_url, post.cover_image_url)
     : post.cover_image_url && post.cover_image_url.trim() !== ""
     ? post.cover_image_url
-    : "https://ik.imagekit.io/te9biwxvl/verrsa-team.png";
+    : "https://ik.imagekit.io/verrsa/verrsa-creators.jpg";
 
   const url = `https://verrsa.org/post/${post.id}`;
 
