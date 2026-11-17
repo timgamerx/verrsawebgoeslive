@@ -4,7 +4,7 @@ import Head from 'next/head';
 const APP_STORE_URL = 'https://apps.apple.com/us/app/verrsa/id6756518229';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.verrsaapp.verrsa';
 const OG_IMAGE =
-  'https://ysmrnxmvuijzvdegfdmm.supabase.co/storage/v1/object/public/media-public/og-images/verrsa-creators.jpg';
+  'https://ik.imagekit.io/verrsa/verrsa-creators.jpg';
 
 const organizationSchema = {
   '@context': 'https://schema.org',

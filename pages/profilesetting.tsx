@@ -109,10 +109,10 @@ export default function ProfileSetting() {
         </div>
 
         <div style={s.section}>
+          {row({ icon: ic(IoPeopleOutline), label: "Referral", onClick: go("/referral") })}
           {row({ icon: ic(IoBanOutline), label: "Blocked Users", onClick: go("/blockedusers") })}
           {row({ icon: ic(IoBanOutline), label: "Blocked Communities", onClick: go("/blockedcommunities") })}
           {row({ icon: ic(IoTrashBinOutline), label: "Recently Deleted", onClick: go("/recentlydeleted") })}
-          {row({ icon: ic(IoHelpCircleOutline), label: "Help & Support", onClick: go("/customersupport") })}
           {st.isSupportAgent && row({
             icon: ic(IoChatbubbleEllipsesOutline), label: "Support Dashboard", onClick: go("/supportagentdashboard"),
           })}

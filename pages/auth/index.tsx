@@ -34,6 +34,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(null);
@@ -174,6 +175,9 @@ export default function Auth() {
 
     try {
       setLoading(true);
+
+      if (referralCode.trim()) localStorage.setItem('pending_referral_code', referralCode.trim().toUpperCase());
+      else localStorage.removeItem('pending_referral_code');
 
       // Check if username is already taken
       const { data: existing } = await supabase
@@ -478,6 +482,17 @@ export default function Auth() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value.toLowerCase())}
                   autoCapitalize="none"
+                />
+              </div>
+
+              <div style={styles.inputContainer}>
+                <IoAtOutline size={20} color="#666" />
+                <input
+                  style={styles.input}
+                  type="text"
+                  placeholder="Referral code (optional)"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
                 />
               </div>
             </>

@@ -103,6 +103,7 @@ type Totals = {
   earnings: number;
   likes: number;
   subscribers: number;
+  profile_visits: number;
   watch_time: number;
   listen_time: number;
   read_time: number;
@@ -114,6 +115,7 @@ const INITIAL_TOTALS: Totals = {
   earnings: 0,
   likes: 0,
   subscribers: 0,
+  profile_visits: 0,
   watch_time: 0,
   listen_time: 0,
   read_time: 0,
@@ -176,6 +178,7 @@ function StatCard({ item, theme, navigate }: any) {
     earnings: <IoCashOutline size={22} color={theme.text} />,
     likes: <IoThumbsUpOutline size={22} color={theme.text} />,
     subscribers: <IoPersonAddOutline size={22} color={theme.text} />,
+    profile_visits: <IoPeopleOutline size={22} color={theme.text} />,
     watch_time: <IoTimeOutline size={22} color={theme.text} />,
     listen_time: <IoHeadsetOutline size={22} color={theme.text} />,
     read_time: <IoBookOutline size={22} color={theme.text} />,
@@ -425,6 +428,13 @@ export default function Performance() {
         .gte("created_at", startIso)
         .lt("created_at", endIso);
 
+      const { count: profileVisitsCount } = await supabase
+        .from("profile_visits")
+        .select("id", { count: "exact", head: true })
+        .eq("profile_id", userId)
+        .gte("created_at", startIso)
+        .lt("created_at", endIso);
+
       const [{ count: followersCount }, { count: subscribersCount }] = await Promise.all([
         supabase
           .from("follows")
@@ -442,6 +452,7 @@ export default function Performance() {
         earnings: Number(calculatedEarnings.toFixed(2)),
         likes: (articleLikes || 0) + (podcastLikes || 0) + (videoLikes || 0),
         subscribers: subscribersCount || 0,
+        profile_visits: profileVisitsCount || 0,
         watch_time,
         listen_time,
         read_time,
@@ -527,6 +538,7 @@ export default function Performance() {
     { key: "earnings", label: "Total Earnings", value: `$${totals.earnings.toFixed(2)}` },
     { key: "likes", label: "Total Likes", value: `${totals.likes}` },
     { key: "subscribers", label: "Total Subscribers", value: `${totals.subscribers}` },
+    { key: "profile_visits", label: "Profile Visits", value: `${totals.profile_visits}` },
     { key: "watch_time", label: "Watch Engagements", value: `${totals.watch_time} users` },
     { key: "listen_time", label: "Listen Engagements", value: `${totals.listen_time} users` },
     { key: "read_time", label: "Read Engagements", value: `${totals.read_time} users` },

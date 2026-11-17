@@ -108,6 +108,18 @@ export default function UserProfile({ initialMeta, initialProfile, isOwnProfile:
   const [expandedVideoTitles, setExpandedVideoTitles] = useState({});
 
   // Deep link: redirect mobile users to the native app
+  // Count the visit (the DB rejects self-visits; we also skip them here)
+  useEffect(() => {
+    if (!userId || typeof userId !== 'string') return;
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || user.id === userId) return;
+        await supabase.from('profile_visits').insert({ profile_id: userId, visitor_id: user.id });
+      } catch (e) {}
+    })();
+  }, [userId]);
+
   useEffect(() => {
     if (typeof window === 'undefined' || !userId) return;
 

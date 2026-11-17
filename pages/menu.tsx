@@ -20,6 +20,7 @@ import {
   IoChevronBack,
   IoPhonePortraitOutline,
   IoMoonOutline,
+  IoHelpCircleOutline,
 } from "react-icons/io5";
 import { FaCoins } from "react-icons/fa";
 import { supabase, signOut } from "../components/supabase";
@@ -348,6 +349,19 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
               <IoTrashOutline size={22} color={theme.icon} />
               <span style={{ ...styles.menuText, color: theme.text }}>
                 Recently Deleted
+              </span>
+            </button>
+
+            <button
+              style={styles.menuItem}
+              onClick={() => {
+                router.push("/customersupport");
+                safeOnClose();
+              }}
+            >
+              <IoHelpCircleOutline size={22} color={theme.icon} />
+              <span style={{ ...styles.menuText, color: theme.text }}>
+                Help & Support
               </span>
             </button>
 

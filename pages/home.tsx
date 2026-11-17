@@ -146,6 +146,18 @@ function Home() {
   const [expandedVideoTitles, setExpandedVideoTitles] = useState({});
   const router = useRouter();
 
+  // Apply a referral code entered at sign up (once the profile exists)
+  useEffect(() => {
+    (async () => {
+      try {
+        const pending = localStorage.getItem('pending_referral_code');
+        if (!pending) return;
+        const { data: ok, error } = await supabase.rpc('apply_referral_code', { p_code: pending });
+        if (!error && ok !== null) localStorage.removeItem('pending_referral_code');
+      } catch (e) {}
+    })();
+  }, []);
+
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
