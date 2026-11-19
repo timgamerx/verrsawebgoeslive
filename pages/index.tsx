@@ -201,7 +201,7 @@ export default function LandingPage() {
     {
       question: "How is Verrsa different from YouTube or TikTok?",
       answer:
-        "Unlike YouTube's 1,000 subscriber and 4,000 watch hour requirements or TikTok's complex Creator Fund criteria, Verrsa lets creators earn immediately through direct payments, gifts, and content monetization with no minimum audience requirement. We're built specifically for emerging creators.",
+        "Unlike YouTube's 1,000 subscriber and 4,000 watch hour requirements or TikTok's complex Creator Fund criteria, Verrsa lets creators earn immediately through direct payments, gifts, and content monetization with no minimum audience requirement. We're built specifically for every creators.",
     },
     {
       question: "What types of content can I create on Verrsa?",
@@ -216,12 +216,12 @@ export default function LandingPage() {
     {
       question: "Does Verrsa work for micro-influencers?",
       answer:
-        "Absolutely. Verrsa is designed specifically for micro-influencers and emerging creators. Whether you have 10 followers or 10,000, you can monetize your content effectively. Our platform values quality engagement over audience size.",
+        "Absolutely. Verrsa is designed specifically for micro-influencers and every creators. Whether you have 10 followers or 10,000, you can monetize your content effectively. Our platform values quality engagement over audience size.",
     },
     {
       question: "What payment methods does Verrsa support?",
       answer:
-        "Verrsa supports multiple payment methods including bank transfers, mobile money, and digital wallets. We're constantly expanding our payment options to serve creators globally, with special focus on emerging markets.",
+        "Verrsa supports multiple payment methods including bank transfers, mobile money, and digital wallets. We're constantly expanding our payment options to serve creators globally.",
     },
   ];
 
@@ -640,21 +640,28 @@ export default function LandingPage() {
           </div>
           <h2 style={styles.sectionTitle}>What is Verrsa?</h2>
           <p style={styles.sectionText}>
-            Verrsa is a monetization-first creator platform for emerging
-            creators. Unlike traditional platforms that require thousands of
-            followers before you can earn, Verrsa lets you monetize from day
-            one.
+            Verrsa is a creator platform for content creation and community
+            building.
           </p>
           <p style={styles.sectionText}>
-            We're an all-in-one platform for writing, podcasting, live
-            streaming, and video content. Whether you're publishing articles,
-            hosting podcasts, or going live, every piece of content can generate
-            income immediately.
+            Verrsa brings together writing, podcasts, video, live streaming, and
+            communities in one platform, with AI-powered creator tools and a
+            native utility token planned to further enhance content creation,
+            rewards, subscriptions, and in-app transactions.
           </p>
           <p style={styles.sectionText}>
-            Built for creators globally. Verrsa provides localized payment
-            options and features designed to help creators succeed without
-            needing a massive audience.
+            Create and publish articles, podcasts, videos and posts, connect
+            with communities, go live, grow your audience and monetize your
+            creativity.
+          </p>
+          <p style={styles.sectionText}>
+            Verrsa helps creators understand how to build audiences and earn
+            from creating.
+          </p>
+          <p style={styles.sectionText}>
+            Verrsa is where you can document your journey, discover useful
+            information and spend your time on content that goes beyond viral
+            memes and entertainment alone
           </p>
         </div>
 
