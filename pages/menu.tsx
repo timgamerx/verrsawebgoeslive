@@ -368,7 +368,7 @@ export default function Menu({ isOpen = false, onClose, embedded = false }) {
             <button
               style={styles.menuItem}
               onClick={() => {
-                router.push("/about");
+                router.push("/aboutverrsa");
                 safeOnClose();
               }}
             >

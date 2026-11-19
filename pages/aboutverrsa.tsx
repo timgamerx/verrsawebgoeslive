@@ -26,25 +26,24 @@ export default function AboutVerrsa() {
     >
       {/* Main Content Area - 80% on desktop */}
       <div style={{ flex: isDesktop ? 0.8 : 1 }}>
-        <div style={{
-          ...styles.container,
-          ...styles.contentContainer,
-          overflowY: "auto",
-          backgroundColor: "#fff",
-        }}>
+        <div
+          style={{
+            ...styles.container,
+            ...styles.contentContainer,
+            overflowY: "auto",
+            backgroundColor: "#fff",
+          }}
+        >
           {/* Back Button */}
-          <button
-            style={styles.backButton}
-            onClick={() => router.back()}
-          >
+          <button style={styles.backButton} onClick={() => router.back()}>
             <IoChevronBack size={25} color="white" />
           </button>
 
           {/* Image Section */}
-          <div 
+          <div
             style={{
               ...styles.imageBackground,
-              backgroundImage: 'url(/creators.png)',
+              backgroundImage: "url(/creators.png)",
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
@@ -54,18 +53,52 @@ export default function AboutVerrsa() {
           <div style={styles.textSection}>
             <h1 style={styles.heading}>About Verrsa</h1>
             <p style={styles.subText}>
-              Verrsa is a revolutionary content platform where writers,
-              podcasters, video creators, and storytellers turn their creativity
-              into impact. Whether you're an aspiring writer, a seasoned
-              journalist, a passionate podcaster, or a video creator, you can
-              publish articles, host podcasts, share videos, and engage with a
-              vibrant community-all while earning from your content.
+              Verrsa is a creator platform for content creation and community
+              building.
             </p>
             <p style={styles.subText}>
-              Verrsa empowers users to maximize their reach and influence.
-              Whether you're looking to share knowledge, spark conversations, or
-              showcase your creativity, this is the ultimate hub for
-              content-driven success.
+              Verrsa brings together writing, podcasts, video, live streaming,
+              and communities in one platform, with AI-powered creator tools and
+              a native utility token planned to further enhance content
+              creation, rewards, subscriptions, and in-app transactions.
+            </p>
+            <p style={styles.subText}>
+              Create and publish articles, podcasts, videos and posts, connect
+              with communities, go live, grow your audience and monetize your
+              creativity.
+            </p>
+            <p style={styles.subText}>
+              Verrsa helps creators understand how to build audiences and earn
+              from creating.
+            </p>
+            <p style={styles.subText}>
+              Verrsa is where you can document your journey, discover useful
+              information and spend your time on content that goes beyond viral
+              memes and entertainment alone
+            </p>
+            <p style={styles.subText}>
+              After years of research and experience across the digital economy,
+              we recognised the challenges creators face—fragmented platforms,
+              limited monetization opportunities, and the difficulty of turning
+              creativity into sustainable income. Verrsa was created to bring
+              the tools, community, and monetization opportunities they need
+              into one ecosystem.
+            </p>
+            <p style={styles.subText}>
+              We believe creators should not have to limit themselves to one
+              format. A writer can become a podcaster. A podcaster can create
+              videos. A video creator can build a community. And every creator
+              should have opportunities to connect with their audience and
+              monetize their work without constantly moving between different
+              platforms.
+            </p>
+            <p style={styles.subText}>
+              Verrsa aims to create new digital opportunities for every talent.
+              Whether you are just starting or already building an audience,
+              Verrsa gives your creativity room to grow.
+            </p>
+            <p style={styles.subText}>
+              Start creating. Start building. Start earning. With Verrsa.
             </p>
           </div>
         </div>
